@@ -32,7 +32,7 @@
 
     <modules>
         <module>assignment0-autorentals-javaapp</module>
-
+        <module>assignment0-autorentals-bootapp</module>
     </modules>
     <repositories>
         <!-- <repository>
