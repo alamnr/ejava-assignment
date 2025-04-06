@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>info.ejava-student.alamnr.assignments.autorentals</groupId>
+        <groupId>info.ejava.alamnr.assignments.autorentals</groupId>
         <artifactId>autorentals-alamnr</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>info.ejava-student.alamnr.assignment0.app.autorentals</groupId>
+    <groupId>info.ejava.alamnr.assignment0.app.autorentals</groupId>
     <artifactId>assignment0-autorentals-javaapp</artifactId>
     <name>Alamnr::Assignment0::AutoRentals::Build::Java App</name>
     <properties>
