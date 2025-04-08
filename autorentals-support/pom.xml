@@ -1,4 +1,3 @@
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -11,11 +10,17 @@
         <version>6.1.0-SNAPSHOT</version>
         <relativePath/>
     </parent>
-    <groupId>info.ejava.alamnr.assignments.autorentals</groupId>
-    <artifactId>autorentals-alamnr</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>info.ejava.assignments.autorentals</groupId>
+    <artifactId>autorentals-support</artifactId>
     <packaging>pom</packaging>
-    <name>Alamnr::Assignments::AutoRentals</name>
+    <name>Alamnr::Assignments::AutoRentals Support Root</name>
+
+     <description>
+    This tree of modules contains artifacts that are intended to 
+    be integrated into student projects unmodified. Students
+    will create dependencies on these projects versus copying them.
+    </description>
+
 
 
     <dependencyManagement>
@@ -31,10 +36,7 @@
     </dependencyManagement>
 
     <modules>
-        <module>assignment0-autorentals-javaapp</module>
-        <module>assignment0-autorentals-bootapp</module>
-        <module>assignment1-autorentals-beanfactory</module>
-        <module>assignment1-autorentals-propertysource</module>
+        <module>autorentals-support-propertysource</module>
     </modules>
     <repositories>
         <!-- <repository>

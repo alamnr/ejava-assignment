@@ -1,0 +1,8 @@
+rentals:
+    priority:
+        source: application-dev.properties
+    db:
+        user: devUser
+        password: dev-password
+        host: dev-host
+        port: 11027

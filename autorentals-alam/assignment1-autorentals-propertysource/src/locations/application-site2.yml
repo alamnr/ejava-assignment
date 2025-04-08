@@ -1,0 +1,8 @@
+rentals:
+  priority:
+    source: application-site2.yml
+  db:
+    #user: prdUser
+    password: site2pass
+    host: db.site2.net
+    port: 27017
