@@ -35,6 +35,7 @@
         <module>assignment0-autorentals-bootapp</module>
         <module>assignment1-autorentals-beanfactory</module>
         <module>assignment1-autorentals-propertysource</module>
+        <module>assignment1-autorentals-configprops</module>
     </modules>
     <repositories>
         <!-- <repository>

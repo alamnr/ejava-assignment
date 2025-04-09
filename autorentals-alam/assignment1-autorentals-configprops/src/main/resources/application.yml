@@ -1,0 +1,39 @@
+rentals:
+  autos:
+    - id: 1
+      rentalDate: 2010-07-01
+      rentalAmount: 100.00
+      renterName: Joe Camper
+      location:
+        city: Jonestown
+        state: PA
+    - id: 4
+      rentalDate: 2021-05-01
+      rentalAmount: 1000
+      renterName: Jill Suburb
+      location:
+        city:
+        state: MD
+    - id: 5
+      rentalDate: 2021-07-01
+      rentalAmount: 80
+      renterName: M.R. Bigshot
+      location:
+        city: Rockville
+        state: MD
+  tools:
+    - id: 2
+      rental-date: 2000-01-01
+      rental-amount: 1000
+      renter_name: Itis Clunker
+      location:
+        city: Dundalk
+        state: MD
+boatental:
+  id: 3
+  RENTAL_DATE: 2022-08-01
+  RENTAL_AMOUNT: 200_000
+  RENTER-NAME: Alexus Blabidy
+  LOCATION:
+    city: Annapolis
+    state: MD
