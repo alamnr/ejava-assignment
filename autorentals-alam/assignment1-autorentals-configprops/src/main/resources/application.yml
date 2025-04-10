@@ -12,7 +12,7 @@ rentals:
       rentalAmount: 1000
       renterName: Jill Suburb
       location:
-        city:
+        city: Dhaka
         state: MD
     - id: 5
       rentalDate: 2021-07-01
@@ -29,7 +29,7 @@ rentals:
       location:
         city: Dundalk
         state: MD
-boatental:
+boatrental:
   id: 3
   RENTAL_DATE: 2022-08-01
   RENTAL_AMOUNT: 200_000
