@@ -21,7 +21,7 @@ import org.springframework.test.util.ReflectionTestUtils;
  */
 
  @SpringBootTest
-public class MyConfigurationTest {
+public class MyConfigurationPropertyTest {
     
     private Object component;
     @BeforeEach
