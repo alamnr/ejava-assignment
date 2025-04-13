@@ -37,6 +37,7 @@
         <module>assignment1-autorentals-propertysource</module>
         <module>assignment1-autorentals-configprops</module>
         <module>assignment1-autorentals-autoconfig</module>
+        <module>assignment1-autorentals-logging</module>
     </modules>
     <repositories>
         <!-- <repository>
