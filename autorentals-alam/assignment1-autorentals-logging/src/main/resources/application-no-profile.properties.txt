@@ -1,0 +1,6 @@
+spring.main.banner-mode=on
+#logging.pattern.console=%date{HH:mm:ss.SSS} %-5level %logger  -  %msg%n
+#logging.level.X.Y=OFF
+#logging.level.info.ejava.alamnr.assignment1.autorentals.logging=OFF
+logging.level.root=OFF
+
