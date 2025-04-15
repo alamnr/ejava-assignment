@@ -20,6 +20,7 @@ public class AutoRentalDTO {
     @Override
     @SneakyThrows
     public String toString() {
+        Thread.sleep(750);
         String result = "AutoRental{" +
                 "autoId='" + autoId + '\'' +
                 ", renterId='" + renterId + '\'' +

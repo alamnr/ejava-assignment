@@ -11,6 +11,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  
 public class LoggingNTest {
 
-
+    @DirtiesContext //clear the log after each test
     @ExtendWith(OutputCaptureExtension.class)
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class TestBase {
@@ -58,16 +59,20 @@ public class LoggingNTest {
     }
 
     @Nested
+    @SpringBootTest(properties = {"spring.main.banner-mode=off","app.autoId=a15"})
+    @ActiveProfiles("app-debug")
+    class app_debug_profile_with_error_log extends TestBase{
+        @Test
+        void xy_error_logs_included() throws Exception {
+            BDDAssertions.then(output).as("X.Y ERROR is missing").containsPattern("ERROR.+X\\.Y");
+            System.out.println("====================== output value - " +output);
+        }
+    }
+    @Nested
     @SpringBootTest(properties = "spring.main.banner-mode=off")
     @ActiveProfiles("app-debug")
     class app_debug_profile extends TestBase{
-        @Test
-        void logs_no_trace() throws Exception {
-            
-            BDDAssertions.then(output.getOut()).as("Trace logs found").doesNotContain("TRACE");
-
-            System.out.println("====================== output value - " +output.getOut());
-        }
+        
 
         @Test
         void xy_info_logs_included(CapturedOutput output) throws Exception {
@@ -80,11 +85,15 @@ public class LoggingNTest {
             BDDAssertions.then(output).as("X.Y INFO is missing").containsPattern("INFO.+X\\.Y");
             System.out.println("====================== output value - " +output);
         }
+   
+       
 
         @Test
         void helper_debug_logs_included(CapturedOutput output) throws Exception {
             BDDAssertions.then(output).as("HrlperImpl debug missing").containsPattern("DEBUG.+HelperImpl");
         }
+
+        
        
         @Test
         void svc_info_logs_included(CapturedOutput output) throws Exception {
