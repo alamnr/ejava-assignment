@@ -1,0 +1,91 @@
+<configuration debug="false">
+    <contextName>Logger Tree</contextName>
+
+    <!-- bring in Spring Boot defaults for Logback -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- leverages what Spring Boot would have given us for console -->
+    <!-- <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>CONSOLE  ${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender> -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- <pattern>%d{yy-MMMM-dd HH:mm:ss:SSS} %5p %t %c{2}:%L - %m%n</pattern> -->
+              <!-- <pattern>%date{HH:mm:ss.SSS} %-5level %logger - %msg%n</pattern> -->
+              <pattern>%date{HH:mm:ss.SSS} %-5level    [%-9mdc{user:-anonymous}][%5mdc{requestId}]   %logger - %msg%n</pattern>
+              <!-- %mdc{user:-anonymous} - the identity of the user making the call or "anonymous" if not supplied
+                %mdc{requestId} - the specific request made or blank if not supplied -->
+        </encoder>
+    </appender>
+
+    <!-- File appenders setting -->
+    <property name="LOG_FILE" value="target/logs/appenders.log"/>
+    <!-- <include resource="org/springframework/boot/logging/logback/file-appender.xml"/> -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>${FILE_LOG_THRESHOLD}</level>
+		</filter>
+		<encoder>
+			<!-- <pattern>${FILE_LOG_PATTERN}</pattern> -->
+            <!-- <pattern>%date{HH:mm:ss.SSS} %-5level %logger - %msg%n</pattern> -->
+            <pattern>%date{HH:mm:ss.SSS} %-5level  [%-9mdc{user:-anonymous}][%5mdc{requestId}]  %logger - %msg%n</pattern>
+            <!-- %mdc{user:-anonymous} - the identity of the user making the call or "anonymous" if not supplied
+                %mdc{requestId} - the specific request made or blank if not supplied -->
+			<charset>${FILE_LOG_CHARSET}</charset>
+		</encoder>
+		<file>${LOG_FILE}</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOGBACK_ROLLINGPOLICY_FILE_NAME_PATTERN:-${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz}</fileNamePattern>
+			<cleanHistoryOnStart>${LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START:-false}</cleanHistoryOnStart>
+			<maxFileSize>${LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE:-10MB}</maxFileSize>
+			<totalSizeCap>${LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP:-0}</totalSizeCap>
+			<maxHistory>${LOGBACK_ROLLINGPOLICY_MAX_HISTORY:-7}</maxHistory>
+		</rollingPolicy>
+	</appender>
+
+
+    
+    <!--
+    <appender name="X-appender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>X        ${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    
+    <appender name="security-appender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>SECURITY ${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender> -->
+
+
+    <springProfile name="appenders">
+        <logger name="X.Y">
+            <!-- <appender-ref ref="X-appender"/>  -->
+            <appender-ref ref="console"/>
+            <appender-ref ref="FILE"/>
+        </logger>
+
+        <logger name="info.ejava.alamnr.assignment1.autorentals.logging.svc" level="TRACE" >
+            <appender-ref ref="console"/>
+            <appender-ref ref="FILE"/>
+        </logger>
+
+        <logger name="info.ejava.alamnr.assignment1.autorentals.logging.repo" level="TRACE">
+            <appender-ref ref="FILE"/>
+        </logger>
+
+
+        <!-- this logger starts a new tree of appenders, nothing gets written to root logger -->
+        <!-- <logger name="security" additivity="false">
+            <appender-ref ref="security-appender"/>
+        </logger> -->
+    </springProfile>
+
+    <root>
+        <appender-ref ref="console"/>
+    </root>
+</configuration>

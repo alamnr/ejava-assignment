@@ -1,7 +1,10 @@
 package info.ejava.alamnr.assignment1.autorentals.logging.app;
 
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -20,6 +23,8 @@ public class AppCommand implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        String requestId = UUID.randomUUID().toString();
+        MDC.put("requestId", requestId);
         log.info("Autorentals has started");
         try {
              log.info("Auto Id - {}  , Renter Id - {} ",autoId,renterId);
@@ -31,6 +36,7 @@ public class AppCommand implements CommandLineRunner {
         }
         
         log.info("Autorentals has ended");
+        MDC.clear();
     }
     
 }
