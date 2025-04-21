@@ -37,6 +37,7 @@
 
     <modules>
         <module>autorentals-support-propertysource</module>
+        <module>autorentals-support-testing</module>
     </modules>
     <repositories>
         <!-- <repository>
