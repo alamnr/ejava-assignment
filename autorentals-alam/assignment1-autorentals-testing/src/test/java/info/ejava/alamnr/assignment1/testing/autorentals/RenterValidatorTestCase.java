@@ -50,17 +50,17 @@ public class RenterValidatorTestCase {
 
     @Test
     void reports_blank_first_name() {
-        // Arrange
+        // Arrange / Given
         validRenter = RenterDTO.builder()
                 .firstName("")
                 .lastName("buffet")
                 .dob(LocalDate.of(1930,8,30))
                 .build();
 
-        // Act
+        // Act / When
         List<String> errMsgs = renterValidator.validateNewRenter(validRenter, 20);
 
-        // Assert
+        // Assert / Then
         Assertions.assertTrue(errMsgs.size()==1, "Expected blank first name to fail validation");
         System.out.println(errMsgs);
         Assertions.assertTrue(errMsgs.get(0).contains("renter.firstName"), "Expected error message to contain first name");
@@ -82,7 +82,7 @@ public class RenterValidatorTestCase {
         
         // when / act
         List<String> errMsgs = renterValidator.validateNewRenter(validRenter, 20);
-        // assert
+        // then / assert
         Assertions.assertTrue(errMsgs.size()==1, "Error message size should be 1");
         Assertions.assertTrue(errMsgs.get(0).contains("renter.lastName"), "Error Message should contain renter.lastName");
 
