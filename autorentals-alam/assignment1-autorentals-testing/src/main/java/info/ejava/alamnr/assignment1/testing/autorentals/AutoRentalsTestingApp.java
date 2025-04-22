@@ -24,6 +24,7 @@ public class AutoRentalsTestingApp {
         SpringApplication.run(AutoRentalsTestingApp.class, args);
     }
 
+    /*
     @Component
     @RequiredArgsConstructor
     static class Init implements CommandLineRunner {
@@ -80,6 +81,6 @@ public class AutoRentalsTestingApp {
             } 
         };
     
-    }   
+    }   */
 
 }

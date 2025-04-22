@@ -150,8 +150,8 @@ public class RentersServiceMockedTest {
                                 .as("errMsg list is not empty hence size is not Zero ")
                                 .isEqualTo(1);
         BDDAssertions.assertThat(ex.getMessage())
-                        .as("doesnot contain - renter.firstName")
-                        .contains("renter.firstName");
+                        .as("doesnot contain - invalid renter")
+                        .contains("invalid renter");
 
 
     }

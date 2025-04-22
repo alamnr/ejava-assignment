@@ -111,7 +111,7 @@ public class RentersServiceMockedNTest {
         BDDAssertions.then(intCaptor.getValue()).isEqualTo(37); // minAge taken from application-test.properties when test profile supplied
 
         // evaluate/assert the returned result
-        BDDAssertions.and.then(ex.getMessage()).contains("renter.firstName");
+        BDDAssertions.and.then(ex.getMessage()).contains("invalid renter");
     }
 
 }
