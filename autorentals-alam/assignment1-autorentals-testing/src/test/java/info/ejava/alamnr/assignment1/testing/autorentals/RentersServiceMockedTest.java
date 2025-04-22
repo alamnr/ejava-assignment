@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.BDDMockito;
 import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
@@ -35,23 +36,28 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RentersServiceMockedTest {
 
-    private RentersService rentersService;
+    //private RentersService rentersService;
     private RenterDTO validRenter;
-    private RentersProperties renterProps;
+    //private RentersProperties renterProps = new RentersProperties(25) ;
 
     @Mock
     private RenterValidator  validatorMock;
+    @Mock
+    private RentersProperties renterProps;
+
+    @InjectMocks // Mockito is instantiating this implementation class for us an injecting mocks
+    private RentersServiceImpl rentersService;
 
     @Captor 
     private ArgumentCaptor<RenterDTO> renterDtoCaptor;
     @Captor 
     private ArgumentCaptor<Integer> intCaptor;
 
-    @BeforeEach
-    void init(){
-        renterProps = new RentersProperties(25);
-        rentersService = new RentersServiceImpl(renterProps, validatorMock);
-    }
+    // @BeforeEach
+    // void init(){
+    //     renterProps = new RentersProperties(25);
+    //     rentersService = new RentersServiceImpl(renterProps, validatorMock);
+    // }
 
     @Test
     void can_create_valid_renter(){
@@ -72,8 +78,10 @@ public class RentersServiceMockedTest {
         // then / assert
         // evaluate result
         verify(validatorMock,times(2)).validateNewRenter(any(RenterDTO.class), anyInt()); // verify called once
+        BDDMockito.then(validatorMock).should(times(2)).validateNewRenter(validRenter, renterProps.getMinAge());
 
         // verify what was given to mock
+        log.info("renter props' age - {}", renterProps.getMinAge());
         log.info("added RenterDTO - {}", validRenterReturned);
         log.info("renter dto captors size - {}" , renterDtoCaptor.getAllValues().size());
         //BDDAssertions.assertThat(renterDtoCaptor.getValue().getId())
@@ -101,6 +109,7 @@ public class RentersServiceMockedTest {
     void rejects_invalid_renter(){
 
         // given / arrange
+
         
 
         // when / act
