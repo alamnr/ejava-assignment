@@ -80,6 +80,7 @@ public class RentersServiceMockedTest {
         // evaluate result
         verify(validatorMock,times(2)).validateNewRenter(any(RenterDTO.class), anyInt()); // verify called once
         BDDMockito.then(validatorMock).should(times(2)).validateNewRenter(validRenter, renterProps.getMinAge());
+        
 
         // verify what was given to mock
         log.info("renter props' age - {}", renterProps.getMinAge());
