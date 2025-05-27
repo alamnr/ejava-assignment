@@ -39,6 +39,7 @@
         <module>assignment1-autorentals-autoconfig</module>
         <module>assignment1-autorentals-logging</module>
         <module>assignment1-autorentals-testing</module>
+        <module>assignment2-autorentals-api</module>
     </modules>
     <repositories>
         <!-- <repository>

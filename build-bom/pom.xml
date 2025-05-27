@@ -28,6 +28,7 @@
         <spock.version>2.4-M1-groovy-4.0</spock.version>
         <springdoc-openapi.version>2.1.0</springdoc-openapi.version>
         <sslcontext-kickstart.version>7.4.9</sslcontext-kickstart.version>
+        <commons-beanutils.version>1.9.4</commons-beanutils.version>
 
         <!-- used for build/deploy of this specific artifact -->
         <maven-clean-plugin.version>3.4.0</maven-clean-plugin.version>
@@ -123,6 +124,11 @@
             </dependency>
 
 
+             <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${commons-beanutils.version}</version>
+            </dependency>
             <!-- openui generated client dependencies -->
             <!-- com.google.gson.Gson -->
             <dependency>
