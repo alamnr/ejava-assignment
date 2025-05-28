@@ -25,6 +25,8 @@ import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.svc.renters.RenterDTORepository;
 import info.ejava.assignments.api.autorenters.svc.renters.RenterServiceImpl;
 import info.ejava.assignments.api.autorenters.svc.utils.RenterValidator;
+import info.ejava.examples.common.exceptions.ClientErrorException;
+import info.ejava.examples.common.exceptions.ClientErrorException.InvalidInputException;
 import lombok.extern.slf4j.Slf4j;
 
 @ExtendWith(MockitoExtension.class)
@@ -88,5 +90,41 @@ public class RenterServiceMockTest {
 
 
     }
+
+    @Test
+    void reject_invalid_renter() {
+        // given 
+        RenterDTO renterDTO  = RenterDTO.builder().firstName("").lastName("Doe")
+                                .dob(LocalDate.of(1965,12,29)).email("renter@email.com").build();
+
+        // define behavior of mock while test
+        BDDMockito.when(validatorMock.validateNewRenter(dtoCaptor.capture(), intCaptor.capture()))
+                    .thenReturn(List.<String>of("renter.firstname is null"));
+        
+
+
+        // when / act
+        Throwable ex = BDDAssertions.catchThrowableOfType(ClientErrorException.InvalidInputException.class,
+                             ()->renterServiceImpl.createRenter(renterDTO));
+
+        List<String> errMsg = validatorMock.validateNewRenter(renterDTO, 20);
+
+        // then
+
+        // verify / inspect the method call
+
+        verify(validatorMock,times(2)).validateNewRenter(any(RenterDTO.class), anyInt());
+        BDDMockito.then(validatorMock).should(times(2)).validateNewRenter(any(RenterDTO.class), anyInt());
+
+        // verify what was given to mock
+
+        BDDAssertions.then(dtoCaptor.getAllValues().get(0).getId()).isNull();
+        BDDAssertions.then(intCaptor.getAllValues().get(0)).isEqualTo(20);
+
+        BDDAssertions.then(errMsg.size()).isEqualTo(1);
+        BDDAssertions.then(errMsg.get(0)).contains("renter.firstname is null");
+    }
+
+    
 
 }
