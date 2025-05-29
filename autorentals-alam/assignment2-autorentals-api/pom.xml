@@ -16,9 +16,10 @@
 
 
     <modules>
-         <module>autorentals-api-dto</module>
-       <module>autorentals-api-client</module>
+        <module>autorentals-api-dto</module>
+        <module>autorentals-api-client</module>
         <module>autorentals-api-svc</module>
+        <module>autorentals-api-main</module>
     </modules>
 
 </project>

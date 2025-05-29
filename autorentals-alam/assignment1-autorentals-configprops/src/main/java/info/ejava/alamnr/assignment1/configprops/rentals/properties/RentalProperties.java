@@ -8,12 +8,15 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.validation.annotation.Validated;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.Value;
 
 @Value
 @Validated
 @ToString
+@AllArgsConstructor
 public class RentalProperties {
     @NotNull
     private int id;

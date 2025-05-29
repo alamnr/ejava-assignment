@@ -51,7 +51,7 @@ public class RentersController {
         return response;
     }
 
-    @GetMapping(path = RentersAPI.RENTER_PATH,
+    @GetMapping(path = RentersAPI.RENTERS_PATH,
                 produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RenterListDTO> getRentersList(
             @RequestParam(value = "pageNumber" , required = false)Integer pageNumber,

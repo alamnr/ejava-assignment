@@ -25,6 +25,7 @@ import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.svc.renters.RenterDTORepository;
 import info.ejava.assignments.api.autorenters.svc.renters.RenterServiceImpl;
 import info.ejava.assignments.api.autorenters.svc.utils.RenterValidator;
+import info.ejava.assignments.api.autorenters.svc.utils.RentersProperties;
 import info.ejava.examples.common.exceptions.ClientErrorException;
 import info.ejava.examples.common.exceptions.ClientErrorException.InvalidInputException;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,8 @@ public class RenterServiceMockTest {
     private RenterValidator validatorMock;
     @Mock 
     private RenterDTORepository repo;
+    @Mock
+    private RentersProperties renterProps;
 
     @InjectMocks // Mockito is instantiating this implementation class for us an injecting mocks
     private RenterServiceImpl renterServiceImpl;
@@ -60,6 +63,7 @@ public class RenterServiceMockTest {
         // BDDMockito.doReturn(Collections.<String>emptyList())
         //             .when(validatorMock.validateNewRenter(dtoCaptor.capture(), intCaptor.capture()));
 
+        BDDMockito.when(renterProps.getMinAge()).thenReturn(20);
         
         BDDMockito.when(repo.save(dtoCaptor.capture()))
                 .thenReturn(RenterDTO.builder().dob(renterDTO.getDob()).email(renterDTO.getEmail()).firstName(renterDTO.getFirstName())
@@ -101,14 +105,15 @@ public class RenterServiceMockTest {
         BDDMockito.when(validatorMock.validateNewRenter(dtoCaptor.capture(), intCaptor.capture()))
                     .thenReturn(List.<String>of("renter.firstname is null"));
         
+        BDDMockito.when(renterProps.getMinAge()).thenReturn(20);
 
 
         // when / act
         Throwable ex = BDDAssertions.catchThrowableOfType(ClientErrorException.InvalidInputException.class,
                              ()->renterServiceImpl.createRenter(renterDTO));
 
-        List<String> errMsg = validatorMock.validateNewRenter(renterDTO, 20);
-
+        List<String> errMsg = validatorMock.validateNewRenter(renterDTO,renterProps.getMinAge());
+        log.info("renter props - {}", renterProps.getMinAge());
         // then
 
         // verify / inspect the method call
