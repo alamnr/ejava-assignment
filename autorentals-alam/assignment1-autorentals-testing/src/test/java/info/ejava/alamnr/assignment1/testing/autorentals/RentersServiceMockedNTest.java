@@ -114,4 +114,6 @@ public class RentersServiceMockedNTest {
         BDDAssertions.and.then(ex.getMessage()).contains("invalid renter");
     }
 
+
+
 }

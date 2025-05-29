@@ -24,7 +24,7 @@ public class RenterValidatorImpl implements RenterValidator {
             errMsgs.add("renter: can not be null");
         } else {
             validate(errMsgs, ()->renter.getId()==null,()->"id must be null");
-            validate(errMsgs, ()-> !ObjectUtils.isEmpty(renter.getFirstName()), ()->"renter.FirtstName - can not be blnk");
+            validate(errMsgs, ()-> !ObjectUtils.isEmpty(renter.getFirstName()), ()->"renter.FirstName - can not be blnk");
             validate(errMsgs, ()-> !ObjectUtils.isEmpty(renter.getLastName()), ()->"renter.LastName - can not be blank");
             Optional.ofNullable(renter.getDob()).ifPresentOrElse((dob)->{
                 LocalDate minDob = LocalDate.now().minusYears(minAge);

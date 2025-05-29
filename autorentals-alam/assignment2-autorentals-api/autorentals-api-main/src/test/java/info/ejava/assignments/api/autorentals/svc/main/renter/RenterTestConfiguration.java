@@ -24,8 +24,8 @@ public class RenterTestConfiguration {
     @Bean
     @Qualifier("invalidRenter")
     public RenterDTO invalidRenter(){
-        return  RenterDTO.builder().email("valid@email.com").firstName("Jane").lastName("Doe")
-                .dob(LocalDate.of(2025,2,26)).build();
+        return  RenterDTO.builder().email("valid@email.com").firstName("").lastName("Doe")
+                .dob(LocalDate.of(1999,2,26)).build();
     }
 
     

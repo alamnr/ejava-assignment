@@ -1,4 +1,4 @@
-package info.ejava.assignments.api.autorenters.svc.renter;
+package info.ejava.assignments.api.autorentals.svc.main.renter;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;

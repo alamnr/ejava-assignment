@@ -1,4 +1,4 @@
-package info.ejava.assignments.api.autorenters.svc;
+package info.ejava.assignments.api.autorentals.svc.main;
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTOFactory;
+import info.ejava.assignments.api.autorenters.svc.POJORepositoryMapImpl;
 import lombok.extern.slf4j.Slf4j;
 
 @ExtendWith(MockitoExtension.class)

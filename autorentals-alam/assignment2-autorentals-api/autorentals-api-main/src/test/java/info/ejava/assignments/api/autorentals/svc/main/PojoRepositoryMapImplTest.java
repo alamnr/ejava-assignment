@@ -1,4 +1,4 @@
-package info.ejava.assignments.api.autorenters.svc;
+package info.ejava.assignments.api.autorentals.svc.main;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import info.ejava.assignments.api.autorenters.svc.POJORepository;
+import info.ejava.assignments.api.autorenters.svc.POJORepositoryMapImpl;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

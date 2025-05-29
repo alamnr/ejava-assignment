@@ -1,4 +1,4 @@
-package info.ejava.assignments.api.autorenters.svc.renter;
+package info.ejava.assignments.api.autorentals.svc.main.renter;
 
 import java.time.LocalDate;
 import java.util.List;
