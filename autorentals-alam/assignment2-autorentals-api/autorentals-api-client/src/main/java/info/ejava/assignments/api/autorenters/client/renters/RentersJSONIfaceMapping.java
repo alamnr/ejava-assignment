@@ -17,11 +17,25 @@ import org.springframework.web.service.annotation.*;
  * interface was written to address JSON requests/responses.
  */
 public interface RentersJSONIfaceMapping extends RentersHttpIface {
+
     @Override
     @PostExchange(url= RENTERS_PATH,
             contentType = MediaType.APPLICATION_JSON_VALUE,
             accept = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<RenterDTO> createRenter(@RequestBody RenterDTO renter);
+
+    @Override
+    @PostExchange(url= RENTERS_PATH,
+            contentType = MediaType.APPLICATION_JSON_VALUE,
+            accept = {MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE})
+    ResponseEntity<RenterDTO> createRenterJson(@RequestBody RenterDTO renter);
+
+    @Override
+    @PostExchange(url= RENTERS_PATH,
+            contentType = MediaType.APPLICATION_XML_VALUE,
+            accept = {MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE})
+    ResponseEntity<RenterDTO> createRenterXml(@RequestBody RenterDTO renter);
+
 
     @Override
     @GetExchange(url= RENTERS_PATH, accept = MediaType.APPLICATION_JSON_VALUE)

@@ -54,10 +54,29 @@ public class RenterDTOFactory {
     public static Consumer<RenterDTO> withId = renter -> renter.setId(id());
 
     public class RentersDTOFactory {
-        public final List<RenterDTO> make(int count, Consumer<RenterDTO>... visitors){
-            return IntStream.range(0, count)
-                .mapToObj(i -> RenterDTOFactory.this.make(visitors))
-                .collect(Collectors.toList());
+
+        public String keywords(int min, int max) {
+            return IntStream.range(0, faker.number().numberBetween(min, max))
+                    .mapToObj(i->faker.company().buzzword())
+                    .collect(Collectors.joining(" "));
+        }
+        @SafeVarargs
+        public final List<RenterDTO> renters(int min, int max, Consumer<RenterDTO>... visitors) {
+            return IntStream.range(0, faker.number().numberBetween(min, max))
+                    .mapToObj(i->RenterDTOFactory.this.make(visitors))
+                    .collect(Collectors.toList());
+        }
+        // public final List<RenterDTO> make(int count, Consumer<RenterDTO>... visitors){
+        //     return IntStream.range(0, count)
+        //         .mapToObj(i -> RenterDTOFactory.this.make(visitors))
+        //         .collect(Collectors.toList());
+        // }
+
+        @SafeVarargs
+        public final RenterListDTO make(int min, int max, Consumer<RenterDTO>... visitors) {
+            return RenterListDTO.builder()
+                    .renters(renters(min, max, visitors))
+                    .build();
         }
     }
 

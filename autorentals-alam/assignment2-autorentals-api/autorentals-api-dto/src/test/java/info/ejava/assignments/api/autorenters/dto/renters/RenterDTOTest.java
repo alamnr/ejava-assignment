@@ -23,7 +23,7 @@ public class RenterDTOTest {
         return Stream.of(
                 Arguments.of(renterFactory.make()),
                 Arguments.of(renterFactory.make(RenterDTOFactory.withId)),
-                Arguments.of(new RenterListDTO(renterFactory.listBuilder().make(3, RenterDTOFactory.withId)))
+                Arguments.of(renterFactory.listBuilder().make(3,3,RenterDTOFactory.withId))
                 );
     }
 

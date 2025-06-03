@@ -67,6 +67,16 @@ public class RentersAPIClient implements RentersAPI {
     }
 
     @Override
+    public ResponseEntity<RenterDTO> createRenterJson(RenterDTO renter) {
+        return rentersHttpAPI.createRenterJson(renter);
+    }
+
+    @Override
+    public ResponseEntity<RenterDTO> createRenterXml(RenterDTO renter) {
+        return rentersHttpAPI.createRenterXml(renter);
+    }
+
+    @Override
     public ResponseEntity<RenterListDTO> getRenters(Integer pageNumber, Integer pageSize) {
         return rentersHttpAPI.getRenters(pageNumber, pageSize);
 //        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUri(baseUrl).path(RENTERS_PATH);

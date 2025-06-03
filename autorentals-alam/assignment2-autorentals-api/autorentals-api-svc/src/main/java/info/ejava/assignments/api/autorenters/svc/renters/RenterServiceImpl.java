@@ -31,13 +31,13 @@ public class RenterServiceImpl implements RenterService {
         if(null != newRenter.getId()){
             throw new ClientErrorException.InvalidInputException("renter.id can not be null - [id] [%s]", newRenter.getId());
         } */
-        validateNewRenter(newRenter);
+        validateRenter(newRenter);
         RenterDTO savedRenter = repo.save(newRenter);
         log.debug("added renter: {}", savedRenter);
         return savedRenter;
     }
 
-    private void validateNewRenter(RenterDTO newRenter) {
+    private void validateRenter(RenterDTO newRenter) {
        List<String> errMsg = renterValidator.validateNewRenter(newRenter, renterProps.getMinAge());
        if(!errMsg.isEmpty()){
         throw new ClientErrorException.InvalidInputException("renter is not valid - %s", errMsg);
@@ -49,7 +49,7 @@ public class RenterServiceImpl implements RenterService {
         return repo.findById(id)
                 .orElseThrow(()-> {
                     log.debug("getRenter- {} , not found", id);
-                    throw new ClientErrorException.NotFoundException("Renter-[%d] not found", id);
+                    throw new ClientErrorException.NotFoundException("Renter-[%s] not found", id);
                 });
     }
 
@@ -60,11 +60,16 @@ public class RenterServiceImpl implements RenterService {
 
     @Override
     public RenterDTO updateRenter(String id, RenterDTO updateRenter) {
+        validateRenter(updateRenter);
         if(null == updateRenter){
             throw new ClientErrorException.InvalidInputException("renter is required", null);
         }
-        if(null != id){
+
+        if(null != id && repo.existsById(id)){
             updateRenter.setId(id);
+        }
+        else{
+            throw new ClientErrorException.InvalidInputException("renter-[%s] not found", id);
         }
         log.debug("updating renter havind id - {}, renter - {}", id, updateRenter);
         return repo.save(updateRenter);

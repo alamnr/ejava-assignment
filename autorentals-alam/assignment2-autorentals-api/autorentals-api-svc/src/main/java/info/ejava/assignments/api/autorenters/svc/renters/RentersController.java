@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import info.ejava.assignments.api.autorenters.client.renters.RentersAPI;
@@ -60,7 +59,10 @@ public class RentersController {
             Pageable pageable = (null != pageNumber && null != pageSize && pageNumber>=0 && pageSize>0) ?
                                     PageRequest.of(pageNumber,pageSize) :Pageable.unpaged();
             Page<RenterDTO> rentersPage = renterService.getRenters(pageable);
-            RenterListDTO rentersList = new RenterListDTO(rentersPage.getContent());
+            RenterListDTO rentersList = RenterListDTO.builder().limit(pageSize)
+                                            .offset(pageNumber).renters(rentersPage.getContent())
+                                            .total((int)rentersPage.getNumberOfElements()).build();
+             
             ResponseEntity<RenterListDTO> response = ResponseEntity.ok().body(rentersList);
             return response;
     }

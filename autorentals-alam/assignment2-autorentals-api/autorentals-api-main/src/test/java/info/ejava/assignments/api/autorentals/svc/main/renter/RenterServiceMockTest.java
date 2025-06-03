@@ -6,7 +6,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 
 import org.assertj.core.api.BDDAssertions;
@@ -27,7 +26,6 @@ import info.ejava.assignments.api.autorenters.svc.renters.RenterServiceImpl;
 import info.ejava.assignments.api.autorenters.svc.utils.RenterValidator;
 import info.ejava.assignments.api.autorenters.svc.utils.RentersProperties;
 import info.ejava.examples.common.exceptions.ClientErrorException;
-import info.ejava.examples.common.exceptions.ClientErrorException.InvalidInputException;
 import lombok.extern.slf4j.Slf4j;
 
 @ExtendWith(MockitoExtension.class)
