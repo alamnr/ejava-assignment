@@ -40,8 +40,8 @@ public class RentersController {
     }
 
     @PostMapping(path = RentersAPI.RENTERS_PATH,
-                consumes = MediaType.APPLICATION_JSON_VALUE,
-                produces = MediaType.APPLICATION_JSON_VALUE)
+                consumes = {MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE},
+                produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<RenterDTO> createRenter(@RequestBody  RenterDTO newRenter) {
         RenterDTO addedRenter = renterService.createRenter(newRenter);
         URI location = ServletUriComponentsBuilder.fromCurrentRequestUri()
