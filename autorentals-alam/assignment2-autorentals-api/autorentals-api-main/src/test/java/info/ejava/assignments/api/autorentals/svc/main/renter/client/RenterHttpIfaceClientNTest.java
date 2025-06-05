@@ -375,14 +375,14 @@ public class RenterHttpIfaceClientNTest {
         List<RenterDTO> renters = given_many_renters(3);
         
         String knownId = renters.get(0).getId();
-        RenterDTO badQuoteMissingText = new RenterDTO();
-        badQuoteMissingText.withId(knownId);
+        RenterDTO badRenterMissingText = new RenterDTO();
+        badRenterMissingText.withId(knownId);
         ResponseEntity<RenterDTO> resp = renterHttpIfaceAPI.getRenter(knownId);
         log.info("resp - {}", resp.getBody());
 
         // when
         RestClientResponseException ex = BDDAssertions.catchThrowableOfType(
-         () -> renterHttpIfaceAPI.updateRenter(knownId, badQuoteMissingText)
+         () -> renterHttpIfaceAPI.updateRenter(knownId, badRenterMissingText)
                     , RestClientResponseException.class);
         // then
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);

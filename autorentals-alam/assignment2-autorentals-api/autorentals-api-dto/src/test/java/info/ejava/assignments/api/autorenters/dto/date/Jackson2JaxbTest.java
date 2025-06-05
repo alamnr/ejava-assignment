@@ -21,12 +21,12 @@ public class Jackson2JaxbTest extends InteropTestBase {
     @ParameterizedTest
     @MethodSource("dtos")
     void jacksonXml2JaxbObj(Object dto) throws Exception {
-        log.info("obj #############################- {}",dto);
+        // log.info("obj #############################- {}",dto);
         String jacksonXml = jacksonXmlTest.marshal(dto);
         
         Object jaxbObjectFromJacjsonXml = jaxbTest.unmarshal(dto.getClass(), jacksonXml) ;
-        log.info("jaxbObjectFromJacjsonXml - {}",jaxbObjectFromJacjsonXml);
-        log.info("jacksonXml - {}",jacksonXml);
+        // log.info("jaxbObjectFromJacjsonXml - {}",jaxbObjectFromJacjsonXml);
+        // log.info("jacksonXml - {}",jacksonXml);
         Assertions.assertThat(jaxbObjectFromJacjsonXml).isEqualTo(dto);
 
         if(dto instanceof ADate){

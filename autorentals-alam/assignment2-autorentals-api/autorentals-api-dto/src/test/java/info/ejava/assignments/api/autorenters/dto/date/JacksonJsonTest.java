@@ -72,7 +72,7 @@ public class JacksonJsonTest extends MarshallingTestBase {
         // given / arrange a renter
         RenterDTO renter = renterDTOFactory.make();
         renter.setUsername("ignored");
-
+        log.info("renter - {}",renter);
         // when / act
         RenterDTO result = marshal_and_unmarshal(renter, RenterDTO.class);
 

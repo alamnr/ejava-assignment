@@ -60,7 +60,7 @@ public class RenterServiceImpl implements RenterService {
 
     @Override
     public RenterDTO updateRenter(String id, RenterDTO updateRenter) {
-        validateRenter(updateRenter);
+        
         if(null == updateRenter){
             throw new ClientErrorException.InvalidInputException("renter is required", null);
         }

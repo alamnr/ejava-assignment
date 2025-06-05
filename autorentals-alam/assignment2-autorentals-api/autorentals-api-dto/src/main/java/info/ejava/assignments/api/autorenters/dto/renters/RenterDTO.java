@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
+import info.ejava.examples.common.dto.adapters.JaxbTimeAdapters;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
@@ -33,7 +34,8 @@ public class RenterDTO {
     private String id;
     private String firstName;
     private String lastName;
-    @XmlJavaTypeAdapter(info.ejava.examples.common.dto.adapters.JaxbTimeAdapters.LocalDateJaxbAdapter.class) 
+    
+    @XmlJavaTypeAdapter(JaxbTimeAdapters.LocalDateJaxbAdapter.class) 
     // JAXB local date adapters since JAXB does not have that default
     private LocalDate dob;
     private String email;

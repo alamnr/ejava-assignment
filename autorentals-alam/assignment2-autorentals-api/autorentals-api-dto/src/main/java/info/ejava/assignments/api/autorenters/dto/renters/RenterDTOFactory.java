@@ -45,7 +45,11 @@ public class RenterDTOFactory {
         final String lastName = lastName();
         final String account = (firstName+"."+lastName).toLowerCase().replaceAll("'", "");
         final String email = email().replaceAll("(.*)@", account+"@");
-        final RenterDTO result = RenterDTO.builder().id(null).firstName(firstName).lastName(lastName).dob(dob())
+        final RenterDTO result = RenterDTO.builder().id(null)
+                                            .firstName(firstName)
+                                            .lastName(lastName)
+                                            .dob(dob())
+                                            //.dob(LocalDate.of(1930,2,26))
                                             .email(email).build();
         Stream.of(visitors).forEach(v->v.accept(result));
         return result;

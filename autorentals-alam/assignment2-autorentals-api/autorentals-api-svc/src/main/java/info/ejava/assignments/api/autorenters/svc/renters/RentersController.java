@@ -51,16 +51,16 @@ public class RentersController {
     }
 
     @GetMapping(path = RentersAPI.RENTERS_PATH,
-                produces = MediaType.APPLICATION_JSON_VALUE)
+                produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<RenterListDTO> getRentersList(
-            @RequestParam(value = "pageNumber" , required = false)Integer pageNumber,
-            @RequestParam(value = "pageSize", required = false) Integer pageSize ) {
+            @RequestParam(value = "offset" , defaultValue = "0")Integer offset,
+            @RequestParam(value = "limit", defaultValue = "0") Integer limit ) {
 
-            Pageable pageable = (null != pageNumber && null != pageSize && pageNumber>=0 && pageSize>0) ?
-                                    PageRequest.of(pageNumber,pageSize) :Pageable.unpaged();
+            Pageable pageable = (null != offset && null != limit && offset>=0 && limit>0) ?
+                                    PageRequest.of(offset,limit) :Pageable.unpaged();
             Page<RenterDTO> rentersPage = renterService.getRenters(pageable);
-            RenterListDTO rentersList = RenterListDTO.builder().limit(pageSize)
-                                            .offset(pageNumber).renters(rentersPage.getContent())
+            RenterListDTO rentersList = RenterListDTO.builder().limit(limit)
+                                            .offset(offset).renters(rentersPage.getContent())
                                             .total((int)rentersPage.getNumberOfElements()).build();
              
             ResponseEntity<RenterListDTO> response = ResponseEntity.ok().body(rentersList);
@@ -68,7 +68,7 @@ public class RentersController {
     }
 
     @GetMapping(path = RentersAPI.RENTER_PATH,
-                    produces = MediaType.APPLICATION_JSON_VALUE)
+                    produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<RenterDTO> getRenter(@PathVariable("id") String id) {
         RenterDTO foundRenter = renterService.getRenter(id);
         ResponseEntity<RenterDTO> response = ResponseEntity.ok(foundRenter);
@@ -87,8 +87,8 @@ public class RentersController {
         return response;
     }
 
-    @PutMapping(path = RentersAPI.RENTER_PATH,consumes = MediaType.APPLICATION_JSON_VALUE,
-                    produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = RentersAPI.RENTER_PATH,consumes = {MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE},
+                    produces = {MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<RenterDTO> updateRenter(@PathVariable("id")String id, @RequestBody RenterDTO renter){
         RenterDTO updatedRenter = renterService.updateRenter(id, renter);
         ResponseEntity<RenterDTO> response = ResponseEntity.ok(updatedRenter);

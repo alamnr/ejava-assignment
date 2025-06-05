@@ -2,6 +2,7 @@ package info.ejava.assignments.api.autorentals.svc.main.renter;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -9,16 +10,21 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import info.ejava.assignments.api.autorenters.client.renters.RentersAPI;
 import info.ejava.assignments.api.autorenters.client.renters.RentersAPIClient;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTOFactory;
-import info.ejava.assignments.api.autorenters.svc.renters.RenterService;
-import info.ejava.assignments.api.autorenters.svc.renters.RenterServiceImpl;
+import info.ejava.examples.common.web.RestTemplateLoggingFilter;
 import info.ejava.examples.common.web.ServerConfig;
+import info.ejava.examples.common.webflux.WebClientLoggingFilter;
 import lombok.extern.slf4j.Slf4j;
 
 @TestConfiguration
@@ -41,8 +47,42 @@ public class RenterTestConfiguration {
     }
 
     @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    ClientHttpRequestFactory requestFactory(){
+        return new SimpleClientHttpRequestFactory();
+    }
+
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.build();
+    }
+
+    @Bean @Qualifier("restTemplateWithLogger")
+    public RestTemplate restTemplateWithLogger(RestTemplateBuilder builder, ClientHttpRequestFactory requestFactory ) {
+        //return builder.build();
+        // or just following will work in the simple cases like this 
+        // return new RestTemplate();
+        return builder.requestFactory(
+              // used to read the Stream twice -- so we can use the logging filter below
+              () -> new BufferingClientHttpRequestFactory(requestFactory))
+              .interceptors(List.of(new RestTemplateLoggingFilter())).build();
+        
+    }
+
+    @Bean 
+    public RestClient restClient(RestClient.Builder builder, RestTemplate restTemplate){
+        return builder.build();
+        // return RestClient.create(restTemplate);
+                        
+    }
+
+    @Bean
+    public WebClient webClient(WebClient.Builder builder){
+        // return builder.build();
+        // or just following will work in the simple cases like this
+        // return WebClient.builder().build();
+        return builder.filter(WebClientLoggingFilter.requestFilter())
+                        .filter(WebClientLoggingFilter.responseFilter())
+                            .build();
     }
 
     @Bean @Lazy
@@ -55,7 +95,10 @@ public class RenterTestConfiguration {
         return serverConfig.getBaseUrl();
     }
 
-    
+    @Bean @Lazy
+    public URI rentersUrl(URI baseUrl){
+        return UriComponentsBuilder.fromUri(baseUrl).path(RentersAPI.RENTERS_PATH).build().toUri();
+    }
     
     @Bean   // injecting port way 3
     public RentersAPI rentersAPI(RestTemplate restTemplate){

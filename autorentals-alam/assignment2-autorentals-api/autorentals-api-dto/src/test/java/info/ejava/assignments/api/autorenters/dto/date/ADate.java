@@ -37,23 +37,23 @@ import lombok.With;
 @XmlAccessorType(XmlAccessType.FIELD)
 @JacksonXmlRootElement(localName = "dates", namespace = "urn:ejava.svc-controllers.renters")
 public class ADate {
-    @JsonbTypeDeserializer(JsonbTimeDeserializers.ZonedDateTimeJsonbDeserializer.class)
+    @JsonbTypeDeserializer(JsonbTimeDeserializers.ZonedDateTimeJsonbDeserializer.class) // Jasonb deserializer for java date and time
     @XmlJavaTypeAdapter(JaxbTimeAdapters.ZonedDateTimeJaxbAdapter.class)
     private ZonedDateTime zdt;
 
-    @JsonbTypeDeserializer(JsonbTimeDeserializers.OffsetDateTimeJsonbDeserializer.class)
+    @JsonbTypeDeserializer(JsonbTimeDeserializers.OffsetDateTimeJsonbDeserializer.class)  // Jsonb deserializer for java date and time
     @XmlJavaTypeAdapter(JaxbTimeAdapters.OffsetDateTimeJaxbAdapter.class)
     private OffsetDateTime odt;
 
-    @JsonbTypeDeserializer(JsonbTimeDeserializers.LocalDateTimeJsonbDeserializer.class)
+    @JsonbTypeDeserializer(JsonbTimeDeserializers.LocalDateTimeJsonbDeserializer.class) // Jasonb deserializer for java date and time
     @XmlJavaTypeAdapter(JaxbTimeAdapters.LocalDateTimeJaxbAdapter.class)
     private LocalDateTime ldt;
 
-    @JsonbTypeDeserializer(JsonbTimeDeserializers.InstantJsonbDeserializer.class)
+    @JsonbTypeDeserializer(JsonbTimeDeserializers.InstantJsonbDeserializer.class)  // Jasonb deserializer for java date and time
     @XmlJavaTypeAdapter(JaxbTimeAdapters.InstantJaxbAdapter.class)
     private Instant instant;
 
-    @JsonbTypeDeserializer(JsonbTimeDeserializers.DateJsonbDeserializer.class)
+    @JsonbTypeDeserializer(JsonbTimeDeserializers.DateJsonbDeserializer.class) 
     @XmlJavaTypeAdapter(JaxbTimeAdapters.DateJaxbAdapter.class)
     @JsonbTypeSerializer(JsonbTimeSerializers.DateJsonbSerializer.class)
     private Date date;
