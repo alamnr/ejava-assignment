@@ -198,8 +198,8 @@ public class RenterRestTemplateClientNTest {
         URI rentersUri = UriComponentsBuilder.fromUri(baseUrl).path(RentersAPI.RENTERS_PATH).build().toUri();
         URI rentersUriWithOffsetAndLimit = UriComponentsBuilder.fromUri(baseUrl)
                                         .path(RentersAPI.RENTERS_PATH)
-                                        .queryParam("offset", 1)
-                                        .queryParam("limit", 20)
+                                        .queryParam("pageNumber", 1)
+                                        .queryParam("pageSize", 20)
                                         .build().toUri();
 
         // when / act
@@ -476,7 +476,7 @@ public class RenterRestTemplateClientNTest {
                     , RestClientResponseException.class);
         // then
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
-        BDDAssertions.then(getErrorResponse(ex).getDescription()).contains(String.format("renter-[%s] not found", unknownId));
+        BDDAssertions.then(getErrorResponse(ex).getDescription()).contains(String.format("renter is not valid", unknownId));
     }
 
     @Test
@@ -509,10 +509,10 @@ public class RenterRestTemplateClientNTest {
         Integer limit = 100;
         UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUri(baseUrl).path(RentersAPI.RENTERS_PATH);
         if (offset!=null) {
-            urlBuilder = urlBuilder.queryParam("offset", offset);
+            urlBuilder = urlBuilder.queryParam("pageNumber", offset);
         }
         if (limit!=null) {
-            urlBuilder = urlBuilder.queryParam("limit", limit);
+            urlBuilder = urlBuilder.queryParam("pageSize", limit);
         }
         URI url = urlBuilder.build().toUri();
 
@@ -542,10 +542,10 @@ public class RenterRestTemplateClientNTest {
         Integer limit = 10;
          UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUri(baseUrl).path(RentersAPI.RENTERS_PATH);
         if (offset!=null) {
-            urlBuilder = urlBuilder.queryParam("offset", offset);
+            urlBuilder = urlBuilder.queryParam("pageNumber", offset);
         }
         if (limit!=null) {
-            urlBuilder = urlBuilder.queryParam("limit", limit);
+            urlBuilder = urlBuilder.queryParam("pageSize", limit);
         }
         URI url = urlBuilder.build().toUri();
 

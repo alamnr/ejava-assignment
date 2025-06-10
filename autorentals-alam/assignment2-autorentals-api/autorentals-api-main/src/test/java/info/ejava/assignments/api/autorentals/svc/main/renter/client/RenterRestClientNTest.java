@@ -194,10 +194,10 @@ public class RenterRestClientNTest {
         }
         BDDAssertions.assertThat(existingRenters).isNotEmpty();
         URI rentersUri = UriComponentsBuilder.fromUri(baseUrl).path(RentersAPI.RENTERS_PATH).build().toUri();
-        URI rentersUriWithOffsetAndLimit = UriComponentsBuilder.fromUri(baseUrl)
+        URI rentersUriWithOffsetAndpageSize = UriComponentsBuilder.fromUri(baseUrl)
                                         .path(RentersAPI.RENTERS_PATH)
-                                        .queryParam("offset", 1)
-                                        .queryParam("limit", 20)
+                                        .queryParam("pageNumber", 1)
+                                        .queryParam("pageSize", 20)
                                         .build().toUri();
 
         // when / act
@@ -205,26 +205,26 @@ public class RenterRestClientNTest {
         ResponseEntity<RenterListDTO> response = restClient.get().uri(rentersUri)
                                                 .accept(mediaType).retrieve().toEntity(RenterListDTO.class);
         
-        ResponseEntity<RenterListDTO> responseWithOffsetAndLimit = restClient.get().uri(rentersUriWithOffsetAndLimit)
+        ResponseEntity<RenterListDTO> responseWithOffsetAndpageSize = restClient.get().uri(rentersUriWithOffsetAndpageSize)
                                                                     .accept(mediaType).retrieve().toEntity(RenterListDTO.class);
                                             
 
         // then / evaluate and assert
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        BDDAssertions.then(responseWithOffsetAndLimit.getStatusCode()).isEqualTo(HttpStatus.OK);
-        RenterListDTO renterPageWithoutOffsetAndLimit = response.getBody();
-        RenterListDTO renterPageWithOffsetAndLimit = responseWithOffsetAndLimit.getBody();
+        BDDAssertions.then(responseWithOffsetAndpageSize.getStatusCode()).isEqualTo(HttpStatus.OK);
+        RenterListDTO renterPageWithoutOffsetAndpageSize = response.getBody();
+        RenterListDTO renterPageWithOffsetAndpageSize = responseWithOffsetAndpageSize.getBody();
 
         
-        BDDAssertions.then(renterPageWithoutOffsetAndLimit.getOffset()).isEqualTo(0);
-        BDDAssertions.then(renterPageWithoutOffsetAndLimit.getLimit()).isEqualTo(0);
-        BDDAssertions.then(renterPageWithOffsetAndLimit.getOffset()).isEqualTo(1);
-        BDDAssertions.then(renterPageWithOffsetAndLimit.getLimit()).isEqualTo(20);
+        BDDAssertions.then(renterPageWithoutOffsetAndpageSize.getOffset()).isEqualTo(0);
+        BDDAssertions.then(renterPageWithoutOffsetAndpageSize.getLimit()).isEqualTo(0);
+        BDDAssertions.then(renterPageWithOffsetAndpageSize.getOffset()).isEqualTo(1);
+        BDDAssertions.then(renterPageWithOffsetAndpageSize.getLimit()).isEqualTo(20);
 
-        BDDAssertions.then(renterPageWithoutOffsetAndLimit.getCount()).isEqualTo(existingRenters.size());
-        BDDAssertions.then(renterPageWithOffsetAndLimit.getCount()).isEqualTo(20);
+        BDDAssertions.then(renterPageWithoutOffsetAndpageSize.getCount()).isEqualTo(existingRenters.size());
+        BDDAssertions.then(renterPageWithOffsetAndpageSize.getCount()).isEqualTo(20);
         
-         for (RenterDTO q: renterPageWithoutOffsetAndLimit.getRenters()) {
+         for (RenterDTO q: renterPageWithoutOffsetAndpageSize.getRenters()) {
             BDDAssertions.then(existingRenters.remove(q.getId())).isNotNull();
         }
         BDDAssertions.then(existingRenters).isEmpty();
@@ -460,7 +460,7 @@ public class RenterRestClientNTest {
                          RestClientResponseException.class);
         // then
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
-        BDDAssertions.then(getErrorResponse(ex).getDescription()).contains(String.format("renter-[%s] not found", unknownId));
+        BDDAssertions.then(getErrorResponse(ex).getDescription()).contains(String.format("renter is not valid", unknownId));
     }
 
     @Test
@@ -490,14 +490,14 @@ public class RenterRestClientNTest {
     @Test
     void get_empty_renters(){
         // given - we have no quotes
-        Integer offset = 0;
-        Integer limit = 100;
+        Integer pageNumber = 0;
+        Integer pageSize = 100;
         UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUri(baseUrl).path(RentersAPI.RENTERS_PATH);
-        if (offset!=null) {
-            urlBuilder = urlBuilder.queryParam("offset", offset);
+        if (pageNumber!=null) {
+            urlBuilder = urlBuilder.queryParam("pageNumber", pageNumber);
         }
-        if (limit!=null) {
-            urlBuilder = urlBuilder.queryParam("limit", limit);
+        if (pageSize!=null) {
+            urlBuilder = urlBuilder.queryParam("pageSize", pageSize);
         }
         URI url = urlBuilder.build().toUri();
 
@@ -524,14 +524,14 @@ public class RenterRestClientNTest {
         given_many_renters(100);
 
         //when asking for a page of quotes
-        Integer offset = 9;
-        Integer limit = 10;
+        Integer pageNumber = 9;
+        Integer pageSize = 10;
          UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUri(baseUrl).path(RentersAPI.RENTERS_PATH);
-        if (offset!=null) {
-            urlBuilder = urlBuilder.queryParam("offset", offset);
+        if (pageNumber!=null) {
+            urlBuilder = urlBuilder.queryParam("pageNumber", pageNumber);
         }
-        if (limit!=null) {
-            urlBuilder = urlBuilder.queryParam("limit", limit);
+        if (pageSize!=null) {
+            urlBuilder = urlBuilder.queryParam("pageSize", pageSize);
         }
         URI url = urlBuilder.build().toUri();
 
