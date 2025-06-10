@@ -365,7 +365,7 @@ public class RenterHttpIfaceClientNTest {
 
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
         MessageDTO errMsg = getErrorResponse(ex);
-        BDDAssertions.then(errMsg.getDescription()).contains(String.format("renter is not valid", unknownId));
+        BDDAssertions.then(errMsg.getDescription()).contains(String.format("renter-[13] not found", unknownId));
     }
 
     @Test
@@ -444,6 +444,7 @@ public class RenterHttpIfaceClientNTest {
         RenterListDTO returnedRenters = response.getBody();
         BDDAssertions.then(returnedRenters.getCount()).isEqualTo(0);
         //and descriptive attributes filed in
+        log.info("returned - {}", returnedRenters);
         BDDAssertions.then(returnedRenters.getOffset()).isEqualTo(0);
         BDDAssertions.then(returnedRenters.getLimit()).isEqualTo(100);
         BDDAssertions.then(returnedRenters.getTotal()).isEqualTo(0);       

@@ -22,8 +22,15 @@ public class RenterValidatorImpl implements RenterValidator {
         log.trace(" validating - {} and minAge - {}", renter, minAge);
         if(renter == null){
             errMsgs.add("renter: can not be null");
-        } else {
+        } else if(renter.getId() == null) {
             validate(errMsgs, ()->renter.getId()==null,()->"id must be null");
+            validate(errMsgs, ()-> !ObjectUtils.isEmpty(renter.getFirstName()), ()->"renter.FirstName - can not be blnk");
+            validate(errMsgs, ()-> !ObjectUtils.isEmpty(renter.getLastName()), ()->"renter.LastName - can not be blank");
+            Optional.ofNullable(renter.getDob()).ifPresentOrElse((dob)->{
+                LocalDate minDob = LocalDate.now().minusYears(minAge);
+                validate(errMsgs, ()->dob.isBefore(minDob), ()->String.format("renter.DOB must be greater than %d years", minAge));
+            }, ()-> errMsgs.add("renter.DOB can not be null"));
+        } else {
             validate(errMsgs, ()-> !ObjectUtils.isEmpty(renter.getFirstName()), ()->"renter.FirstName - can not be blnk");
             validate(errMsgs, ()-> !ObjectUtils.isEmpty(renter.getLastName()), ()->"renter.LastName - can not be blank");
             Optional.ofNullable(renter.getDob()).ifPresentOrElse((dob)->{

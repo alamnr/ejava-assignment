@@ -1,4 +1,4 @@
-package info.ejava.assignments.api.autorentals.svc.main;
+package info.ejava.assignments.api.autorentals.svc.main.renter.repo;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 //@ExtendWith(MockitoExtension.class)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @Slf4j
-public class BoRepositoryMapImplTest {
+public class RenterRepositoryMapImplTest {
 
     private POJORepositoryMapImpl<RenterDTO> repo;
 

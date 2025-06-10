@@ -1,5 +1,6 @@
 package info.ejava.assignments.api.autorenters.svc.autos;
 
+import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +78,23 @@ public class AutosDTORepositoryMapImpl implements AutosDTORepository{
         Predicate<AutoDTO> query = Stream.of(min,max).reduce(Predicate::and).orElse(x->true);
         return find(query, pageable);
      }
+
+      /**
+     * Return autos matching the dailyRate.
+     * @param minDailyRate inclusive
+     * @param maxDailyRate inclusive
+     * @param pageable with offset and limit unless unpaged
+     * @return page of matching autos ordered by ID
+     */
+    @Override
+    public Page<AutoDTO> findByDailyRateBetween(BigDecimal minDailyRate, BigDecimal maxDailyRate, Pageable pageable) {
+        Predicate<AutoDTO> min = candidate-> candidate.getDailyRate().compareTo(minDailyRate) >= 0;
+        Predicate<AutoDTO> max = candidate->candidate.getDailyRate().compareTo(maxDailyRate) <= 0;
+
+        Predicate<AutoDTO> query = Stream.of(min, max).reduce(Predicate::and).orElse(x->true);
+        return find(query, pageable);
+    }
+
 
      /*
       * Returns autos that match the provided example prototype

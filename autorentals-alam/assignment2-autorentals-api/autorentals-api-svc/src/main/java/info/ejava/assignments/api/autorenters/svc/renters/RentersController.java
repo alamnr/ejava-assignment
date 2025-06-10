@@ -53,15 +53,16 @@ public class RentersController {
     @GetMapping(path = RentersAPI.RENTERS_PATH,
                 produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<RenterListDTO> getRentersList(
-            @RequestParam(value = "offset" , defaultValue = "0")Integer offset,
-            @RequestParam(value = "limit", defaultValue = "0") Integer limit ) {
+            @RequestParam(value = "pageNumber" , defaultValue = "0")Integer pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "0") Integer pageSize ) {
 
-            Pageable pageable = (null != offset && null != limit && offset>=0 && limit>0) ?
-                                    PageRequest.of(offset,limit) :Pageable.unpaged();
+            Pageable pageable = (null != pageNumber && null != pageSize && pageNumber>=0 && pageSize>0) ?
+                                    PageRequest.of(pageNumber,pageSize) :Pageable.unpaged();
             Page<RenterDTO> rentersPage = renterService.getRenters(pageable);
-            RenterListDTO rentersList = RenterListDTO.builder().limit(limit)
-                                            .offset(offset).renters(rentersPage.getContent())
-                                            .total((int)rentersPage.getNumberOfElements()).build();
+            //log.info("renterPage- {}, pageNumber -{}, pageSize- {}", rentersPage, pageNumber, pageSize);
+            RenterListDTO rentersList = new RenterListDTO(pageNumber,pageSize,
+                                        rentersPage.getContent().size(),"",rentersPage.getContent());
+            
              
             ResponseEntity<RenterListDTO> response = ResponseEntity.ok().body(rentersList);
             return response;

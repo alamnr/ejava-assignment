@@ -6,6 +6,8 @@ import info.ejava.examples.common.web.ServerConfig;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
@@ -25,6 +27,7 @@ import java.net.URI;
  */
 @Setter
 @Getter
+@Slf4j
 public class RentersAPIClient implements RentersAPI {
     private final URI baseUrl;
     private final RentersHttpIface rentersHttpAPI;
@@ -70,6 +73,7 @@ public class RentersAPIClient implements RentersAPI {
 
     @Override
     public ResponseEntity<RenterListDTO> getRenters(Integer pageNumber, Integer pageSize) {
+        
         return rentersHttpAPI.getRenters(pageNumber, pageSize);
 //        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUri(baseUrl).path(RENTERS_PATH);
 //        if (null!=pageNumber && null!=pageSize) {
