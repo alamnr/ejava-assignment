@@ -90,6 +90,21 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>exec-maven-plugin</artifactId>
+              <version>1.6.0</version> <!-- Use a recent stable version -->
+              <executions>
+                  <execution>
+                      <goals>
+                          <goal>java</goal>
+                      </goals>
+                  </execution>
+              </executions>
+              <configuration>
+                  <mainClass>info.ejava.assignments.api.autorenters.svc.utils.Util</mainClass>
+              </configuration>
+          </plugin>
         </plugins>
     </build>
 </project>

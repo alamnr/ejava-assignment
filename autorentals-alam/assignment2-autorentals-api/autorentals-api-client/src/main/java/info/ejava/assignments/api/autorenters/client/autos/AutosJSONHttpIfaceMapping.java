@@ -1,0 +1,55 @@
+package info.ejava.assignments.api.autorenters.client.autos;
+
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.service.annotation.DeleteExchange;
+import org.springframework.web.service.annotation.GetExchange;
+import org.springframework.web.service.annotation.HttpExchange;
+import org.springframework.web.service.annotation.PostExchange;
+import org.springframework.web.service.annotation.PutExchange;
+
+import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
+import info.ejava.assignments.api.autorenters.dto.autos.AutoListDTO;
+import info.ejava.assignments.api.autorenters.dto.autos.AutoSearchParams;
+
+public interface AutosJSONHttpIfaceMapping extends AutosAPI {
+
+    @Override
+    @PostExchange(url = AUTOS_PATH,
+                    accept = MediaType.APPLICATION_JSON_VALUE,
+                    contentType = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AutoDTO> createAuto(@RequestBody AutoDTO auto) ;
+
+    @Override
+    @GetExchange(url = AUTO_PATH,accept = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AutoDTO> getAuto(@PathVariable("id") String id);
+
+    @Override
+    @HttpExchange(method = "HEAD", url = AUTO_PATH)
+    public ResponseEntity<Void> hasAuto(@PathVariable("id") String id) ;
+
+    @Override
+    @GetExchange(url = AUTOS_QUERY_PATH, accept = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AutoListDTO> queryAutos(@RequestBody AutoDTO probe, 
+                        @RequestParam(name = "pageNumber", required = false) Integer pageNumber, 
+                        @RequestParam(name = "pageSize", required = false) Integer pageSize) ;
+
+    @Override
+    @DeleteExchange(url = AUTOS_PATH)
+    public ResponseEntity<Void> removeAllAutos() ;
+
+    @Override
+    @DeleteExchange(url = AUTO_PATH)
+    public ResponseEntity<Void> removeAuto(@PathVariable("id") String id) ;
+
+    @Override
+    @GetExchange(url = AUTOS_QUERY_PATH)
+    public ResponseEntity<AutoListDTO> searchAutos(@RequestBody AutoSearchParams searchParams) ;
+
+    @Override
+    @PutExchange(url = AUTO_PATH,contentType = MediaType.APPLICATION_JSON_VALUE, accept = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AutoDTO> updateAuto(@PathVariable("id") String id, @RequestBody AutoDTO auto);
+}

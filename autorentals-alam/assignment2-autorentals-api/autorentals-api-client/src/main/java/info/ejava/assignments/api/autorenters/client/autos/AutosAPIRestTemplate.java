@@ -17,20 +17,20 @@ import java.net.URI;
 
 @Setter
 @Getter
-public class AutosAPIClient implements AutosAPI {
+public class AutosAPIRestTemplate implements AutosAPI {
     protected URI baseUrl;
     protected RestTemplate restTemplate;
     protected MediaType mediaType;
 
-    public AutosAPIClient(RestTemplate restTemplate, ServerConfig serverConfig, MediaType mediaType) {
+    public AutosAPIRestTemplate(RestTemplate restTemplate, ServerConfig serverConfig, MediaType mediaType) {
         this.baseUrl = serverConfig.getBaseUrl();
         this.restTemplate = restTemplate;
         this.mediaType = mediaType;
     }
-    @Override
-    public AutosAPIClient withRestTemplate(RestTemplate restTemplate) {
+    
+    public AutosAPIRestTemplate withRestTemplate(RestTemplate restTemplate) {
         ServerConfig serverConfig = new ServerConfig().withBaseUrl(baseUrl).build();
-        return new AutosAPIClient(restTemplate, serverConfig, mediaType);
+        return new AutosAPIRestTemplate(restTemplate, serverConfig, mediaType);
     }
 
     @Override

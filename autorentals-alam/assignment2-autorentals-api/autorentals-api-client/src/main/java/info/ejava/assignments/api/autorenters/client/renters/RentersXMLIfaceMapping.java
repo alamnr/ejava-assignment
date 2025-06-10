@@ -16,16 +16,16 @@ import org.springframework.web.service.annotation.*;
  * Since annotations are hard-wired within code, this version of the
  * interface was written to address JSON requests/responses.
  */
-public interface RentersJSONIfaceMapping extends RentersHttpIface {
+public interface RentersXMLIfaceMapping extends RentersHttpIface {
 
     @Override
     @PostExchange(url= RENTERS_PATH,
-            contentType = MediaType.APPLICATION_JSON_VALUE,
-            accept = MediaType.APPLICATION_JSON_VALUE)
+            contentType = MediaType.APPLICATION_XML_VALUE,
+            accept = MediaType.APPLICATION_XML_VALUE)
     ResponseEntity<RenterDTO> createRenter(@RequestBody RenterDTO renter);
 
     @Override
-    @GetExchange(url= RENTERS_PATH, accept = MediaType.APPLICATION_JSON_VALUE)
+    @GetExchange(url= RENTERS_PATH, accept = MediaType.APPLICATION_XML_VALUE)
     ResponseEntity<RenterListDTO> getRenters(
             @RequestParam(name="pageNumber", required = false)
             Integer pageNumber,
@@ -33,7 +33,7 @@ public interface RentersJSONIfaceMapping extends RentersHttpIface {
             Integer pageSize);
 
     @Override
-    @GetExchange(url = RENTER_PATH, accept = MediaType.APPLICATION_JSON_VALUE)
+    @GetExchange(url = RENTER_PATH, accept = MediaType.APPLICATION_XML_VALUE)
     ResponseEntity<RenterDTO> getRenter(@PathVariable("id") String id);
 
     @Override
@@ -42,8 +42,8 @@ public interface RentersJSONIfaceMapping extends RentersHttpIface {
 
     @Override
     @PutExchange(url=RENTER_PATH,
-            contentType = MediaType.APPLICATION_JSON_VALUE,
-            accept = MediaType.APPLICATION_JSON_VALUE)
+            contentType = MediaType.APPLICATION_XML_VALUE,
+            accept = MediaType.APPLICATION_XML_VALUE)
     ResponseEntity<RenterDTO> updateRenter(@PathVariable("id") String id,
                                            @RequestBody RenterDTO renter);
 

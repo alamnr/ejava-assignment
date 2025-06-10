@@ -13,10 +13,7 @@ public interface RentersHttpIface {
     String RENTER_PATH = "/api/renters/{id}";
 
     ResponseEntity<RenterDTO> createRenter(RenterDTO renter);
-    ResponseEntity<RenterDTO> createRenterJson(RenterDTO renter);
-
-    ResponseEntity<RenterDTO> createRenterXml(RenterDTO renter);
-
+   
     ResponseEntity<RenterListDTO> getRenters(Integer pageNumber, Integer pageSize);
 
     ResponseEntity<RenterDTO> getRenter(String id);

@@ -66,15 +66,7 @@ public class RentersAPIClient implements RentersAPI {
 //        return response;
     }
 
-    @Override
-    public ResponseEntity<RenterDTO> createRenterJson(RenterDTO renter) {
-        return rentersHttpAPI.createRenterJson(renter);
-    }
-
-    @Override
-    public ResponseEntity<RenterDTO> createRenterXml(RenterDTO renter) {
-        return rentersHttpAPI.createRenterXml(renter);
-    }
+   
 
     @Override
     public ResponseEntity<RenterListDTO> getRenters(Integer pageNumber, Integer pageSize) {

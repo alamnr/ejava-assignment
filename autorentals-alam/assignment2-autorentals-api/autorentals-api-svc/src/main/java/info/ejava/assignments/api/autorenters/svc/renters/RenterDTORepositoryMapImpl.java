@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.svc.POJORepositoryMapImpl;
 
+
 public class RenterDTORepositoryMapImpl extends POJORepositoryMapImpl<RenterDTO>
         implements RenterDTORepository {
     public RenterDTORepositoryMapImpl(){
