@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 
 import info.ejava.assignments.api.autorenters.dto.StreetAddressDTO;
 import info.ejava.assignments.api.autorenters.dto.StreetAddressDTOFactory;
+import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
+import info.ejava.assignments.api.autorenters.dto.renters.RenterListDTO;
 import net.datafaker.Faker;
 import net.datafaker.providers.base.Vehicle;
 
@@ -65,10 +67,27 @@ public class AutoDTOFactory {
     public static Consumer<AutoDTO> withId = auto -> auto.setId(id());
 
     public class AutosDTOFactory {
-        public final List<AutoDTO> make(int count, Consumer<AutoDTO>... visitors){
-            return IntStream.range(0, count)
-                        .mapToObj(i -> AutoDTOFactory.this.make(visitors))
-                        .collect(Collectors.toList());
+         public String keywords(int min, int max) {
+            return IntStream.range(0, faker.number().numberBetween(min, max))
+                    .mapToObj(i->faker.company().buzzword())
+                    .collect(Collectors.joining(" "));
+        }
+        @SafeVarargs
+        public final List<AutoDTO> autos(int min, int max, Consumer<AutoDTO>... visitors) {
+            return IntStream.range(0, faker.number().numberBetween(min, max))
+                    .mapToObj(i->AutoDTOFactory.this.make(visitors))
+                    .collect(Collectors.toList());
+        }
+        // public final List<AutoDTO> make(int count, Consumer<AutoDTO>... visitors){
+        //     return IntStream.range(0, count)
+        //                 .mapToObj(i -> AutoDTOFactory.this.make(visitors))
+        //                 .collect(Collectors.toList());
+        // }
+        @SafeVarargs
+        public final AutoListDTO make(int min, int max, Consumer<AutoDTO>... visitors) {
+            return AutoListDTO.builder()
+                    .autos(autos(min, max, visitors))
+                    .build();
         }
     }
 

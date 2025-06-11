@@ -61,8 +61,8 @@ public class AutosController {
 
         Pageable pageable = (null != pageNumber && null != pageSize && pageNumber>0 && pageSize>0) ? 
                             PageRequest.of(pageNumber, pageSize) : Pageable.unpaged();
-        Page<AutoDTO> autosPag = autosService.queryAutos(probe, pageable);
-        AutoListDTO autosList = new AutoListDTO(autosPag.toList());
+        Page<AutoDTO> autosPage = autosService.queryAutos(probe, pageable);
+        AutoListDTO autosList = new AutoListDTO(pageNumber,pageSize,autosPage.getContent().size() ,"",autosPage.toList());
         ResponseEntity<AutoListDTO> response = ResponseEntity.ok(autosList);
         return response;
 
@@ -104,7 +104,7 @@ public class AutosController {
                                                 .maxPassengersInclusive(maxPassengers)
                                                 .build();
                 Page<AutoDTO> autosPage = autosService.searchAutos(searchParams, pageable);
-                AutoListDTO autosList = new AutoListDTO(autosPage.toList());
+                AutoListDTO autosList = new AutoListDTO(pageNumber,pageSize,autosPage.getContent().size() ,"",autosPage.toList());
                 ResponseEntity<AutoListDTO> response = ResponseEntity.ok(autosList);
                 return response;
 

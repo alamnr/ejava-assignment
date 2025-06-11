@@ -1,4 +1,4 @@
-package info.ejava.assignments.api.autorentals.svc.main.renter;
+package info.ejava.assignments.api.autorentals.svc.main.renter.validator;
 
 import java.time.LocalDate;
 import java.util.List;

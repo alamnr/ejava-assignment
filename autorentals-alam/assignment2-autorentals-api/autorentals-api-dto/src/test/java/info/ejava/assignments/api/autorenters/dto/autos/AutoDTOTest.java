@@ -23,17 +23,19 @@ public class AutoDTOTest {
         return Stream.of(
             Arguments.of(autoDTOFactory.make()),
             Arguments.of(autoDTOFactory.make(AutoDTOFactory.withId)),
-            Arguments.of(new AutoListDTO(autoDTOFactory.listBuilder().make(3, AutoDTOFactory.withId)))
+            Arguments.of(autoDTOFactory.listBuilder().make(3,3, AutoDTOFactory.withId))
         );
     }
 
     @ParameterizedTest
     @MethodSource("autos")
     void can_marshal_demarshal(Object original){
+        log.info("object payload original - {}", original);
         // when 
         String payload =  dtoUtil.marshal(original);
-        log.info("payload- {}", payload);
+        log.info("json payload- {}", payload);
         Object copy = dtoUtil.unmarshal(payload, original.getClass());
+        log.info("object payload- {}", copy);
         // then
         BDDAssertions.then(copy).isEqualTo(original);
     }

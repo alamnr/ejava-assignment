@@ -1,4 +1,4 @@
-package info.ejava.assignments.api.autorentals.svc.main.renter;
+package info.ejava.assignments.api.autorentals.svc.main.renter.service;
 
 import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import info.ejava.assignments.api.autorentals.svc.main.renter.RenterTestConfiguration;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.svc.renters.RenterService;
 import info.ejava.examples.common.exceptions.ClientErrorException;
