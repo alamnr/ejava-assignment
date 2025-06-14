@@ -36,12 +36,13 @@ public class AutosController {
         log.info("Autos initialized , URI - {}", AutosAPI.AUTOS_PATH);
     }
 
-    @RequestMapping(path = AutosAPI.AUTOS_PATH, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+    @RequestMapping(path = AutosAPI.AUTOS_PATH, method = RequestMethod.POST,
+                            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
                             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<AutoDTO> createAuto(@RequestBody AutoDTO auto){
         AutoDTO addedAuto = autosService.createAuto(auto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().replacePath(AutosAPI.AUTO_PATH).build(addedAuto.getId()); 
-        ResponseEntity<AutoDTO> response = ResponseEntity.created(location).body(addedAuto);
+        ResponseEntity<AutoDTO> response = ResponseEntity.created(location).body(addedAuto); // http status code - 201
         return response;
     }
 
@@ -63,7 +64,7 @@ public class AutosController {
                             PageRequest.of(pageNumber, pageSize) : Pageable.unpaged();
         Page<AutoDTO> autosPage = autosService.queryAutos(probe, pageable);
         AutoListDTO autosList = new AutoListDTO(pageNumber,pageSize,autosPage.getContent().size() ,"",autosPage.toList());
-        ResponseEntity<AutoListDTO> response = ResponseEntity.ok(autosList);
+        ResponseEntity<AutoListDTO> response = ResponseEntity.ok(autosList); // http status code - 200
         return response;
 
      }
@@ -105,7 +106,7 @@ public class AutosController {
                                                 .build();
                 Page<AutoDTO> autosPage = autosService.searchAutos(searchParams, pageable);
                 AutoListDTO autosList = new AutoListDTO(pageNumber,pageSize,autosPage.getContent().size() ,"",autosPage.toList());
-                ResponseEntity<AutoListDTO> response = ResponseEntity.ok(autosList);
+                ResponseEntity<AutoListDTO> response = ResponseEntity.ok(autosList); // http status code - 200
                 return response;
 
       }
@@ -127,7 +128,7 @@ public class AutosController {
             throw new ClientErrorException.NotFoundException("auto[%s] does not exist.", id);
         }
 
-        ResponseEntity<Void> response = ResponseEntity.ok().build();
+        ResponseEntity<Void> response = ResponseEntity.ok().build();  // http status code  - 200
         return response;
       }
 
@@ -137,21 +138,21 @@ public class AutosController {
     public ResponseEntity<AutoDTO> updateAuto(@PathVariable("id") String id, @RequestBody AutoDTO auto){
 
         AutoDTO updatedAuto = autosService.updateAuto(id, auto);
-        ResponseEntity<AutoDTO> response = ResponseEntity.ok(updatedAuto);
+        ResponseEntity<AutoDTO> response = ResponseEntity.ok(updatedAuto); // http status code - 200
         return response;
     }
 
     @RequestMapping(path = AutosAPI.AUTO_PATH, method = RequestMethod.DELETE)
     public ResponseEntity<Void> removeAuto(@PathVariable("id") String id) {
         autosService.removeAuto(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();  // http status code  - 204
     }
 
 
     @RequestMapping(path = AutosAPI.AUTOS_PATH, method = RequestMethod.DELETE)
     public ResponseEntity<Void> removeAllAutos(){
         autosService.removeAllAutos();
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();   // http status code - 204
     }
 
 }
