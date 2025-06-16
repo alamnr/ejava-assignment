@@ -44,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 @AutoConfigureMockMvc
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @Slf4j
-class RenterControllerMockTest {
+public class RenterControllerMockTest {
     
     @Autowired
     MockMvc mockMvc;

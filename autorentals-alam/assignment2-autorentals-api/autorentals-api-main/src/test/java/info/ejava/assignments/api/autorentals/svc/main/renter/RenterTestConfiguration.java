@@ -10,6 +10,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -100,14 +101,12 @@ public class RenterTestConfiguration {
         return UriComponentsBuilder.fromUri(baseUrl).path(RentersAPI.RENTERS_PATH).build().toUri();
     }
     
-    @Bean   // injecting port way 3
-    public RentersAPI rentersAPI(RestTemplate restTemplate){
-        int port = 8080;
-        String baseUrl = String.format("http://localhost:%d/",port);
-        URI uri= UriComponentsBuilder.fromUriString(baseUrl).build().toUri();
-        ServerConfig cfg = new ServerConfig().withBaseUrl(uri).build();
-        return new RentersAPIClient(restTemplate, cfg, null);
+
+    @Bean @Lazy @Qualifier("rentersHttpIfaceJson")
+    public RentersAPIClient rentersAPIHttpIfaceJsonClient(RestTemplate restTemplate, ServerConfig serverConfig) {
+        return new RentersAPIClient(restTemplate, serverConfig, MediaType.valueOf(MediaType.APPLICATION_JSON_VALUE));
     }
+
 
     @Bean
     public RenterDTOFactory renterDTOFactory() {

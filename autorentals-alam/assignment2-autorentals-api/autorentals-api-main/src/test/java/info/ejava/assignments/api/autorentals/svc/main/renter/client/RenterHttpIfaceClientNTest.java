@@ -32,6 +32,7 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import info.ejava.assignments.api.autorentals.svc.main.AutoRentalsAppMain;
+import info.ejava.assignments.api.autorentals.svc.main.ProvidedApiAutoRenterTestConfiguration;
 import info.ejava.assignments.api.autorentals.svc.main.renter.RenterTestConfiguration;
 import info.ejava.assignments.api.autorenters.client.renters.RentersAPI;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
@@ -41,14 +42,14 @@ import info.ejava.examples.common.dto.JsonUtil;
 import info.ejava.examples.common.dto.MessageDTO;
 import lombok.extern.slf4j.Slf4j;
 
-@SpringBootTest(classes = {AutoRentalsAppMain.class, RenterTestConfiguration.class},
+@SpringBootTest(classes = {RenterTestConfiguration.class},
                 webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("test")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @Slf4j
 public class RenterHttpIfaceClientNTest {
 
-    @Autowired
+    @Autowired @Qualifier("rentersHttpIfaceJson")
     private RentersAPI renterHttpIfaceAPI;
 
     @LocalServerPort

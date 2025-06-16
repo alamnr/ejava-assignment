@@ -43,7 +43,7 @@ import info.ejava.examples.common.dto.JsonUtil;
 import info.ejava.examples.common.dto.MessageDTO;
 import lombok.extern.slf4j.Slf4j;
 
-@SpringBootTest(classes = {AutoRentalsAppMain.class,RenterTestConfiguration.class},
+@SpringBootTest(classes = {RenterTestConfiguration.class},
                 webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)

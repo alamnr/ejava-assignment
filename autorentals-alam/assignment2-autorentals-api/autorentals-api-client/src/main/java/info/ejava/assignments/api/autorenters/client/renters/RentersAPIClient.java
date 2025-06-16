@@ -30,14 +30,32 @@ import java.net.URI;
 @Slf4j
 public class RentersAPIClient implements RentersAPI {
     private final URI baseUrl;
-    private final RentersHttpIface rentersHttpAPI;
+    private  RentersHttpIface rentersHttpAPI;
     @Setter(AccessLevel.NONE)
     private final RestClient restClient;
 
-    public RentersAPIClient(RestTemplate restTemplate, ServerConfig serverConfig, MediaType alwaysJson) {
-        this(restTemplate, serverConfig.getBaseUrl());
+    public RentersAPIClient(RestTemplate restTemplate, ServerConfig serverConfig, MediaType mediaType) {
+        this(restTemplate, serverConfig.getBaseUrl(), mediaType);
     }
 
+    public RentersAPIClient(RestTemplate restTemplate, URI baseUrl, MediaType mediaType) {
+        this.baseUrl = baseUrl;
+
+        this.restClient = RestClient.builder(restTemplate)
+                .baseUrl(baseUrl.toString())
+                .build();
+        RestClientAdapter adapter = RestClientAdapter.create(restClient);
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+        if(MediaType.APPLICATION_JSON_VALUE.contentEquals(mediaType.toString())){
+
+            this.rentersHttpAPI = factory.createClient(RentersJSONHttpIfaceMapping.class);
+        }
+        if(MediaType.APPLICATION_XML_VALUE.contentEquals(mediaType.toString())){
+
+            this.rentersHttpAPI = factory.createClient(RentersJSONHttpIfaceMapping.class);
+        }
+        
+    }
     public RentersAPIClient(RestTemplate restTemplate, URI baseUrl) {
         this.baseUrl = baseUrl;
 
@@ -47,7 +65,7 @@ public class RentersAPIClient implements RentersAPI {
         RestClientAdapter adapter = RestClientAdapter.create(restClient);
         HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
 
-        this.rentersHttpAPI = factory.createClient(RentersJSONIfaceMapping.class);
+        this.rentersHttpAPI = factory.createClient(RentersJSONHttpIfaceMapping.class);
     }
 
     @Override
