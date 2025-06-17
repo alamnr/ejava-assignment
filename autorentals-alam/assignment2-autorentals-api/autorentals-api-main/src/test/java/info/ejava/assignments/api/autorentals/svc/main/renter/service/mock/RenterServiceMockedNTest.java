@@ -23,7 +23,7 @@ import info.ejava.assignments.api.autorentals.svc.main.renter.RenterTestConfigur
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.svc.renters.RenterDTORepository;
 import info.ejava.assignments.api.autorenters.svc.renters.RenterService;
-import info.ejava.assignments.api.autorenters.svc.utils.RenterValidator;
+import info.ejava.assignments.api.autorenters.svc.utils.DtoValidator;
 import info.ejava.assignments.api.autorenters.svc.utils.RentersProperties;
 import info.ejava.examples.common.exceptions.ClientErrorException;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +44,7 @@ public class RenterServiceMockedNTest {
     @MockitoBean
     private RenterDTORepository renterDTORepository;
     @MockitoBean
-    private RenterValidator renterValidator;
+    private DtoValidator dtoValidator;
     @MockitoBean
     private RentersProperties rentersProperties;
 
@@ -58,7 +58,7 @@ public class RenterServiceMockedNTest {
         // when / arrange
 
         // configure mock
-        BDDMockito.when(renterValidator.validateNewRenter(renterDTOCaptor.capture(), intCaptor.capture()))
+        BDDMockito.when(dtoValidator.validateDto(renterDTOCaptor.capture(), intCaptor.capture()))
                         .thenReturn(List.<String>of());
         BDDMockito.when(rentersProperties.getMinAge()).thenReturn(20);
         BDDMockito.when(renterDTORepository.save(renterDTOCaptor.capture()))
@@ -69,8 +69,8 @@ public class RenterServiceMockedNTest {
 
         // then
         // inspect call
-        verify(renterValidator,times(1)).validateNewRenter(any(RenterDTO.class),  anyInt());
-        BDDMockito.then(renterValidator).should(times(1)).validateNewRenter(any((RenterDTO.class)), anyInt());
+        verify(dtoValidator,times(1)).validateDto(any(RenterDTO.class),  anyInt());
+        BDDMockito.then(dtoValidator).should(times(1)).validateDto(any((RenterDTO.class)), anyInt());
         BDDMockito.then(renterDTORepository).should(times(1)).save(any(RenterDTO.class));
         verify(renterDTORepository, times(1)).save(any(RenterDTO.class));
         verify(rentersProperties,times(1)).getMinAge();
@@ -91,7 +91,7 @@ public class RenterServiceMockedNTest {
         // given / arrange
 
         // define Mockito behavior / configure mock
-        BDDMockito.when(renterValidator.validateNewRenter(renterDTOCaptor.capture(), intCaptor.capture()))
+        BDDMockito.when(dtoValidator.validateDto(renterDTOCaptor.capture(), intCaptor.capture()))
                         .thenReturn(List.<String>of("renter.firstName is empty"));
         BDDMockito.when(rentersProperties.getMinAge()).thenReturn(20);
         // BDDMockito.when(renterDTORepository.save(renterDTOCaptor.capture()))
@@ -104,8 +104,8 @@ public class RenterServiceMockedNTest {
                     () -> renterService.createRenter(invalidRenterDTO));
 
 
-        verify(renterValidator,times(1)).validateNewRenter(any(RenterDTO.class),  anyInt());
-        BDDMockito.then(renterValidator).should(times(1)).validateNewRenter(any((RenterDTO.class)), anyInt());
+        verify(dtoValidator,times(1)).validateDto(any(RenterDTO.class),  anyInt());
+        BDDMockito.then(dtoValidator).should(times(1)).validateDto(any((RenterDTO.class)), anyInt());
         //BDDMockito.then(renterDTORepository).should(times(1)).save(any(RenterDTO.class));
         //verify(renterDTORepository, times(1)).save(any(RenterDTO.class));
         verify(rentersProperties,times(1)).getMinAge();

@@ -23,11 +23,10 @@ public class AutoTestConfiguration {
                 .build();
     }
     
-    // @Bean
-    // @Qualifier("invalidRenter")
-    // public AutoDTO invalidRenter(){
-    //     return  AutoDTO.builder().email("valid@email.com").firstName("").lastName("Doe")
-    //             .dob(LocalDate.of(1999,2,26)).build();
-    // }
+    @Bean
+    @Qualifier("invalidAuto")
+    public AutoDTO invalidAuto(){
+        return  AutoDTO.builder().build();
+    }
 
 }

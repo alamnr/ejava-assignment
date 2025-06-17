@@ -23,7 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.svc.renters.RenterDTORepository;
 import info.ejava.assignments.api.autorenters.svc.renters.RenterServiceImpl;
-import info.ejava.assignments.api.autorenters.svc.utils.RenterValidator;
+import info.ejava.assignments.api.autorenters.svc.utils.DtoValidator;
 import info.ejava.assignments.api.autorenters.svc.utils.RentersProperties;
 import info.ejava.examples.common.exceptions.ClientErrorException;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class RenterServiceMockTest {
     
     private RenterDTO renterDTO;
     @Mock
-    private RenterValidator validatorMock;
+    private DtoValidator validatorMock;
     @Mock 
     private RenterDTORepository repo;
     @Mock
@@ -56,10 +56,10 @@ public class RenterServiceMockTest {
                         .lastName("Doe").dob(LocalDate.of(1380, 5, 26)).build();
 
         // define behavior of mock during test
-        BDDMockito.when(validatorMock.validateNewRenter(dtoCaptor.capture() , intCaptor.capture()))
+        BDDMockito.when(validatorMock.validateDto(dtoCaptor.capture() , intCaptor.capture()))
                     .thenReturn(List.<String>of());
         // BDDMockito.doReturn(Collections.<String>emptyList())
-        //             .when(validatorMock.validateNewRenter(dtoCaptor.capture(), intCaptor.capture()));
+        //             .when(validatorMock.validateDto(dtoCaptor.capture(), intCaptor.capture()));
 
         BDDMockito.when(renterProps.getMinAge()).thenReturn(20);
         
@@ -69,12 +69,12 @@ public class RenterServiceMockTest {
 
         // when / act 
         RenterDTO returnedRenter = renterServiceImpl.createRenter(renterDTO);
-        List<String> errMsg = validatorMock.validateNewRenter(renterDTO, 20);
+        List<String> errMsg = validatorMock.validateDto(renterDTO, 20);
 
         // then / assert - evaluate - verify
 
-        verify(validatorMock, times(2)).validateNewRenter(any(RenterDTO.class), anyInt());
-        BDDMockito.then(validatorMock).should(times(2)).validateNewRenter(any(RenterDTO.class), anyInt());
+        verify(validatorMock, times(2)).validateDto(any(RenterDTO.class), anyInt());
+        BDDMockito.then(validatorMock).should(times(2)).validateDto(any(RenterDTO.class), anyInt());
 
 
         // verify what was given to captor
@@ -100,7 +100,7 @@ public class RenterServiceMockTest {
                                 .dob(LocalDate.of(1965,12,29)).email("renter@email.com").build();
 
         // define behavior of mock while test
-        BDDMockito.when(validatorMock.validateNewRenter(dtoCaptor.capture(), intCaptor.capture()))
+        BDDMockito.when(validatorMock.validateDto(dtoCaptor.capture(), intCaptor.capture()))
                     .thenReturn(List.<String>of("renter.firstname is null"));
         
         BDDMockito.when(renterProps.getMinAge()).thenReturn(20);
@@ -110,14 +110,14 @@ public class RenterServiceMockTest {
         Throwable ex = BDDAssertions.catchThrowableOfType(ClientErrorException.InvalidInputException.class,
                              ()->renterServiceImpl.createRenter(renterDTO));
 
-        List<String> errMsg = validatorMock.validateNewRenter(renterDTO,renterProps.getMinAge());
+        List<String> errMsg = validatorMock.validateDto(renterDTO,renterProps.getMinAge());
         log.info("renter props - {}", renterProps.getMinAge());
         // then
 
         // verify / inspect the method call
 
-        verify(validatorMock,times(2)).validateNewRenter(any(RenterDTO.class), anyInt());
-        BDDMockito.then(validatorMock).should(times(2)).validateNewRenter(any(RenterDTO.class), anyInt());
+        verify(validatorMock,times(2)).validateDto(any(RenterDTO.class), anyInt());
+        BDDMockito.then(validatorMock).should(times(2)).validateDto(any(RenterDTO.class), anyInt());
 
         // verify what was given to mock
 

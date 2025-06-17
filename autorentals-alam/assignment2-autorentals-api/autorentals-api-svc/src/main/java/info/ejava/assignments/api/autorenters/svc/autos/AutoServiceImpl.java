@@ -1,6 +1,7 @@
 package info.ejava.assignments.api.autorenters.svc.autos;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -8,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 
 import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
 import info.ejava.assignments.api.autorenters.dto.autos.AutoSearchParams;
+import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
+import info.ejava.assignments.api.autorenters.svc.utils.DtoValidator;
 import info.ejava.examples.common.exceptions.ClientErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,14 +20,18 @@ import lombok.extern.slf4j.Slf4j;
 public class AutoServiceImpl implements AutosService {
 
     private final AutosDTORepository repository;
+    private final DtoValidator dtoValidator;
+
+    
     @Override
     public AutoDTO createAuto(AutoDTO newAuto) {
-        if(null == newAuto){
-            throw new ClientErrorException.InvalidInputException("auto is required");
-        }
-        if(null != newAuto.getId()){
-            throw new ClientErrorException.InvalidInputException("auto.id must be null");
-        }
+        validateAuto(newAuto);
+        // if(null == newAuto){
+        //     throw new ClientErrorException.InvalidInputException("auto is required");
+        // }
+        // if(null != newAuto.getId()){
+        //     throw new ClientErrorException.InvalidInputException("auto.id must be null");
+        // }
         AutoDTO savedAuto = repository.save(newAuto);
         log.debug("added auto - {}", savedAuto);
         return savedAuto;
@@ -46,11 +53,14 @@ public class AutoServiceImpl implements AutosService {
 
     @Override
     public AutoDTO updateAuto(String id, AutoDTO updateAuto) {
+        validateAuto(updateAuto);
         if(null == updateAuto){
             throw new ClientErrorException.InvalidInputException("auto is required");
         }
-        if(null !=id){
+        if(null !=id && repository.existsById(id)){
             updateAuto.setId(id);
+        } else {
+            throw new ClientErrorException.InvalidInputException("auto-[%s] not found", id);
         }
         log.debug("updating auto id - {} , {}",id, updateAuto);
         return repository.save(updateAuto);
@@ -96,5 +106,11 @@ public class AutoServiceImpl implements AutosService {
     public void removeAllAutos() {
         repository.deleteAll();
     }
-    
+
+    private void validateAuto(AutoDTO auto) {
+       List<String> errMsg = dtoValidator.validateDto(auto, 0);
+       if(!errMsg.isEmpty()){
+        throw new ClientErrorException.InvalidInputException("renter is not valid - %s", errMsg);
+       }
+    }
 }

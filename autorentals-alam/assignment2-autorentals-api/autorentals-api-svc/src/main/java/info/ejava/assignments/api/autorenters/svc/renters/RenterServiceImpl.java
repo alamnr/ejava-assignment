@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
-import info.ejava.assignments.api.autorenters.svc.utils.RenterValidator;
+import info.ejava.assignments.api.autorenters.svc.utils.DtoValidator;
 import info.ejava.assignments.api.autorenters.svc.utils.RentersProperties;
 import info.ejava.examples.common.exceptions.ClientErrorException;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RenterServiceImpl implements RenterService {
 
     private final RenterDTORepository repo;
-    private final RenterValidator renterValidator;
+    private final DtoValidator dtoValidator;
     private final RentersProperties renterProps;
 
     @Override
@@ -38,7 +38,7 @@ public class RenterServiceImpl implements RenterService {
     }
 
     private void validateRenter(RenterDTO newRenter) {
-       List<String> errMsg = renterValidator.validateNewRenter(newRenter, renterProps.getMinAge());
+       List<String> errMsg = dtoValidator.validateDto(newRenter, renterProps.getMinAge());
        if(!errMsg.isEmpty()){
         throw new ClientErrorException.InvalidInputException("renter is not valid - %s", errMsg);
        }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 
-public interface RenterValidator {
-    List<String> validateNewRenter(RenterDTO renter, int minAge);
+public interface DtoValidator {
+    //List<String> validateNewRenter(RenterDTO renter, int minAge);
+    <T> List<String> validateDto(T type, int minAge);
 }

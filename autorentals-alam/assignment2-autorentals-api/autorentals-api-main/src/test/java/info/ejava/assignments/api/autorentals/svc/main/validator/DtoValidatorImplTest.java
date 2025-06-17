@@ -1,4 +1,4 @@
-package info.ejava.assignments.api.autorentals.svc.main.renter.validator;
+package info.ejava.assignments.api.autorentals.svc.main.validator;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -11,20 +11,20 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
-import info.ejava.assignments.api.autorenters.svc.utils.RenterValidator;
-import info.ejava.assignments.api.autorenters.svc.utils.RenterValidatorImpl;
+import info.ejava.assignments.api.autorenters.svc.utils.DtoValidator;
+import info.ejava.assignments.api.autorenters.svc.utils.DtoValidatorImpl;
 import lombok.extern.slf4j.Slf4j;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @Slf4j
-public class RenterValidatorImplTest {
+public class DtoValidatorImplTest {
 
-    private RenterValidator renterValidator;
+    private DtoValidator dtoValidator;
     private RenterDTO renterDTO;
 
     @BeforeEach
     public void init(){
-        renterValidator = new RenterValidatorImpl();
+        dtoValidator = new DtoValidatorImpl();
     }
 
     @Test
@@ -35,7 +35,7 @@ public class RenterValidatorImplTest {
                         .dob(LocalDate.of(1930,8,30)).build();
 
         // when / act 
-        List<String> errMsgs = renterValidator.validateNewRenter(renterDTO, 20);
+        List<String> errMsgs = dtoValidator.validateDto(renterDTO, 20);
 
         // then / assert - evaluate
         Assertions.assertTrue(errMsgs.size()==0,"Error msg should be 0");
@@ -52,7 +52,7 @@ public class RenterValidatorImplTest {
                     .dob(LocalDate.of(1930,8,30)).email("renter@email.com").build();
         
         // when / act
-        List<String> errMsgs = renterValidator.validateNewRenter(renterDTO, 20);
+        List<String> errMsgs = dtoValidator.validateDto(renterDTO, 20);
 
         // then / evaluate - assert
         Assertions.assertTrue(errMsgs.size()==1);
@@ -71,7 +71,7 @@ public class RenterValidatorImplTest {
                     .dob(LocalDate.of(1980, 5, 25)).email("renter@email.com").build();
         
         // when / act
-        List<String> errMsg = renterValidator.validateNewRenter(renterDTO, 20);
+        List<String> errMsg = dtoValidator.validateDto(renterDTO, 20);
 
         // then / evaluate -assert
         Assertions.assertTrue(errMsg.size()==1);
