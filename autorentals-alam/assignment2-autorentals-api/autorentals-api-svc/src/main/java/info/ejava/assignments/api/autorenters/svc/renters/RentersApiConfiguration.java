@@ -32,7 +32,7 @@ public class RentersApiConfiguration {
 
     @Bean
     //@Order(Ordered.LOWEST_PRECEDENCE)
-    public RenterService renterServiceMapImpl(RenterDTORepository renterDTORepository, DtoValidator dtoValidator, RentersProperties renterProps){
+    public RenterService renterService(RenterDTORepository renterDTORepository, DtoValidator dtoValidator, RentersProperties renterProps){
         return new RenterServiceImpl(renterDTORepository, dtoValidator, renterProps);
     }
 

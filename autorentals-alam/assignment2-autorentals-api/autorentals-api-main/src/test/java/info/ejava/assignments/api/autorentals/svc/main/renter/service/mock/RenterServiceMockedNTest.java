@@ -28,7 +28,7 @@ import info.ejava.assignments.api.autorenters.svc.utils.RentersProperties;
 import info.ejava.examples.common.exceptions.ClientErrorException;
 import lombok.extern.slf4j.Slf4j;
 
-@SpringBootTest(classes =RenterTestConfiguration.class)
+@SpringBootTest(classes = RenterTestConfiguration.class)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @Slf4j
 public class RenterServiceMockedNTest {

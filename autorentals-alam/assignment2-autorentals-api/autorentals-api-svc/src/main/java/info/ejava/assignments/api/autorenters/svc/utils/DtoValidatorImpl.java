@@ -1,5 +1,6 @@
 package info.ejava.assignments.api.autorenters.svc.utils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,16 +49,20 @@ public class DtoValidatorImpl implements DtoValidator {
             AutoDTO auto = (AutoDTO)type;
             log.trace(" validating - {} ", auto);
             if(auto == null){
-                errMsgs.add("renter: can not be null");
+                errMsgs.add("auto: can not be null");
             } else if(auto.getId() == null) {
                 validate(errMsgs, ()->auto.getId()==null,()->"id must be null");
-                validate(errMsgs, ()-> !ObjectUtils.isEmpty(auto.getUsername()), ()->"auto.username - can not be blank");
+                //validate(errMsgs, ()-> !ObjectUtils.isEmpty(auto.getUsername()), ()->"auto.username - can not be blank");
+                validate(errMsgs, ()-> !ObjectUtils.isEmpty(auto.getMake()), ()->"auto.make - can not be blank");
+                validate(errMsgs, ()-> !ObjectUtils.isEmpty(auto.getModel()), ()->"auto.model - can not be blank");
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(auto.getFuelType()), ()->"auto.fueltype - can not be blank");
-                validate(errMsgs, ()-> auto.getDailyRate()==null , ()-> "renter.dailyrate  can not be null");
+                validate(errMsgs, ()-> !(auto.getDailyRate()==null || auto.getDailyRate().doubleValue()<=0) , ()-> "auto.dailyrate  can not be null");
             } else {
-                validate(errMsgs, ()-> !ObjectUtils.isEmpty(auto.getUsername()), ()->"auto.username - can not be blank");
+                //validate(errMsgs, ()-> !ObjectUtils.isEmpty(auto.getUsername()), ()->"auto.username - can not be blank");
+                validate(errMsgs, ()-> !ObjectUtils.isEmpty(auto.getMake()), ()->"auto.make - can not be blank");
+                validate(errMsgs, ()-> !ObjectUtils.isEmpty(auto.getModel()), ()->"auto.model - can not be blank");
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(auto.getFuelType()), ()->"auto.fueltype - can not be blank");
-                validate(errMsgs, ()-> auto.getDailyRate()==null , ()-> "renter.dailyrate  can not be null");
+                validate(errMsgs, ()-> !(auto.getDailyRate()==null || auto.getDailyRate().doubleValue()<=0) , ()-> "auto.dailyrate  can not be null");
             }
     
             log.trace("auto - {} , valid - {}, errors-{}", auto, errMsgs.isEmpty(), errMsgs);

@@ -32,11 +32,24 @@ public interface AutosJSONHttpIfaceMapping extends AutosAPI {
     public ResponseEntity<Void> hasAuto(@PathVariable("id") String id) ;
 
     @Override
-    @GetExchange(url = AUTOS_QUERY_PATH, accept = MediaType.APPLICATION_JSON_VALUE)
+    @PostExchange(url = AUTOS_QUERY_PATH, accept = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AutoListDTO> queryAutos(@RequestBody AutoDTO probe, 
                         @RequestParam(name = "pageNumber", required = false) Integer pageNumber, 
                         @RequestParam(name = "pageSize", required = false) Integer pageSize) ;
 
+    
+    @GetExchange(url = AUTOS_PATH, accept = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AutoListDTO> searchAutosList(
+            @RequestParam(value = "minDailyRate", required = false)Integer minDailyRate,
+            @RequestParam(value = "maxDailyRate", required=false) Integer maxDailyRate,
+            @RequestParam(value = "minPassengers", required=false) Integer minPassengers,
+            @RequestParam(value = "maxPassengers", required = false) Integer maxPassengers,
+
+            @RequestParam(value = "pageNumber" , required = false) Integer pageNumber,
+            @RequestParam(value = "pageSize", required = false) Integer pageSize);
+    
+
+    
     @Override
     @DeleteExchange(url = AUTOS_PATH)
     public ResponseEntity<Void> removeAllAutos() ;
@@ -45,10 +58,7 @@ public interface AutosJSONHttpIfaceMapping extends AutosAPI {
     @DeleteExchange(url = AUTO_PATH)
     public ResponseEntity<Void> removeAuto(@PathVariable("id") String id) ;
 
-    @Override
-    @GetExchange(url = AUTOS_QUERY_PATH)
-    public ResponseEntity<AutoListDTO> searchAutos(@RequestBody AutoSearchParams searchParams) ;
-
+    
     @Override
     @PutExchange(url = AUTO_PATH,contentType = MediaType.APPLICATION_JSON_VALUE, accept = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AutoDTO> updateAuto(@PathVariable("id") String id, @RequestBody AutoDTO auto);

@@ -137,7 +137,7 @@ public class ProvidedApiAutoRenterTestConfiguration {
     
 
     @Bean @Lazy @Qualifier("autosHttpIfaceJson")
-    public AutosAPI autosAPIHttpIfaceJsonClient(RestTemplate restTemplate, ServerConfig serverConfig) {
+    public AutosJSONHttpIfaceMapping autosAPIHttpIfaceJsonClient(RestTemplate restTemplate, ServerConfig serverConfig) {
         
         final RestClient restClient =  RestClient.builder(restTemplate)
                                         .baseUrl(serverConfig.getBaseUrl())
@@ -149,7 +149,7 @@ public class ProvidedApiAutoRenterTestConfiguration {
     }
 
     @Bean @Lazy @Qualifier("autosHttpIfaceXml")
-    public AutosAPI autosAPIHttpIfaceXmlClient(RestTemplate restTemplate, ServerConfig serverConfig) {
+    public AutosXMLHttpIfaceMapping autosAPIHttpIfaceXmlClient(RestTemplate restTemplate, ServerConfig serverConfig) {
         final RestClient restClient =  RestClient.builder(restTemplate)
                                         .baseUrl(serverConfig.getBaseUrl())
                                         .build();

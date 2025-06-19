@@ -26,7 +26,7 @@ public class AutosAPIConfiguration {
 
     @Bean
     //@Order(Ordered.LOWEST_PRECEDENCE)
-    public AutosService AutosDTOService(AutosDTORepository repository, DtoValidator dtoValidator){
+    public AutosService autosService(AutosDTORepository repository, DtoValidator dtoValidator){
         return new AutoServiceImpl(repository, dtoValidator);
     }
 
@@ -34,7 +34,7 @@ public class AutosAPIConfiguration {
     @ConditionalOnMissingBean
     public AutosController autosController(AutosService service){
         return new AutosController(service);
-    }
+    }  
 
     @Bean
     @ConditionalOnMissingBean

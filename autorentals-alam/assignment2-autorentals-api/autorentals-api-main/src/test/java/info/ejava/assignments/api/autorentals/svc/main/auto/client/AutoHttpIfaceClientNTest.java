@@ -1,4 +1,4 @@
-package info.ejava.assignments.api.autorentals.svc.main.renter.client;
+package info.ejava.assignments.api.autorentals.svc.main.auto.client;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -31,24 +31,28 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import info.ejava.assignments.api.autorentals.svc.main.renter.RenterTestConfiguration;
-import info.ejava.assignments.api.autorenters.client.renters.RentersAPI;
-import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
-import info.ejava.assignments.api.autorenters.dto.renters.RenterDTOFactory;
-import info.ejava.assignments.api.autorenters.dto.renters.RenterListDTO;
+import info.ejava.assignments.api.autorentals.svc.main.AutoRentalsAppMain;
+import info.ejava.assignments.api.autorentals.svc.main.auto.AutoTestConfiguration;
+import info.ejava.assignments.api.autorenters.client.autos.AutosAPI;
+import info.ejava.assignments.api.autorenters.client.autos.AutosJSONHttpIfaceMapping;
+import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
+import info.ejava.assignments.api.autorenters.dto.autos.AutoDTOFactory;
+import info.ejava.assignments.api.autorenters.dto.autos.AutoListDTO;
+import info.ejava.assignments.api.autorenters.dto.autos.AutoSearchParams;
+import info.ejava.assignments.api.autorenters.dto.rentals.SearchParams;
 import info.ejava.examples.common.dto.JsonUtil;
 import info.ejava.examples.common.dto.MessageDTO;
 import lombok.extern.slf4j.Slf4j;
 
-@SpringBootTest(classes = {RenterTestConfiguration.class},
+@SpringBootTest(classes = {AutoTestConfiguration.class, AutoRentalsAppMain.class},
                 webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("test")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @Slf4j
-public class RenterHttpIfaceClientNTest {
+public class AutoHttpIfaceClientNTest {
 
-    @Autowired @Qualifier("rentersHttpIfaceJson")
-    private RentersAPI renterHttpIfaceAPI;
+    @Autowired @Qualifier("autosHttpIfaceJson")
+    private AutosJSONHttpIfaceMapping autoHttpIfaceJsonAPI;
 
     @LocalServerPort
     private int port;  // injecting port way -1
@@ -57,13 +61,13 @@ public class RenterHttpIfaceClientNTest {
     private URI baseUrl;
 
     @Autowired
-    private RenterDTOFactory renterDTOFactory;
+    private AutoDTOFactory autoDTOFactory;
 
-    @Autowired @Qualifier("validRenter")
-    private RenterDTO validRenter;
+    @Autowired @Qualifier("validAuto")
+    private AutoDTO validAuto;
 
-    @Autowired @Qualifier("invalidRenter")
-    private RenterDTO invalidRenter;
+    @Autowired @Qualifier("invalidAuto")
+    private AutoDTO invalidAuto;
 
     
     private static final MediaType[] MEDIA_TYPES = new MediaType[] {
@@ -99,20 +103,17 @@ public class RenterHttpIfaceClientNTest {
 
     @BeforeEach  // injecting port way -2
     public void init(@LocalServerPort int port ) {
-        //log.info("port way2 - {}", port);
-        //ResponseEntity<RenterDTO> resp = renterHttpIfaceAPI.createRenter(validRenter);
-        //log.info("response - {}", resp);
-        renterHttpIfaceAPI.removeAllRenters();
+        
+        autoHttpIfaceJsonAPI.removeAllAutos();
     }
 
     @ParameterizedTest
     @MethodSource("mediaTypes")
-    void add_valid_renter_for_type(MediaType contentType, MediaType accept){
-        //log.info("port way1 - {}", port);
+    void add_valid_auto_for_type(MediaType contentType, MediaType accept){
         // given / arrange
 
         // when  / act
-        ResponseEntity<RenterDTO> response = renterHttpIfaceAPI.createRenter(validRenter) ;
+        ResponseEntity<AutoDTO> response = autoHttpIfaceJsonAPI.createAuto(validAuto) ;
      
         log.info("resp. status - {} - {}", response.getStatusCode(), HttpStatus.valueOf(response.getStatusCode().value()));
         log.info("resp. body - {}", response.getBody());
@@ -122,101 +123,104 @@ public class RenterHttpIfaceClientNTest {
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         
 
-        RenterDTO createdRenter = response.getBody();
-        BDDAssertions.then(createdRenter).isEqualTo(validRenter.withId(createdRenter.getId()));
-        URI location = UriComponentsBuilder.fromUri(baseUrl).replacePath(RentersAPI.RENTER_PATH).build(createdRenter.getId());
+        AutoDTO createdRenter = response.getBody();
+        BDDAssertions.then(createdRenter).isEqualTo(validAuto.withId(createdRenter.getId()));
+        URI location = UriComponentsBuilder.fromUri(baseUrl).replacePath(AutosAPI.AUTO_PATH).build(createdRenter.getId());
         BDDAssertions.then(response.getHeaders().getFirst(HttpHeaders.LOCATION)).isEqualTo(location.toString());
     }
 
     @Test
-    void get_renter() {
+    void get_auto() {
         // given / arrange
-        RenterDTO existingRenter = renterDTOFactory.make();
+        AutoDTO existingAuto = autoDTOFactory.make();
         
         // when / act
-        ResponseEntity<RenterDTO> response = renterHttpIfaceAPI.createRenter(existingRenter);
+        ResponseEntity<AutoDTO> response = autoHttpIfaceJsonAPI.createAuto(existingAuto);
 
         // then / assert -evaluate
         BDDAssertions.then(response.getStatusCode().is2xxSuccessful()).isTrue();
 
         String requestId = response.getBody().getId();
-        URI location = UriComponentsBuilder.fromUri(baseUrl).replacePath(RentersAPI.RENTER_PATH).build(requestId);
-        ResponseEntity<RenterDTO> getRenter = renterHttpIfaceAPI.getRenter(requestId);
+        URI location = UriComponentsBuilder.fromUri(baseUrl).replacePath(AutosAPI.AUTO_PATH).build(requestId);
+        ResponseEntity<AutoDTO> getAuto = autoHttpIfaceJsonAPI.getAuto(requestId);
 
-        BDDAssertions.then(getRenter.getStatusCode()).isEqualTo(HttpStatus.OK);
-        BDDAssertions.then(getRenter.getBody()).isEqualTo(existingRenter.withId(requestId));
+        BDDAssertions.then(getAuto.getStatusCode()).isEqualTo(HttpStatus.OK);
+        BDDAssertions.then(getAuto.getBody()).isEqualTo(existingAuto.withId(requestId));
         BDDAssertions.then(response.getHeaders().getLocation()).isEqualTo(location);
     }
 
      @ParameterizedTest
      @ValueSource(strings = {MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE})
-     void get_renters(String mediaTypeString){
+     void get_autos(String mediaTypeString){
         // given / arrange
         MediaType mediaType = MediaType.valueOf(mediaTypeString);
-        Map<String,RenterDTO> rentersMap = new HashMap<>();
-        RenterListDTO renters = renterDTOFactory.listBuilder().make(3,3);
-        for (RenterDTO renterDTO : renters.getRenters()) {
-            ResponseEntity<RenterDTO> response = renterHttpIfaceAPI.createRenter(renterDTO);
+        Map<String,AutoDTO> autosMap = new HashMap<>();
+        AutoListDTO autos = autoDTOFactory.listBuilder().make(3,3);
+        for (AutoDTO autoDTO : autos.getAutos()) {
+            ResponseEntity<AutoDTO> response = autoHttpIfaceJsonAPI.createAuto(autoDTO);
             BDDAssertions.then(response.getStatusCode().is2xxSuccessful()).isTrue();
-            RenterDTO addedRenter = response.getBody();
-            rentersMap.put(addedRenter.getId(), addedRenter);
+            AutoDTO addedRenter = response.getBody();
+            autosMap.put(addedRenter.getId(), addedRenter);
         }
-        BDDAssertions.then(rentersMap).isNotEmpty();
+        BDDAssertions.then(autosMap).isNotEmpty();
 
       
-        // when / act
-        ResponseEntity<RenterListDTO> response = renterHttpIfaceAPI.getRenters(0, 0);
-        ResponseEntity<RenterListDTO> responseWithOffsetLimit  = renterHttpIfaceAPI.getRenters(0, 15 );
+        // when / act        
+        ResponseEntity<AutoListDTO> response = autoHttpIfaceJsonAPI.searchAutosList(null,null,
+                null,null,0,0);
+                 
+        ResponseEntity<AutoListDTO> responseWithOffsetLimit  = autoHttpIfaceJsonAPI.searchAutosList(null,null,
+                null,null,0,15);
 
         // then / evaluate - assert
 
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         BDDAssertions.then(responseWithOffsetLimit.getStatusCode()).isEqualTo(HttpStatus.OK);
-        RenterListDTO renterPage = response.getBody();
-        RenterListDTO renterPageWithOffset = responseWithOffsetLimit.getBody();
-        //log.info("offset - {}, limit - {}", renterPage.getOffset(), renterPage.getLimit());
-        BDDAssertions.then(renterPage.getOffset()).isEqualTo(0);
-        BDDAssertions.then(renterPage.getLimit()).isEqualTo(0);
-        log.info("renter map size - {}",rentersMap.size());
-        log.info("count-{}, total -{}",renterPage.getCount(), renterPage.getTotal());
+        AutoListDTO autoPage = response.getBody();
+        AutoListDTO autoPageWithOffset = responseWithOffsetLimit.getBody();
+        //log.info("offset - {}, limit - {}", autoPage.getOffset(), autoPage.getLimit());
+        BDDAssertions.then(autoPage.getOffset()).isEqualTo(0);
+        BDDAssertions.then(autoPage.getLimit()).isEqualTo(0);
+        log.info("auto map size - {}",autosMap.size());
+        log.info("count-{}, total -{}",autoPage.getCount(), autoPage.getTotal());
         
-        BDDAssertions.then(renterPage.getCount()).isEqualTo(rentersMap.size());
+        BDDAssertions.then(autoPage.getCount()).isEqualTo(autosMap.size());
 
-        BDDAssertions.then(renterPageWithOffset.getOffset()).isEqualTo(0);
-        BDDAssertions.then(renterPageWithOffset.getLimit()).isEqualTo(15);
-        log.info("offset count-{}, total -{}",renterPageWithOffset.getCount(), renterPageWithOffset.getTotal());
-        //BDDAssertions.then(renterPageWithOffset.getCount()).isEqualTo(rentersMap.size()-2);
+        BDDAssertions.then(autoPageWithOffset.getOffset()).isEqualTo(0);
+        BDDAssertions.then(autoPageWithOffset.getLimit()).isEqualTo(15);
+        log.info("offset count-{}, total -{}",autoPageWithOffset.getCount(), autoPageWithOffset.getTotal());
+        //BDDAssertions.then(autoPageWithOffset.getCount()).isEqualTo(autosMap.size()-2);
 
-        for(RenterDTO renter: renterPage.getRenters()){
-            BDDAssertions.then(rentersMap.remove(renter.getId())).isNotNull();
+        for(AutoDTO auto: autoPage.getAutos()){
+            BDDAssertions.then(autosMap.remove(auto.getId())).isNotNull();
         }
 
-        BDDAssertions.then(rentersMap).isEmpty();
+        BDDAssertions.then(autosMap).isEmpty();
 
      }
 
      @ParameterizedTest
      @MethodSource("mediaTypes")
-     void add_valid_renter(MediaType contentType, MediaType accept){
+     void add_valid_auto(MediaType contentType, MediaType accept){
         // given / arrange 
-        RenterDTO validRenter = renterDTOFactory.make();
+        AutoDTO validAuto = autoDTOFactory.make();
 
         // when / act
 
-        ResponseEntity<RenterDTO> response = renterHttpIfaceAPI.createRenter(validRenter);
+        ResponseEntity<AutoDTO> response = autoHttpIfaceJsonAPI.createAuto(validAuto);
 
         // then / evaluate - assert
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        RenterDTO createdQuote = response.getBody();
-        BDDAssertions.then(createdQuote).isEqualTo(validRenter.withId(createdQuote.getId()));
-        URI location = UriComponentsBuilder.fromUri(baseUrl).path(RentersAPI.RENTER_PATH).build(createdQuote.getId());
+        AutoDTO createdAuto = response.getBody();
+        BDDAssertions.then(createdAuto).isEqualTo(validAuto.withId(createdAuto.getId()));
+        URI location = UriComponentsBuilder.fromUri(baseUrl).path(AutosAPI.AUTO_PATH).build(createdAuto.getId());
         BDDAssertions.then(response.getHeaders().getLocation()).isEqualTo(location);
      }
 
-    private RenterDTO given_an_existing_renter() {
-        RenterDTO existingRenter = renterDTOFactory.make();
-        ResponseEntity<RenterDTO> response = renterHttpIfaceAPI.createRenter(existingRenter);
+    private AutoDTO given_an_existing_auto() {
+        AutoDTO existingAuto = autoDTOFactory.make();
+        ResponseEntity<AutoDTO> response = autoHttpIfaceJsonAPI.createAuto(existingAuto);
         BDDAssertions.then(response.getStatusCode().is2xxSuccessful()).isTrue();
         BDDAssertions.then((response.getStatusCode())).isEqualTo(HttpStatus.CREATED);
         return response.getBody();
@@ -224,108 +228,108 @@ public class RenterHttpIfaceClientNTest {
      }
 
     @Test
-    void update_an_existing_renter() {
-        // given - an existing renter
-        RenterDTO existingRenter = given_an_existing_renter();
-        String requestId = existingRenter.getId();
+    void update_an_existing_auto() {
+        // given - an existing auto
+        AutoDTO existingAuto = given_an_existing_auto();
+        String requestId = existingAuto.getId();
 
-        RenterDTO updatedRenter = existingRenter.withFirstName(existingRenter.getFirstName()+"Updated ").withId(null);
+        AutoDTO updatedAuto = existingAuto.withModel(existingAuto.getModel()+"Updated ").withId(null);
 
         // when / act
-        ResponseEntity<RenterDTO> response = renterHttpIfaceAPI.updateRenter(requestId, updatedRenter);
+        ResponseEntity<AutoDTO> response = autoHttpIfaceJsonAPI.updateAuto(requestId, updatedAuto);
 
         // then / evaluate - assert
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        ResponseEntity<RenterDTO> getupdatedRenter = renterHttpIfaceAPI.getRenter(requestId);
+        ResponseEntity<AutoDTO> getupdatedAuto = autoHttpIfaceJsonAPI.getAuto(requestId);
 
-        BDDAssertions.then(getupdatedRenter.getStatusCode()).isEqualTo(HttpStatus.OK);
-        BDDAssertions.then(getupdatedRenter.getBody()).isEqualTo(updatedRenter.withId(requestId));
-        BDDAssertions.then(getupdatedRenter.getBody()).isNotEqualTo(existingRenter);
+        BDDAssertions.then(getupdatedAuto.getStatusCode()).isEqualTo(HttpStatus.OK);
+        BDDAssertions.then(getupdatedAuto.getBody()).isEqualTo(updatedAuto.withId(requestId));
+        BDDAssertions.then(getupdatedAuto.getBody()).isNotEqualTo(existingAuto);
 
      }
 
       @Test
-     void get_renter_1(){
+     void get_auto_1(){
         // given / arrange
-        RenterDTO existingRenter = renterDTOFactory.make();
-        ResponseEntity<RenterDTO> response = renterHttpIfaceAPI.createRenter(existingRenter);
+        AutoDTO existingAuto = autoDTOFactory.make();
+        ResponseEntity<AutoDTO> response = autoHttpIfaceJsonAPI.createAuto(existingAuto);
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         String requestId = response.getBody().getId();
 
         // when / act
-        ResponseEntity<RenterDTO>  getRenter = renterHttpIfaceAPI.getRenter(requestId);
+        ResponseEntity<AutoDTO>  getAuto = autoHttpIfaceJsonAPI.getAuto(requestId);
 
         // then
-        BDDAssertions.then(getRenter.getStatusCode()).isEqualTo(HttpStatus.OK);
-        BDDAssertions.then(getRenter.getBody()).isEqualTo(existingRenter.withId(requestId));
+        BDDAssertions.then(getAuto.getStatusCode()).isEqualTo(HttpStatus.OK);
+        BDDAssertions.then(getAuto.getBody()).isEqualTo(existingAuto.withId(requestId));
      }
 
-     protected List<RenterDTO> given_many_renters(int count) {
-        List<RenterDTO> renters = new ArrayList<>(count);
-        for (RenterDTO renterDTO : renterDTOFactory.listBuilder().renters(count, count)) {
-            ResponseEntity<RenterDTO> response = renterHttpIfaceAPI.createRenter(renterDTO);
+     protected List<AutoDTO> given_many_autos(int count) {
+        List<AutoDTO> autos = new ArrayList<>(count);
+        for (AutoDTO autoDTO : autoDTOFactory.listBuilder().autos(count, count)) {
+            ResponseEntity<AutoDTO> response = autoHttpIfaceJsonAPI.createAuto(autoDTO);
             BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-            renters.add(response.getBody());
+            autos.add(response.getBody());
         }
-        return renters;
+        return autos;
      }
 
     @Test
-     void remove_renter() {
+     void remove_auto() {
         // given
-        List<RenterDTO> renters = given_many_renters(5);
-        String requestId = renters.get(1).getId();
-        BDDAssertions.then(renterHttpIfaceAPI.getRenter(requestId).getStatusCode()).isEqualTo(HttpStatus.OK);
+        List<AutoDTO> autos = given_many_autos(5);
+        String requestId = autos.get(1).getId();
+        BDDAssertions.then(autoHttpIfaceJsonAPI.getAuto(requestId).getStatusCode()).isEqualTo(HttpStatus.OK);
 
         // when requested to remove
-        ResponseEntity<Void> response = renterHttpIfaceAPI.removeRenter(requestId);
+        ResponseEntity<Void> response = autoHttpIfaceJsonAPI.removeAuto(requestId);
 
         // then
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        RestClientResponseException ex = BDDAssertions.catchThrowableOfType(()-> renterHttpIfaceAPI.getRenter(requestId),
+        RestClientResponseException ex = BDDAssertions.catchThrowableOfType(()-> autoHttpIfaceJsonAPI.getAuto(requestId),
                                          RestClientResponseException.class);
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
      }
     
     @Test
-    void remove_all_renter() {
+    void remove_all_auto() {
         // given / arrange
-        List<RenterDTO> renters = given_many_renters(6);
+        List<AutoDTO> autos = given_many_autos(6);
 
         // when / act
-        ResponseEntity<Void> resp = renterHttpIfaceAPI.removeAllRenters();
+        ResponseEntity<Void> resp = autoHttpIfaceJsonAPI.removeAllAutos();
 
         // then 
         BDDAssertions.then(resp.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        for (RenterDTO renterDTO : renters) {
+        for (AutoDTO autoDTO : autos) {
             RestClientResponseException ex = BDDAssertions.catchThrowableOfType(
-                    () -> renterHttpIfaceAPI.getRenter(renterDTO.getId()),
+                    () -> autoHttpIfaceJsonAPI.getAuto(autoDTO.getId()),
                     RestClientResponseException.class);
             BDDAssertions.assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         }
     }
 
     @Test
-    void remove_unknown_renter() {  // idempotent http method
+    void remove_unknown_auto() {  // idempotent http method
         // given 
-        String requestId = "renter-13";
+        String requestId = "auto-13";
 
         // when
-        ResponseEntity<Void> resp = renterHttpIfaceAPI.removeRenter(requestId);
+        ResponseEntity<Void> resp = autoHttpIfaceJsonAPI.removeAuto(requestId);
 
         // then
         BDDAssertions.then(resp.getStatusCode().is2xxSuccessful()).isTrue();
     }
 
     @Test
-    void get_renter_no_renters(){
+    void get_auto_no_autos(){
         // given
-        BDDAssertions.assertThat(renterHttpIfaceAPI.removeAllRenters().getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        BDDAssertions.assertThat(autoHttpIfaceJsonAPI.removeAllAutos().getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         
         // then
         RestClientResponseException ex = BDDAssertions.catchThrowableOfType(
-            () -> renterHttpIfaceAPI.getRenter("renter-123")
+            () -> autoHttpIfaceJsonAPI.getAuto("auto-123")
                                     , RestClientResponseException.class);
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         MessageDTO errMsg = getErrorResponse(ex);
@@ -334,82 +338,77 @@ public class RenterHttpIfaceClientNTest {
     }
 
     @Test
-    void get_unknown_renter(){
+    void get_unknown_auto(){
         // given
-        String unknownId ="renter-13";
+        String unknownId ="auto-13";
 
         // when - requesting quote by id
 
         RestClientResponseException ex = BDDAssertions.catchThrowableOfType(
-            () -> renterHttpIfaceAPI.getRenter(unknownId)       
+            () -> autoHttpIfaceJsonAPI.getAuto(unknownId)       
                             , RestClientResponseException.class);
         // then
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         MessageDTO errMsg = getErrorResponse(ex);
-        BDDAssertions.then(errMsg.getDescription()).contains(String.format("Renter-[%s]", unknownId));
+        BDDAssertions.then(errMsg.getDescription()).contains(String.format("auto[%s]", unknownId));
 
     }
 
     @Test
-    void update_unknown_renter() {
+    void update_unknown_auto() {
         // given
 
         String unknownId = "13";
-        RenterDTO updateRenter = renterDTOFactory.make().withId(unknownId);
+        AutoDTO updateAuto = autoDTOFactory.make().withId(unknownId);
 
         // verify that updating existing quote
         RestClientResponseException ex =  BDDAssertions.catchThrowableOfType(
-            ()-> renterHttpIfaceAPI.updateRenter(unknownId, updateRenter)
+            ()-> autoHttpIfaceJsonAPI.updateAuto(unknownId, updateAuto)
                     , RestClientResponseException.class);
 
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
         MessageDTO errMsg = getErrorResponse(ex);
-        BDDAssertions.then(errMsg.getDescription()).contains(String.format("renter-[13] not found", unknownId));
+        BDDAssertions.then(errMsg.getDescription()).contains(String.format("auto-[%s] not found", unknownId));
     }
 
     @Test
     //@Disabled
-    void update_known_renter_with_bad_renter() {
+    void update_known_auto_with_bad_auto() {
         // given
-        List<RenterDTO> renters = given_many_renters(3);
+        List<AutoDTO> autos = given_many_autos(3);
         
-        String knownId = renters.get(0).getId();
-        RenterDTO badRenterMissingText = new RenterDTO();
-        badRenterMissingText.withId(knownId);
-        ResponseEntity<RenterDTO> resp = renterHttpIfaceAPI.getRenter(knownId);
+        String knownId = autos.get(0).getId();
+        AutoDTO badAutoMissingText = new AutoDTO();
+        badAutoMissingText.withId(knownId);
+        ResponseEntity<AutoDTO> resp = autoHttpIfaceJsonAPI.getAuto(knownId);
         log.info("resp - {}", resp.getBody());
 
         // when
         RestClientResponseException ex = BDDAssertions.catchThrowableOfType(
-         () -> renterHttpIfaceAPI.updateRenter(knownId, badRenterMissingText)
+         () -> autoHttpIfaceJsonAPI.updateAuto(knownId, badAutoMissingText)
                     , RestClientResponseException.class);
         // then
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
-        BDDAssertions.then(getErrorResponse(ex).getDescription()).contains(String.format("renter is not valid", knownId));
+        BDDAssertions.then(getErrorResponse(ex).getDescription()).contains(String.format("auto is not valid", knownId));
     }
 
     @Test
     //@Disabled
-    void add_bad_renter_rejected() {
+    void add_bad_auto_rejected() {
         // given
         
-        RenterDTO badRenterMissingText = new RenterDTO();
-        // ResponseEntity<RenterDTO> resp =   webClient.post()
-        //             .uri(UriComponentsBuilder.fromUri(baseUrl).path(QuotesAPI.QUOTES_PATH).build().toUri())
-        //             .bodyValue(badQuoteMissingText)
-        //             .retrieve().toEntity(RenterDTO.class).block();
-        // log.info("resp - {} ", resp.getBody());
-
+        AutoDTO badAutoMissingText = new AutoDTO();
+        
         
         // when
         RestClientResponseException ex = BDDAssertions.catchThrowableOfType(
         //  () -> webClient.post().uri(UriComponentsBuilder.fromUri(baseUrl).path(QuotesAPI.QUOTES_PATH).build().toUri())
-        //             .bodyValue(badQuoteMissingText).retrieve().toEntity(RenterDTO.class).block()
-        () -> renterHttpIfaceAPI.createRenter(badRenterMissingText)
+        //             .bodyValue(badQuoteMissingText).retrieve().toEntity(AutoDTO.class).block()
+        () -> autoHttpIfaceJsonAPI.createAuto(badAutoMissingText)
                     , RestClientResponseException.class);
         // then
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
-        BDDAssertions.then(getErrorResponse(ex).getDescription()).contains(String.format("renter is not valid ", ""));
+        BDDAssertions.then(getErrorResponse(ex).getDescription()).contains(String.format("auto is not valid ", ""));
     }
 
     public static class IntegerConverter implements ArgumentConverter {
@@ -420,7 +419,7 @@ public class RenterHttpIfaceClientNTest {
     }
 
     @Test
-    void get_empty_renters(){
+    void get_empty_autos(){
         // given - we have no quotes
         Integer offset = 0;
         Integer limit = 100;
@@ -435,25 +434,26 @@ public class RenterHttpIfaceClientNTest {
 
         
          //when - asked for amounts we do not have
-        ResponseEntity<RenterListDTO> response = renterHttpIfaceAPI.getRenters(0,100);
+        ResponseEntity<AutoListDTO> response = autoHttpIfaceJsonAPI.searchAutosList(null,null,
+                null,null,0,100);
         log.debug("{}", response);
 
         //then - the response will be empty
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        RenterListDTO returnedRenters = response.getBody();
-        BDDAssertions.then(returnedRenters.getCount()).isEqualTo(0);
+        AutoListDTO returnedAutos = response.getBody();
+        BDDAssertions.then(returnedAutos.getCount()).isEqualTo(0);
         //and descriptive attributes filed in
-        log.info("returned - {}", returnedRenters);
-        BDDAssertions.then(returnedRenters.getOffset()).isEqualTo(0);
-        BDDAssertions.then(returnedRenters.getLimit()).isEqualTo(100);
-        BDDAssertions.then(returnedRenters.getTotal()).isEqualTo(0);       
+        log.info("returned - {}", returnedAutos);
+        BDDAssertions.then(returnedAutos.getOffset()).isEqualTo(0);
+        BDDAssertions.then(returnedAutos.getLimit()).isEqualTo(100);
+        BDDAssertions.then(returnedAutos.getTotal()).isEqualTo(0);       
 
     }
 
     @Test
-    void get_many_renters() {
+    void get_many_autos() {
         // given many quotes
-        given_many_renters(100);
+        given_many_autos(100);
 
         //when asking for a page of quotes
         Integer offset = 9;
@@ -466,24 +466,24 @@ public class RenterHttpIfaceClientNTest {
         //     urlBuilder = urlBuilder.queryParam("limit", limit);
         // }
         // URI url = urlBuilder.build().toUri();
-
-        ResponseEntity<RenterListDTO> response = renterHttpIfaceAPI.getRenters(offset, limit);
+        ResponseEntity<AutoListDTO> response = autoHttpIfaceJsonAPI.searchAutosList(null,null,
+                null,null,offset,limit);
 
          //then - page of results returned
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        RenterListDTO returnedRenters = response.getBody();
-        log.debug("{}", returnedRenters);
-        BDDAssertions.then(returnedRenters.getCount()).isEqualTo(10);
-        RenterDTO renter0 = returnedRenters.getRenters().get(0);
-        String[] ids = renter0.getId().split("-");
+        AutoListDTO returnedAutos = response.getBody();
+        log.debug("{}", returnedAutos);
+        BDDAssertions.then(returnedAutos.getCount()).isEqualTo(10);
+        AutoDTO auto0 = returnedAutos.getAutos().get(0);
+        String[] ids = auto0.getId().split("-");
         
         BDDAssertions.then(Integer.valueOf(ids[1])).isGreaterThan(1);
         
 
         //and descriptive attributes filed in
-        BDDAssertions.then(returnedRenters.getOffset()).isEqualTo(9);
-        BDDAssertions.then(returnedRenters.getLimit()).isEqualTo(10);
-        BDDAssertions.then(returnedRenters.getTotal()).isEqualTo(10);
+        BDDAssertions.then(returnedAutos.getOffset()).isEqualTo(9);
+        BDDAssertions.then(returnedAutos.getLimit()).isEqualTo(10);
+        BDDAssertions.then(returnedAutos.getTotal()).isEqualTo(10);
     }
 
    

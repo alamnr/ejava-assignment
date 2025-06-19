@@ -110,7 +110,7 @@ public class AutoServiceImpl implements AutosService {
     private void validateAuto(AutoDTO auto) {
        List<String> errMsg = dtoValidator.validateDto(auto, 0);
        if(!errMsg.isEmpty()){
-        throw new ClientErrorException.InvalidInputException("renter is not valid - %s", errMsg);
+        throw new ClientErrorException.InvalidInputException("auto is not valid - %s", errMsg);
        }
     }
 }

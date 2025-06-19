@@ -4,6 +4,7 @@ import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
 import info.ejava.assignments.api.autorenters.dto.autos.AutoListDTO;
 import info.ejava.assignments.api.autorenters.dto.autos.AutoSearchParams;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -19,6 +20,8 @@ public interface AutosAPI {
 
     ResponseEntity<AutoDTO> createAuto(AutoDTO auto);
     ResponseEntity<AutoListDTO> queryAutos(AutoDTO probe, Integer pageNumber, Integer pageSize);
+    // ResponseEntity<AutoListDTO> searchAutos(Integer minDailyRate,Integer maxDailyRate,
+    //             Integer minPassengers,Integer maxPassengers,Integer pageNumber,Integer pageSize);
     ResponseEntity<AutoListDTO> searchAutos(AutoSearchParams searchParams);
     ResponseEntity<AutoDTO> getAuto(String id);
     ResponseEntity<Void> hasAuto(String id);

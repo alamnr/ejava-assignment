@@ -24,7 +24,7 @@ import lombok.With;
 @AllArgsConstructor
 
 @XmlRootElement(name = "auto" , namespace = "urn:ejava.svc-controllers.autos")      // JAXB
-//@XmlAccessorType(XmlAccessType.FIELD)  // JAXB java.util.date and java.time adapters
+@XmlAccessorType(XmlAccessType.FIELD)  // JAXB java.util.date and java.time adapters
 
 @JacksonXmlRootElement(localName = "auto", namespace = "urn:ejava.svc-controllers.autos")  // JACKSON
 public class AutoDTO {
