@@ -218,8 +218,8 @@ public class AutoRestTemplateClientNTest {
         AutoListDTO autoPageWithOffsetAndLimit = responseWithOffsetAndLimit.getBody();
 
         
-        BDDAssertions.then(autoPageWithoutOffsetAndLimit.getOffset()).isNull();
-        BDDAssertions.then(autoPageWithoutOffsetAndLimit.getLimit()).isNull();
+        BDDAssertions.then(autoPageWithoutOffsetAndLimit.getOffset()).isEqualTo(0);
+        BDDAssertions.then(autoPageWithoutOffsetAndLimit.getLimit()).isEqualTo(0);
         BDDAssertions.then(autoPageWithOffsetAndLimit.getOffset()).isEqualTo(1);
         BDDAssertions.then(autoPageWithOffsetAndLimit.getLimit()).isEqualTo(20);
 

@@ -215,8 +215,8 @@ public class AutoWebClientNTest {
         AutoListDTO autoPageWithpageNumberAndpageSize = responseWithpageNumberAndpageSize.getBody();
 
         
-        BDDAssertions.then(autoPageWithoutpageNumberAndpageSize.getOffset()).isNull();
-        BDDAssertions.then(autoPageWithoutpageNumberAndpageSize.getLimit()).isNull();
+        BDDAssertions.then(autoPageWithoutpageNumberAndpageSize.getOffset()).isEqualTo(0);
+        BDDAssertions.then(autoPageWithoutpageNumberAndpageSize.getLimit()).isEqualTo(0);
         BDDAssertions.then(autoPageWithpageNumberAndpageSize.getOffset()).isEqualTo(1);
         BDDAssertions.then(autoPageWithpageNumberAndpageSize.getLimit()).isEqualTo(20);
 

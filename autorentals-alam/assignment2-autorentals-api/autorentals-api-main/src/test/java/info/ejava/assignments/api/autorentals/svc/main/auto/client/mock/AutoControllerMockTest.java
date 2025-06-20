@@ -72,8 +72,8 @@ public class AutoControllerMockTest {
         // autos = autoDTOFactory.listBuilder().make(5, 5);  
             // With ID
         autos = autoDTOFactory.listBuilder().make(5, 5, AutoDTOFactory.withId);
-        //autos.setOffset(0);
-        //autos.setLimit(0);
+        autos.setOffset(0);
+        autos.setLimit(0);
         autos.setTotal(autos.getAutos().size());
         autos.setKeywords("");
         //System.out.println("autos - "+ autos);

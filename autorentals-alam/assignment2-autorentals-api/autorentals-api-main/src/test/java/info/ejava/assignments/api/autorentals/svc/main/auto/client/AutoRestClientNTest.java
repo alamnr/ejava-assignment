@@ -217,8 +217,8 @@ public class AutoRestClientNTest {
         AutoListDTO autoPageWithOffsetAndpageSize = responseWithOffsetAndpageSize.getBody();
 
         
-        BDDAssertions.then(autoPageWithoutOffsetAndpageSize.getOffset()).isNull();
-        BDDAssertions.then(autoPageWithoutOffsetAndpageSize.getLimit()).isNull();
+        BDDAssertions.then(autoPageWithoutOffsetAndpageSize.getOffset()).isEqualTo(0);
+        BDDAssertions.then(autoPageWithoutOffsetAndpageSize.getLimit()).isEqualTo(0);
         BDDAssertions.then(autoPageWithOffsetAndpageSize.getOffset()).isEqualTo(1);
         BDDAssertions.then(autoPageWithOffsetAndpageSize.getLimit()).isEqualTo(20);
 

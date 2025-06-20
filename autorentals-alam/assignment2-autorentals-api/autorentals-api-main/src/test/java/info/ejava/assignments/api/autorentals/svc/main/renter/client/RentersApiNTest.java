@@ -117,6 +117,7 @@ public class RentersApiNTest {
     void can_update_renter() {
         //given
         RenterDTO existingRenter = populate(1).get(0);
+        existingRenter.getDob().plusYears(20);
         LocalDate updatedDob = existingRenter.getDob().plus(10, ChronoUnit.YEARS);
         RenterDTO updatedRenter = existingRenter.withDob(updatedDob);
         //when
