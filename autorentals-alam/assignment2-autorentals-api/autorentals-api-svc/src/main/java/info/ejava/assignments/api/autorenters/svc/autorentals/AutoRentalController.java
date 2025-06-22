@@ -3,6 +3,7 @@ package info.ejava.assignments.api.autorenters.svc.autorentals;
 import java.net.URI;
 import java.time.LocalDate;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,14 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsAPI;
-import info.ejava.assignments.api.autorenters.client.autos.AutosAPI;
-import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
-import info.ejava.assignments.api.autorenters.dto.autos.AutoListDTO;
-import info.ejava.assignments.api.autorenters.dto.autos.AutoSearchParams;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalListDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.SearchParams;
@@ -73,7 +69,7 @@ public class AutoRentalController {
      @RequestMapping(path = AutoRentalsAPI.AUTO_RENTAL_QUERY_PATH,method = RequestMethod.POST, 
                         produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
      public ResponseEntity<AutoRentalListDTO> queryAutoRentalList(@RequestParam(value = "pageNumber", required = false)Integer pageNumber, 
-                    @RequestParam(value = "pageSize", required = false)Integer pageSize, @RequestBody AutoDTO probe) {
+                    @RequestParam(value = "pageSize", required = false)Integer pageSize, @RequestBody AutoRentalDTO probe) {
 
         Pageable pageable = (null != pageNumber && null != pageSize && pageNumber>0 && pageSize>0) ? 
                             PageRequest.of(pageNumber, pageSize) : Pageable.unpaged();
@@ -116,7 +112,21 @@ public class AutoRentalController {
                 Pageable pageable = ( null != pageNumber && null != pageSize && pageNumber>=0 && pageSize>0) ? 
                                     PageRequest.of(pageNumber, pageSize) : Pageable.unpaged();
                 
-                TimePeriod timePeriod = TimePeriod.builder().startDate(LocalDate.parse(startDate)).endDate(LocalDate.parse(endDate)).build();
+                //log.info("startDate - {} , endDate - {}", startDate,endDate);
+                TimePeriod timePeriod = null ;
+                if(startDate != null && !startDate.isBlank()){
+                   if(timePeriod == null ){
+                    timePeriod = new TimePeriod(LocalDate.parse(startDate),null);
+                   }
+                    
+                } else if( endDate != null && !endDate.isBlank()){
+                    if(timePeriod == null ){
+                        timePeriod = new TimePeriod(null, LocalDate.parse(endDate));
+                    } else {
+                        timePeriod.withEndDate(LocalDate.parse(endDate));
+                    }
+                }
+                
                 SearchParams searchParams = SearchParams.builder()
                                                 .autoId(autoId)
                                                 .renterId(renterId)
@@ -154,23 +164,23 @@ public class AutoRentalController {
     @RequestMapping(path = AutoRentalsAPI.AUTO_RENTAL_PATH, method = RequestMethod.PUT,
                     consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
                     produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<AutoRentalDTO> updateAutoRental(@PathVariable("id") String id, @RequestBody AutoRentalDTO auto){
+    public ResponseEntity<AutoRentalDTO> updateAutoRental(@PathVariable("id") String id, @RequestBody AutoRentalDTO autoRental){
 
-        AutoRentalDTO updatedAutoRental = autoRentalService.updateAutoRental(id, auto);
+        AutoRentalDTO updatedAutoRental = autoRentalService.updateAutoRental(id, autoRental);
         ResponseEntity<AutoRentalDTO> response = ResponseEntity.ok(updatedAutoRental); // http status code - 200
         return response;
     }
 
     @RequestMapping(path = AutoRentalsAPI.AUTO_RENTAL_PATH, method = RequestMethod.DELETE)
     public ResponseEntity<Void> removeAutoRental(@PathVariable("id") String id) {
-        autoRentalService.removeAuto(id);
+        autoRentalService.removeAutoRental(id);
         return ResponseEntity.noContent().build();  // http status code  - 204
     }
 
 
     @RequestMapping(path = AutoRentalsAPI.AUTO_RENTALS_PATH, method = RequestMethod.DELETE)
     public ResponseEntity<Void> removeAllAutoRental(){
-        autoRentalService.removeAllAutos();
+        autoRentalService.removeAllAutoRental();
         return ResponseEntity.noContent().build();   // http status code - 204
     }
 

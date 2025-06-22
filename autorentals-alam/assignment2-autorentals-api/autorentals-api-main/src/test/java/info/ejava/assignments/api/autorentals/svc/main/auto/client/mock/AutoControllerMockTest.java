@@ -85,7 +85,7 @@ public class AutoControllerMockTest {
     void should_find_all_autos() throws Exception {
         
         
-        String jsonResponse  = dtoUtil.marshal(autos);
+        String  jsonResponse  = dtoUtil.marshal(autos);
         log.info("jsonResponse- {}", jsonResponse);
 
         BDDMockito.when(autosServiceMock.searchAutos(any(AutoSearchParams.class),any(Pageable.class)))
