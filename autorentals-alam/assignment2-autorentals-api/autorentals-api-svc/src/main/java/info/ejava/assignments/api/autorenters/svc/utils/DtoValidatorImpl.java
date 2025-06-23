@@ -1,6 +1,5 @@
 package info.ejava.assignments.api.autorenters.svc.utils;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,7 @@ public class DtoValidatorImpl implements DtoValidator {
     
     @Override
     //public List<String> validateNewRenter(RenterDTO renter, int minAge) {
-    public <T> List<String> validateDto(T type, int minAge) {
+    public <T> List<String> validateDto(T type, Integer minAge) {
         
         List<String> errMsgs = new ArrayList<>();
         if(type instanceof RenterDTO){
@@ -75,5 +74,10 @@ public class DtoValidatorImpl implements DtoValidator {
             errMsgs.add(errorMsg.get());
         }
     }
+
+    
+
+    
+
 
 }

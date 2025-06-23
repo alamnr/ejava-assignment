@@ -26,6 +26,7 @@ public class AutoServiceImpl implements AutosService {
     @Override
     public AutoDTO createAuto(AutoDTO newAuto) {
         validateAuto(newAuto);
+        
         // if(null == newAuto){
         //     throw new ClientErrorException.InvalidInputException("auto is required");
         // }
@@ -54,6 +55,7 @@ public class AutoServiceImpl implements AutosService {
     @Override
     public AutoDTO updateAuto(String id, AutoDTO updateAuto) {
         validateAuto(updateAuto);
+        
         if(null == updateAuto){
             throw new ClientErrorException.InvalidInputException("auto is required");
         }

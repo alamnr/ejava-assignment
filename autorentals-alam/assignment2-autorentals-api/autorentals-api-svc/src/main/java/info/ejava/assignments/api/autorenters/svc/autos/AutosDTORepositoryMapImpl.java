@@ -111,7 +111,7 @@ public class AutosDTORepositoryMapImpl implements AutosDTORepository{
             predicates.add(candidate -> Objects.equals(probe.getId(), candidate.getId()));
          }
          if(probe.getPassengers() != null){
-            predicates.add(candidate -> Objects.equals(candidate.getPassengers(), probe.getPassengers()));
+            predicates.add(candidate -> Objects.equals(probe.getPassengers(), candidate.getPassengers()));
          }
          if(probe.getMake()!=null){
             predicates.add(candidate -> Objects.equals(probe.getMake(), candidate.getMake()));
@@ -157,4 +157,6 @@ public class AutosDTORepositoryMapImpl implements AutosDTORepository{
          }
          return auto;
       }
+
+      
 }
