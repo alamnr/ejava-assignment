@@ -3,7 +3,6 @@ package info.ejava.assignments.api.autorenters.svc.autorentals;
 import java.net.URI;
 import java.time.LocalDate;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsAPI;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalListDTO;
-import info.ejava.assignments.api.autorenters.dto.rentals.SearchParams;
+import info.ejava.assignments.api.autorenters.dto.rentals.RentalSearchParams;
 import info.ejava.assignments.api.autorenters.dto.rentals.TimePeriod;
 import info.ejava.examples.common.exceptions.ClientErrorException;
 import jakarta.annotation.PostConstruct;
@@ -127,7 +126,7 @@ public class AutoRentalController {
                     }
                 }
                 
-                SearchParams searchParams = SearchParams.builder()
+                RentalSearchParams searchParams = RentalSearchParams.builder()
                                                 .autoId(autoId)
                                                 .renterId(renterId)
                                                 .timePeriod(timePeriod)

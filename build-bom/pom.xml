@@ -30,6 +30,8 @@
         <sslcontext-kickstart.version>7.4.9</sslcontext-kickstart.version>
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
 
+        <jackson-datatype-jsr31.version>2.19.0</jackson-datatype-jsr31.version>
+
         <!-- used for build/deploy of this specific artifact -->
         <maven-clean-plugin.version>3.4.0</maven-clean-plugin.version>
         <maven-dependency-plugin.version>3.7.1</maven-dependency-plugin.version>
@@ -163,6 +165,11 @@
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>logging-interceptor</artifactId>
                 <version>${okhttp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>${jackson-datatype-jsr31.version}</version>
             </dependency>
          </dependencies>
     </dependencyManagement>

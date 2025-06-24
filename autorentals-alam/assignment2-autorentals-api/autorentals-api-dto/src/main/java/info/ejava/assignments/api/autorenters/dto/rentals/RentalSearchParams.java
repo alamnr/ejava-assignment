@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @ToString
 @Builder
 @AllArgsConstructor
-public class SearchParams {
+public class RentalSearchParams {
     private String autoId;
     private String renterId;
     private TimePeriod timePeriod;

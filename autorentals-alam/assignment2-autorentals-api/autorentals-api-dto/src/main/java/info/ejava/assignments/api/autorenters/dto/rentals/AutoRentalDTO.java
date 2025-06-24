@@ -16,12 +16,17 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
 
 @Data
+@Builder
+@With
 @NoArgsConstructor
+@AllArgsConstructor
 
 @XmlRootElement(name = "autoRental" , namespace = "urn:ejava.svc-controllers.autoRental") // JAXB
 @XmlAccessorType(XmlAccessType.FIELD) // JAXB java.util.Date and java.time adapters

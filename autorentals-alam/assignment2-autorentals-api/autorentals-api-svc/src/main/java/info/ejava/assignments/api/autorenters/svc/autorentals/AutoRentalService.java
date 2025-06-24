@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
-import info.ejava.assignments.api.autorenters.dto.rentals.SearchParams;
+import info.ejava.assignments.api.autorenters.dto.rentals.RentalSearchParams;
 
 public interface AutoRentalService {
     
@@ -23,10 +23,10 @@ public interface AutoRentalService {
 
 
     Page<AutoRentalDTO> queryAutoRental(AutoRentalDTO probe, Pageable pageable);
-    Page<AutoRentalDTO> searchAutoRental(SearchParams searchParams, Pageable pageable);
+    Page<AutoRentalDTO> searchAutoRental(RentalSearchParams searchParams, Pageable pageable);
 
     Page<AutoRentalDTO> getAutoRentals(Pageable pageable);
-    Optional<AutoRentalDTO> findAutoRentalsByRenterName(String renterName);
+    Page<AutoRentalDTO> findByRenterName(String renterName, Pageable pageable);
     
     
 }

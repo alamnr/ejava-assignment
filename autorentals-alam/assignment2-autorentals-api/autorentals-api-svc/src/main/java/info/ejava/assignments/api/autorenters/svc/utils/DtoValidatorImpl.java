@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import org.apache.commons.lang3.ObjectUtils;
 
 import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
+import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,16 +18,14 @@ import lombok.extern.slf4j.Slf4j;
 public class DtoValidatorImpl implements DtoValidator {
     
     @Override
-    //public List<String> validateNewRenter(RenterDTO renter, int minAge) {
+    
     public <T> List<String> validateDto(T type, Integer minAge) {
         
         List<String> errMsgs = new ArrayList<>();
         if(type instanceof RenterDTO){
             RenterDTO renter = (RenterDTO) type;
             log.trace(" validating - {} and minAge - {}", renter, minAge);
-            if(renter == null){
-                errMsgs.add("renter: can not be null");
-            } else if(renter.getId() == null) {
+            if(renter.getId() == null) {
                 validate(errMsgs, ()->renter.getId()==null,()->"id must be null");
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(renter.getFirstName()), ()->"renter.FirstName - can not be blnk");
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(renter.getLastName()), ()->"renter.LastName - can not be blank");
@@ -47,9 +46,7 @@ public class DtoValidatorImpl implements DtoValidator {
         } else if( type instanceof AutoDTO){
             AutoDTO auto = (AutoDTO)type;
             log.trace(" validating - {} ", auto);
-            if(auto == null){
-                errMsgs.add("auto: can not be null");
-            } else if(auto.getId() == null) {
+            if(auto.getId() == null) {
                 validate(errMsgs, ()->auto.getId()==null,()->"id must be null");
                 //validate(errMsgs, ()-> !ObjectUtils.isEmpty(auto.getUsername()), ()->"auto.username - can not be blank");
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(auto.getMake()), ()->"auto.make - can not be blank");
@@ -65,6 +62,24 @@ public class DtoValidatorImpl implements DtoValidator {
             }
     
             log.trace("auto - {} , valid - {}, errors-{}", auto, errMsgs.isEmpty(), errMsgs);
+        } else if( type instanceof AutoRentalDTO){
+             AutoRentalDTO autoRental = (AutoRentalDTO)type;
+            log.trace(" validating - {} ", autoRental);
+            if(autoRental.getId() == null) {
+                validate(errMsgs, ()->autoRental.getId()==null,()->"id must be null");
+               
+                validate(errMsgs, ()-> !ObjectUtils.isEmpty(autoRental.getAutoId()), ()->"autoRental.autoId - can not be blank");
+                validate(errMsgs, ()-> !ObjectUtils.isEmpty(autoRental.getRenterId()), ()->"autoRental.renterId - can not be blank");
+                validate(errMsgs, ()-> autoRental.getRenterAge() > 20, ()->"autoRenter.renterAge - must be greater than 20");
+               
+            } else {
+               
+                validate(errMsgs, ()-> !ObjectUtils.isEmpty(autoRental.getAutoId()), ()->"autoRental.autoId - can not be blank");
+                validate(errMsgs, ()-> !ObjectUtils.isEmpty(autoRental.getRenterId()), ()->"autoRental.renterId - can not be blank");
+                validate(errMsgs, ()-> autoRental.getRenterAge() > 20, ()->"autoRenter.renterAge - must be greater than 20");
+            }
+    
+            log.trace("auto Rental - {} , valid - {}, errors-{}", autoRental, errMsgs.isEmpty(), errMsgs);
         }
         return errMsgs;
     }

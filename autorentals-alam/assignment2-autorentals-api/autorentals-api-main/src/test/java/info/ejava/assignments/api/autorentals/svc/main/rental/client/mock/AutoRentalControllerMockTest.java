@@ -29,12 +29,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsAPI;
-import info.ejava.assignments.api.autorenters.client.autos.AutosAPI;
-import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTOFactory;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalListDTO;
-import info.ejava.assignments.api.autorenters.dto.rentals.SearchParams;
+import info.ejava.assignments.api.autorenters.dto.rentals.RentalSearchParams;
 import info.ejava.assignments.api.autorenters.svc.autorentals.AutoRentalController;
 import info.ejava.assignments.api.autorenters.svc.autorentals.AutoRentalExceptionAdvice;
 import info.ejava.assignments.api.autorenters.svc.autorentals.AutoRentalService;
@@ -48,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 @AutoConfigureMockMvc
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @Slf4j
-public class AutoRentalMockTest {
+public class AutoRentalControllerMockTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -88,7 +86,7 @@ public class AutoRentalMockTest {
         String jsonResponse = dtoUtil.marshal(autoRentals);
         log.info(" jsonResponse - {}", jsonResponse);
 
-        BDDMockito.when(autoRentalServiceMock.searchAutoRental(any(SearchParams.class),any(Pageable.class)))
+        BDDMockito.when(autoRentalServiceMock.searchAutoRental(any(RentalSearchParams.class),any(Pageable.class)))
                     .thenReturn(new PageImpl<AutoRentalDTO>(autoRentals.getAutoRentals(),Pageable.unpaged(),
                                     autoRentals.getAutoRentals().size()));
         URI uri =  UriComponentsBuilder.fromPath(AutoRentalsAPI.AUTO_RENTALS_PATH)
@@ -100,8 +98,8 @@ public class AutoRentalMockTest {
                                                 .andExpect(MockMvcResultMatchers.status().isOk())
                                                 .andExpect(MockMvcResultMatchers.content().json(jsonResponse));
         
-        verify(autoRentalServiceMock, times(1)).searchAutoRental(any(SearchParams.class), any(Pageable.class));    
-        BDDMockito.then(autoRentalServiceMock).should(times(1)).searchAutoRental(any(SearchParams.class), any(Pageable.class));
+        verify(autoRentalServiceMock, times(1)).searchAutoRental(any(RentalSearchParams.class), any(Pageable.class));    
+        BDDMockito.then(autoRentalServiceMock).should(times(1)).searchAutoRental(any(RentalSearchParams.class), any(Pageable.class));
     
     }
 

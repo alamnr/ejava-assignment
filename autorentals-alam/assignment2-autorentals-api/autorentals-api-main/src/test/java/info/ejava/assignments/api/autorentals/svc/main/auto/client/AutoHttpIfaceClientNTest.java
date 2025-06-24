@@ -38,8 +38,6 @@ import info.ejava.assignments.api.autorenters.client.autos.AutosJSONHttpIfaceMap
 import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
 import info.ejava.assignments.api.autorenters.dto.autos.AutoDTOFactory;
 import info.ejava.assignments.api.autorenters.dto.autos.AutoListDTO;
-import info.ejava.assignments.api.autorenters.dto.autos.AutoSearchParams;
-import info.ejava.assignments.api.autorenters.dto.rentals.SearchParams;
 import info.ejava.examples.common.dto.JsonUtil;
 import info.ejava.examples.common.dto.MessageDTO;
 import lombok.extern.slf4j.Slf4j;
