@@ -58,7 +58,8 @@ public class AutoRentalServiceMockTest {
         // given / arrange 
         
         autoRentalDTO = AutoRentalDTO.builder().amount(BigDecimal.valueOf(100))
-                        .autoId("auto-1").renterId("renter-1").renterAge(21).startDate(LocalDate.now()).build();
+                        .autoId("auto-1").renterId("renter-1")
+                        .renterAge(21).startDate(LocalDate.now()).build();
         
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -66,8 +67,7 @@ public class AutoRentalServiceMockTest {
 
         // define behavior of mock during test
         BDDMockito.when(validatorMock.validateDto(dtoCaptor.capture() , intCaptor.capture()))
-        
-        .thenReturn(List.<String>of());
+                .thenReturn(List.<String>of());
         
         BDDMockito.when(repo.save(dtoCaptor.capture()))
                 .thenReturn(deepCopy.withId("autoRental-1"));
@@ -100,8 +100,8 @@ public class AutoRentalServiceMockTest {
     void reject_invalid_autorental() {
         // given 
         AutoRentalDTO autoRentalDTO  = AutoRentalDTO.builder().amount(BigDecimal.valueOf(100))
-                        .autoId("auto-1").renterId("renter-1").renterAge(11)
-                        .startDate(LocalDate.now()).build();
+                    .autoId("auto-1").renterId("renter-1").renterAge(11)
+                    .startDate(LocalDate.now()).build();
         
 
         // define behavior of mock while test
@@ -111,7 +111,7 @@ public class AutoRentalServiceMockTest {
         
         // when / act
         Throwable ex = BDDAssertions.catchThrowableOfType(ClientErrorException.InvalidInputException.class,
-                            ()-> autoRentalServiceImpl.createAutoRental(autoRentalDTO));
+                        ()-> autoRentalServiceImpl.createAutoRental(autoRentalDTO));
 
         List<String> errMsg = validatorMock.validateDto(autoRentalDTO,20);
         
