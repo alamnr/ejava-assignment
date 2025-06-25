@@ -68,13 +68,5 @@ public class AutoRentalDTO implements RentalDTO {
         this.streetAddress = auto.getLocation();
     }
 
-    public AutoRentalDTO withAmount(BigDecimal amount){
-        this.amount = amount;
-        return this;
-    }
-
-    public AutoRentalDTO withUserName(String userName){
-        this.userName = userName;
-        return this;
-    }
+    
 }

@@ -21,10 +21,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsAPI;
-import info.ejava.assignments.api.autorenters.client.renters.RentersAPI;
 import info.ejava.assignments.api.autorenters.client.renters.RentersAPIClient;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
-import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
+import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTOFactory;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTOFactory;
 import info.ejava.examples.common.web.RestTemplateLoggingFilter;
 import info.ejava.examples.common.web.ServerConfig;
@@ -101,7 +100,7 @@ public class AutoRentalTestConfiguration {
     }
 
     @Bean @Lazy
-    public URI autoRentalsUrl(URI baseUrl){
+    public URI autoRentalUrl(URI baseUrl){
         return UriComponentsBuilder.fromUri(baseUrl).path(AutoRentalsAPI.AUTO_RENTALS_PATH).build().toUri();
     }
     
@@ -113,8 +112,8 @@ public class AutoRentalTestConfiguration {
 
 
     @Bean
-    public RenterDTOFactory renterDTOFactory() {
-        return new RenterDTOFactory();
+    public AutoRentalDTOFactory autoRentalDTOFactory() {
+        return new AutoRentalDTOFactory();
     }
     
 }

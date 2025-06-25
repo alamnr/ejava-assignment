@@ -50,7 +50,7 @@ public class AutoRentalDTOFactory {
     public class AutoRentalsDTOFactory {
 
         @SafeVarargs
-        public final List<AutoRentalDTO> renters(int min, int max, Consumer<AutoRentalDTO>... visitors) {
+        public final List<AutoRentalDTO> autoRentals(int min, int max, Consumer<AutoRentalDTO>... visitors) {
             return IntStream.range(0, faker.number().numberBetween(min, max))
                     .mapToObj(i->AutoRentalDTOFactory.this.make(visitors))
                     .collect(Collectors.toList());
@@ -60,7 +60,7 @@ public class AutoRentalDTOFactory {
         @SafeVarargs
         public final AutoRentalListDTO make(int min, int max, Consumer<AutoRentalDTO>... visitors) {
             return AutoRentalListDTO.builder()
-                    .autoRentals(renters(min, max, visitors))
+                    .autoRentals(autoRentals(min, max, visitors))
                     .build();
         }
     }

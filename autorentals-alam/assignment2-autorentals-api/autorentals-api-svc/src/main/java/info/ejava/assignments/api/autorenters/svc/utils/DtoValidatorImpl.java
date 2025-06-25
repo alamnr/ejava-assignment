@@ -70,13 +70,13 @@ public class DtoValidatorImpl implements DtoValidator {
                
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(autoRental.getAutoId()), ()->"autoRental.autoId - can not be blank");
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(autoRental.getRenterId()), ()->"autoRental.renterId - can not be blank");
-                validate(errMsgs, ()-> autoRental.getRenterAge() > 20, ()->"autoRental.renterAge - must be greater than 20");
+                validate(errMsgs, ()-> autoRental.getRenterAge()!=null? autoRental.getRenterAge() > 20:false, ()->"autoRental.renterAge - must be greater than 20");
                
             } else {
                
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(autoRental.getAutoId()), ()->"autoRental.autoId - can not be blank");
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(autoRental.getRenterId()), ()->"autoRental.renterId - can not be blank");
-                validate(errMsgs, ()-> autoRental.getRenterAge() > 20, ()->"autoRental.renterAge - must be greater than 20");
+                validate(errMsgs, ()-> autoRental.getRenterAge()!=null? autoRental.getRenterAge() > 20:false, ()->"autoRental.renterAge - must be greater than 20");
             }
     
             log.trace("auto Rental - {} , valid - {}, errors-{}", autoRental, errMsgs.isEmpty(), errMsgs);
