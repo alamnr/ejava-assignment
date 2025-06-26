@@ -1,4 +1,4 @@
-package info.ejava.assignments.api.autorentals.svc.main.auto.client;
+package info.ejava.assignments.api.autorentals.svc.main.rental.client;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -32,25 +32,25 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import info.ejava.assignments.api.autorentals.svc.main.AutoRentalsAppMain;
-import info.ejava.assignments.api.autorentals.svc.main.auto.AutoTestConfiguration;
-import info.ejava.assignments.api.autorenters.client.autos.AutosAPI;
-import info.ejava.assignments.api.autorenters.client.autos.AutosJSONHttpIfaceMapping;
-import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
-import info.ejava.assignments.api.autorenters.dto.autos.AutoDTOFactory;
-import info.ejava.assignments.api.autorenters.dto.autos.AutoListDTO;
+import info.ejava.assignments.api.autorentals.svc.main.rental.AutoRentalTestConfiguration;
+import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsAPI;
+import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsJSONHttpIfaceMapping;
+import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
+import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTOFactory;
+import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalListDTO;
 import info.ejava.examples.common.dto.JsonUtil;
 import info.ejava.examples.common.dto.MessageDTO;
 import lombok.extern.slf4j.Slf4j;
 
-@SpringBootTest(classes = {AutoTestConfiguration.class, AutoRentalsAppMain.class},
+@SpringBootTest(classes = {AutoRentalTestConfiguration.class, AutoRentalsAppMain.class},
                 webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @Slf4j
-public class AutoHttpIfaceClientNTest {
+public class AutoRentalHttpIfaceClientNTest {
 
-    @Autowired @Qualifier("autosHttpIfaceJson")
-    private AutosJSONHttpIfaceMapping autoHttpIfaceJsonAPI;
+    @Autowired @Qualifier("autoRentalHttpIfaceJson")
+    private AutoRentalsJSONHttpIfaceMapping autoHttpIfaceJsonAPI;
 
     @LocalServerPort
     private int port;  // injecting port way -1
@@ -59,13 +59,13 @@ public class AutoHttpIfaceClientNTest {
     private URI baseUrl;
 
     @Autowired
-    private AutoDTOFactory autoDTOFactory;
+    private AutoRentalDTOFactory autoRentalDTOFactory;
 
-    @Autowired @Qualifier("validAuto")
-    private AutoDTO validAuto;
+    @Autowired @Qualifier("validAutoRental")
+    private AutoRentalDTO validAutoRental;
 
-    @Autowired @Qualifier("invalidAuto")
-    private AutoDTO invalidAuto;
+    @Autowired @Qualifier("invalidAutoRental")
+    private AutoRentalDTO invalidAutoRental;
 
     
     private static final MediaType[] MEDIA_TYPES = new MediaType[] {
@@ -102,16 +102,16 @@ public class AutoHttpIfaceClientNTest {
     @BeforeEach  // injecting port way -2
     public void init(@LocalServerPort int port ) {
         
-        autoHttpIfaceJsonAPI.removeAllAutos();
+        autoHttpIfaceJsonAPI.removeAllAutoRental();
     }
 
     @ParameterizedTest
     @MethodSource("mediaTypes")
-    void add_valid_auto_for_type(MediaType contentType, MediaType accept){
+    void add_valid_autoRental_for_type(MediaType contentType, MediaType accept){
         // given / arrange
 
         // when  / act
-        ResponseEntity<AutoDTO> response = autoHttpIfaceJsonAPI.createAuto(validAuto) ;
+        ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.createAutoRental(validAutoRental) ;
      
         log.info("resp. status - {} - {}", response.getStatusCode(), HttpStatus.valueOf(response.getStatusCode().value()));
         log.info("resp. body - {}", response.getBody());
@@ -121,104 +121,104 @@ public class AutoHttpIfaceClientNTest {
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         
 
-        AutoDTO createdRenter = response.getBody();
-        BDDAssertions.then(createdRenter).isEqualTo(validAuto.withId(createdRenter.getId()));
-        URI location = UriComponentsBuilder.fromUri(baseUrl).replacePath(AutosAPI.AUTO_PATH).build(createdRenter.getId());
+        AutoRentalDTO createdAutoRental = response.getBody();
+        BDDAssertions.then(createdAutoRental).isEqualTo(validAutoRental.withId(createdAutoRental.getId()));
+        URI location = UriComponentsBuilder.fromUri(baseUrl).replacePath(AutoRentalsAPI.AUTO_RENTAL_PATH).build(createdAutoRental.getId());
         BDDAssertions.then(response.getHeaders().getFirst(HttpHeaders.LOCATION)).isEqualTo(location.toString());
     }
 
     @Test
-    void get_auto() {
+    void get_autoRental() {
         // given / arrange
-        AutoDTO existingAuto = autoDTOFactory.make();
+        AutoRentalDTO existingAutoRental = autoRentalDTOFactory.make();
         
         // when / act
-        ResponseEntity<AutoDTO> response = autoHttpIfaceJsonAPI.createAuto(existingAuto);
+        ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.createAutoRental(existingAutoRental);
 
         // then / assert -evaluate
         BDDAssertions.then(response.getStatusCode().is2xxSuccessful()).isTrue();
 
         String requestId = response.getBody().getId();
-        URI location = UriComponentsBuilder.fromUri(baseUrl).replacePath(AutosAPI.AUTO_PATH).build(requestId);
-        ResponseEntity<AutoDTO> getAuto = autoHttpIfaceJsonAPI.getAuto(requestId);
+        URI location = UriComponentsBuilder.fromUri(baseUrl).replacePath(AutoRentalsAPI.AUTO_RENTAL_PATH).build(requestId);
+        ResponseEntity<AutoRentalDTO> getAutoRental = autoHttpIfaceJsonAPI.getAutoRental(requestId);
 
-        BDDAssertions.then(getAuto.getStatusCode()).isEqualTo(HttpStatus.OK);
-        BDDAssertions.then(getAuto.getBody()).isEqualTo(existingAuto.withId(requestId));
+        BDDAssertions.then(getAutoRental.getStatusCode()).isEqualTo(HttpStatus.OK);
+        BDDAssertions.then(getAutoRental.getBody()).isEqualTo(existingAutoRental.withId(requestId));
         BDDAssertions.then(response.getHeaders().getLocation()).isEqualTo(location);
     }
 
      @ParameterizedTest
      @ValueSource(strings = {MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE})
-     void get_autos(String mediaTypeString){
+     void get_autoRentals(String mediaTypeString){
         // given / arrange
         MediaType mediaType = MediaType.valueOf(mediaTypeString);
-        Map<String,AutoDTO> autosMap = new HashMap<>();
-        AutoListDTO autos = autoDTOFactory.listBuilder().make(3,3);
-        for (AutoDTO autoDTO : autos.getAutos()) {
-            ResponseEntity<AutoDTO> response = autoHttpIfaceJsonAPI.createAuto(autoDTO);
+        Map<String,AutoRentalDTO> autoRentalsMap = new HashMap<>();
+        AutoRentalListDTO autoRentals = autoRentalDTOFactory.listBuilder().make(3,3);
+        for (AutoRentalDTO autoRental : autoRentals.getAutoRentals()) {
+            ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.createAutoRental(autoRental);
             BDDAssertions.then(response.getStatusCode().is2xxSuccessful()).isTrue();
-            AutoDTO addedRenter = response.getBody();
-            autosMap.put(addedRenter.getId(), addedRenter);
+            AutoRentalDTO addedAutoRental = response.getBody();
+            autoRentalsMap.put(addedAutoRental.getId(), addedAutoRental);
         }
-        BDDAssertions.then(autosMap).isNotEmpty();
+        BDDAssertions.then(autoRentalsMap).isNotEmpty();
 
       
         // when / act        
-        ResponseEntity<AutoListDTO> response = autoHttpIfaceJsonAPI.searchAutosList(null,null,
+        ResponseEntity<AutoRentalListDTO> response = autoHttpIfaceJsonAPI.searchAutoRental(null,null,
                 null,null,0,0);
                  
-        ResponseEntity<AutoListDTO> responseWithOffsetLimit  = autoHttpIfaceJsonAPI.searchAutosList(null,null,
+        ResponseEntity<AutoRentalListDTO> responseWithOffsetLimit  = autoHttpIfaceJsonAPI.searchAutoRental(null,null,
                 null,null,0,15);
 
         // then / evaluate - assert
 
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         BDDAssertions.then(responseWithOffsetLimit.getStatusCode()).isEqualTo(HttpStatus.OK);
-        AutoListDTO autoPage = response.getBody();
-        AutoListDTO autoPageWithOffset = responseWithOffsetLimit.getBody();
+        AutoRentalListDTO autoRentalPage = response.getBody();
+        AutoRentalListDTO autoRentalPageWithOffset = responseWithOffsetLimit.getBody();
         //log.info("offset - {}, limit - {}", autoPage.getOffset(), autoPage.getLimit());
-        BDDAssertions.then(autoPage.getOffset()).isEqualTo(0);
-        BDDAssertions.then(autoPage.getLimit()).isEqualTo(0);
-        log.info("auto map size - {}",autosMap.size());
-        log.info("count-{}, total -{}",autoPage.getCount(), autoPage.getTotal());
+        BDDAssertions.then(autoRentalPage.getOffset()).isEqualTo(0);
+        BDDAssertions.then(autoRentalPage.getLimit()).isEqualTo(0);
+        log.info("auto map size - {}",autoRentalsMap.size());
+        log.info("count-{}, total -{}",autoRentalPage.getCount(), autoRentalPage.getTotal());
         
-        BDDAssertions.then(autoPage.getCount()).isEqualTo(autosMap.size());
+        BDDAssertions.then(autoRentalPage.getCount()).isEqualTo(autoRentalsMap.size());
 
-        BDDAssertions.then(autoPageWithOffset.getOffset()).isEqualTo(0);
-        BDDAssertions.then(autoPageWithOffset.getLimit()).isEqualTo(15);
-        log.info("offset count-{}, total -{}",autoPageWithOffset.getCount(), autoPageWithOffset.getTotal());
-        //BDDAssertions.then(autoPageWithOffset.getCount()).isEqualTo(autosMap.size()-2);
+        BDDAssertions.then(autoRentalPageWithOffset.getOffset()).isEqualTo(0);
+        BDDAssertions.then(autoRentalPageWithOffset.getLimit()).isEqualTo(15);
+        log.info("offset count-{}, total -{}",autoRentalPageWithOffset.getCount(), autoRentalPageWithOffset.getTotal());
+        //BDDAssertions.then(autoRentalPageWithOffset.getCount()).isEqualTo(autoRentalsMap.size()-2);
 
-        for(AutoDTO auto: autoPage.getAutos()){
-            BDDAssertions.then(autosMap.remove(auto.getId())).isNotNull();
+        for(AutoRentalDTO auto: autoRentalPage.getAutoRentals()){
+            BDDAssertions.then(autoRentalsMap.remove(auto.getId())).isNotNull();
         }
 
-        BDDAssertions.then(autosMap).isEmpty();
+        BDDAssertions.then(autoRentalsMap).isEmpty();
 
      }
 
      @ParameterizedTest
      @MethodSource("mediaTypes")
-     void add_valid_auto(MediaType contentType, MediaType accept){
+     void add_valid_autoRental(MediaType contentType, MediaType accept){
         // given / arrange 
-        AutoDTO validAuto = autoDTOFactory.make();
+        AutoRentalDTO validAutoRental = autoRentalDTOFactory.make();
 
         // when / act
 
-        ResponseEntity<AutoDTO> response = autoHttpIfaceJsonAPI.createAuto(validAuto);
+        ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.createAutoRental(validAutoRental);
 
         // then / evaluate - assert
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        AutoDTO createdAuto = response.getBody();
-        BDDAssertions.then(createdAuto).isEqualTo(validAuto.withId(createdAuto.getId()));
-        URI location = UriComponentsBuilder.fromUri(baseUrl).path(AutosAPI.AUTO_PATH).build(createdAuto.getId());
+        AutoRentalDTO createdAuto = response.getBody();
+        BDDAssertions.then(createdAuto).isEqualTo(validAutoRental.withId(createdAuto.getId()));
+        URI location = UriComponentsBuilder.fromUri(baseUrl).path(AutoRentalsAPI.AUTO_RENTAL_PATH).build(createdAuto.getId());
         BDDAssertions.then(response.getHeaders().getLocation()).isEqualTo(location);
      }
 
-    private AutoDTO given_an_existing_auto() {
-        AutoDTO existingAuto = autoDTOFactory.make();
-        ResponseEntity<AutoDTO> response = autoHttpIfaceJsonAPI.createAuto(existingAuto);
+    private AutoRentalDTO given_an_existing_autoRental() {
+        AutoRentalDTO existingAutoRental = autoRentalDTOFactory.make();
+        ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.createAutoRental(existingAutoRental);
         BDDAssertions.then(response.getStatusCode().is2xxSuccessful()).isTrue();
         BDDAssertions.then((response.getStatusCode())).isEqualTo(HttpStatus.CREATED);
         return response.getBody();
@@ -226,108 +226,108 @@ public class AutoHttpIfaceClientNTest {
      }
 
     @Test
-    void update_an_existing_auto() {
+    void update_an_existing_autoRental() {
         // given - an existing auto
-        AutoDTO existingAuto = given_an_existing_auto();
-        String requestId = existingAuto.getId();
+        AutoRentalDTO existingAutoRental = given_an_existing_autoRental();
+        String requestId = existingAutoRental.getId();
 
-        AutoDTO updatedAuto = existingAuto.withModel(existingAuto.getModel()+"Updated ").withId(null);
+        AutoRentalDTO updatedAuto = existingAutoRental.withMakeModel(existingAutoRental.getMakeModel()+"Updated ").withId(null);
 
         // when / act
-        ResponseEntity<AutoDTO> response = autoHttpIfaceJsonAPI.updateAuto(requestId, updatedAuto);
+        ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.updateAutoRental(requestId, updatedAuto);
 
         // then / evaluate - assert
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        ResponseEntity<AutoDTO> getupdatedAuto = autoHttpIfaceJsonAPI.getAuto(requestId);
+        ResponseEntity<AutoRentalDTO> getupdatedAuto = autoHttpIfaceJsonAPI.getAutoRental(requestId);
 
         BDDAssertions.then(getupdatedAuto.getStatusCode()).isEqualTo(HttpStatus.OK);
         BDDAssertions.then(getupdatedAuto.getBody()).isEqualTo(updatedAuto.withId(requestId));
-        BDDAssertions.then(getupdatedAuto.getBody()).isNotEqualTo(existingAuto);
+        BDDAssertions.then(getupdatedAuto.getBody()).isNotEqualTo(existingAutoRental);
 
      }
 
       @Test
-     void get_auto_1(){
+     void get_autoRental_1(){
         // given / arrange
-        AutoDTO existingAuto = autoDTOFactory.make();
-        ResponseEntity<AutoDTO> response = autoHttpIfaceJsonAPI.createAuto(existingAuto);
+        AutoRentalDTO existingAutoRental = autoRentalDTOFactory.make();
+        ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.createAutoRental(existingAutoRental);
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         String requestId = response.getBody().getId();
 
         // when / act
-        ResponseEntity<AutoDTO>  getAuto = autoHttpIfaceJsonAPI.getAuto(requestId);
+        ResponseEntity<AutoRentalDTO>  getAutoRental = autoHttpIfaceJsonAPI.getAutoRental(requestId);
 
         // then
-        BDDAssertions.then(getAuto.getStatusCode()).isEqualTo(HttpStatus.OK);
-        BDDAssertions.then(getAuto.getBody()).isEqualTo(existingAuto.withId(requestId));
+        BDDAssertions.then(getAutoRental.getStatusCode()).isEqualTo(HttpStatus.OK);
+        BDDAssertions.then(getAutoRental.getBody()).isEqualTo(existingAutoRental.withId(requestId));
      }
 
-     protected List<AutoDTO> given_many_autos(int count) {
-        List<AutoDTO> autos = new ArrayList<>(count);
-        for (AutoDTO autoDTO : autoDTOFactory.listBuilder().autos(count, count)) {
-            ResponseEntity<AutoDTO> response = autoHttpIfaceJsonAPI.createAuto(autoDTO);
+     protected List<AutoRentalDTO> given_many_autoRentals(int count) {
+        List<AutoRentalDTO> autoRentals = new ArrayList<>(count);
+        for (AutoRentalDTO autoRental : autoRentalDTOFactory.listBuilder().autoRentals(count, count)) {
+            ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.createAutoRental(autoRental);
             BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-            autos.add(response.getBody());
+            autoRentals.add(response.getBody());
         }
-        return autos;
+        return autoRentals;
      }
 
     @Test
-     void remove_auto() {
+     void remove_autoRental() {
         // given
-        List<AutoDTO> autos = given_many_autos(5);
-        String requestId = autos.get(1).getId();
-        BDDAssertions.then(autoHttpIfaceJsonAPI.getAuto(requestId).getStatusCode()).isEqualTo(HttpStatus.OK);
+        List<AutoRentalDTO> autoRentals = given_many_autoRentals(5);
+        String requestId = autoRentals.get(1).getId();
+        BDDAssertions.then(autoHttpIfaceJsonAPI.getAutoRental(requestId).getStatusCode()).isEqualTo(HttpStatus.OK);
 
         // when requested to remove
-        ResponseEntity<Void> response = autoHttpIfaceJsonAPI.removeAuto(requestId);
+        ResponseEntity<Void> response = autoHttpIfaceJsonAPI.removeAutoRental(requestId);
 
         // then
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        RestClientResponseException ex = BDDAssertions.catchThrowableOfType(()-> autoHttpIfaceJsonAPI.getAuto(requestId),
+        RestClientResponseException ex = BDDAssertions.catchThrowableOfType(()-> autoHttpIfaceJsonAPI.getAutoRental(requestId),
                                          RestClientResponseException.class);
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
      }
     
     @Test
-    void remove_all_auto() {
+    void remove_all_autoRental() {
         // given / arrange
-        List<AutoDTO> autos = given_many_autos(6);
+        List<AutoRentalDTO> autoRentals = given_many_autoRentals(6);
 
         // when / act
-        ResponseEntity<Void> resp = autoHttpIfaceJsonAPI.removeAllAutos();
+        ResponseEntity<Void> resp = autoHttpIfaceJsonAPI.removeAllAutoRental();
 
         // then 
         BDDAssertions.then(resp.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        for (AutoDTO autoDTO : autos) {
+        for (AutoRentalDTO autoRental : autoRentals) {
             RestClientResponseException ex = BDDAssertions.catchThrowableOfType(
-                    () -> autoHttpIfaceJsonAPI.getAuto(autoDTO.getId()),
+                    () -> autoHttpIfaceJsonAPI.getAutoRental(autoRental.getId()),
                     RestClientResponseException.class);
             BDDAssertions.assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         }
     }
 
     @Test
-    void remove_unknown_auto() {  // idempotent http method
+    void remove_unknown_autoRental() {  // idempotent http method
         // given 
-        String requestId = "auto-13";
+        String requestId = "autoRental-13";
 
         // when
-        ResponseEntity<Void> resp = autoHttpIfaceJsonAPI.removeAuto(requestId);
+        ResponseEntity<Void> resp = autoHttpIfaceJsonAPI.removeAutoRental(requestId);
 
         // then
         BDDAssertions.then(resp.getStatusCode().is2xxSuccessful()).isTrue();
     }
 
     @Test
-    void get_auto_no_autos(){
+    void get_auto_no_autoRentals(){
         // given
-        BDDAssertions.assertThat(autoHttpIfaceJsonAPI.removeAllAutos().getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        BDDAssertions.assertThat(autoHttpIfaceJsonAPI.removeAllAutoRental().getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         
         // then
         RestClientResponseException ex = BDDAssertions.catchThrowableOfType(
-            () -> autoHttpIfaceJsonAPI.getAuto("auto-123")
+            () -> autoHttpIfaceJsonAPI.getAutoRental("autoRental-123")
                                     , RestClientResponseException.class);
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         MessageDTO errMsg = getErrorResponse(ex);
@@ -336,77 +336,77 @@ public class AutoHttpIfaceClientNTest {
     }
 
     @Test
-    void get_unknown_auto(){
+    void get_unknown_autoRental(){
         // given
-        String unknownId ="auto-13";
+        String unknownId ="autoRental-13";
 
         // when - requesting quote by id
 
         RestClientResponseException ex = BDDAssertions.catchThrowableOfType(
-            () -> autoHttpIfaceJsonAPI.getAuto(unknownId)       
+            () -> autoHttpIfaceJsonAPI.getAutoRental(unknownId)       
                             , RestClientResponseException.class);
         // then
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         MessageDTO errMsg = getErrorResponse(ex);
-        BDDAssertions.then(errMsg.getDescription()).contains(String.format("auto[%s]", unknownId));
+        BDDAssertions.then(errMsg.getDescription()).contains(String.format("autoRental[%s]", unknownId));
 
     }
 
     @Test
-    void update_unknown_auto() {
+    void update_unknown_autoRental() {
         // given
 
-        String unknownId = "13";
-        AutoDTO updateAuto = autoDTOFactory.make().withId(unknownId);
+        String unknownId = "AutoRental-13";
+        AutoRentalDTO updateAutoRental = autoRentalDTOFactory.make().withId(unknownId);
 
         // verify that updating existing quote
         RestClientResponseException ex =  BDDAssertions.catchThrowableOfType(
-            ()-> autoHttpIfaceJsonAPI.updateAuto(unknownId, updateAuto)
+            ()-> autoHttpIfaceJsonAPI.updateAutoRental(unknownId, updateAutoRental)
                     , RestClientResponseException.class);
 
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
         MessageDTO errMsg = getErrorResponse(ex);
-        BDDAssertions.then(errMsg.getDescription()).contains(String.format("auto-[%s] not found", unknownId));
+        BDDAssertions.then(errMsg.getDescription()).contains(String.format("autoRental-[%s] not found", unknownId));
     }
 
     @Test
     //@Disabled
-    void update_known_auto_with_bad_auto() {
+    void update_known_autoRental_with_bad_autoRental() {
         // given
-        List<AutoDTO> autos = given_many_autos(3);
+        List<AutoRentalDTO> autos = given_many_autoRentals(3);
         
         String knownId = autos.get(0).getId();
-        AutoDTO badAutoMissingText = new AutoDTO();
+        AutoRentalDTO badAutoMissingText = new AutoRentalDTO();
         badAutoMissingText.withId(knownId);
-        ResponseEntity<AutoDTO> resp = autoHttpIfaceJsonAPI.getAuto(knownId);
+        ResponseEntity<AutoRentalDTO> resp = autoHttpIfaceJsonAPI.getAutoRental(knownId);
         log.info("resp - {}", resp.getBody());
 
         // when
         RestClientResponseException ex = BDDAssertions.catchThrowableOfType(
-         () -> autoHttpIfaceJsonAPI.updateAuto(knownId, badAutoMissingText)
+         () -> autoHttpIfaceJsonAPI.updateAutoRental(knownId, badAutoMissingText)
                     , RestClientResponseException.class);
         // then
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
-        BDDAssertions.then(getErrorResponse(ex).getDescription()).contains(String.format("auto is not valid", knownId));
+        BDDAssertions.then(getErrorResponse(ex).getDescription()).contains(String.format("auto rental is not valid", knownId));
     }
 
     @Test
     //@Disabled
-    void add_bad_auto_rejected() {
+    void add_bad_autoRental_rejected() {
         // given
         
-        AutoDTO badAutoMissingText = new AutoDTO();
+        AutoRentalDTO badAutoRentalMissingText = new AutoRentalDTO();
         
         
         // when
         RestClientResponseException ex = BDDAssertions.catchThrowableOfType(
         //  () -> webClient.post().uri(UriComponentsBuilder.fromUri(baseUrl).path(QuotesAPI.QUOTES_PATH).build().toUri())
-        //             .bodyValue(badQuoteMissingText).retrieve().toEntity(AutoDTO.class).block()
-        () -> autoHttpIfaceJsonAPI.createAuto(badAutoMissingText)
+        //             .bodyValue(badQuoteMissingText).retrieve().toEntity(AutoRentalDTO.class).block()
+        () -> autoHttpIfaceJsonAPI.createAutoRental(badAutoRentalMissingText)
                     , RestClientResponseException.class);
         // then
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
-        BDDAssertions.then(getErrorResponse(ex).getDescription()).contains(String.format("auto is not valid ", ""));
+        BDDAssertions.then(getErrorResponse(ex).getDescription()).contains(String.format("auto rental is not valid ", ""));
     }
 
     public static class IntegerConverter implements ArgumentConverter {
@@ -414,14 +414,16 @@ public class AutoHttpIfaceClientNTest {
         public Object convert(Object o, ParameterContext parameterContext) throws ArgumentConversionException {
             return o.equals("null") ? null : Integer.parseInt((String)o);
         }
+        
     }
 
     @Test
-    void get_empty_autos(){
+    void get_empty_autoRentals(){
         // given - we have no quotes
         Integer offset = 0;
         Integer limit = 100;
-        // UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUri(baseUrl).path(QuotesAPI.QUOTES_PATH);
+        
+        // UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUri(baseUrl).path(AutoRentalsAPI.AUTO_RENTALS_PATH);
         // if (offset!=null) {
         //     urlBuilder = urlBuilder.queryParam("offset", offset);
         // }
@@ -432,31 +434,31 @@ public class AutoHttpIfaceClientNTest {
 
         
          //when - asked for amounts we do not have
-        ResponseEntity<AutoListDTO> response = autoHttpIfaceJsonAPI.searchAutosList(null,null,
+        ResponseEntity<AutoRentalListDTO> response = autoHttpIfaceJsonAPI.searchAutoRental(null,null,
                 null,null,0,100);
         log.debug("{}", response);
 
         //then - the response will be empty
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        AutoListDTO returnedAutos = response.getBody();
-        BDDAssertions.then(returnedAutos.getCount()).isEqualTo(0);
+        AutoRentalListDTO returnedAutoRentals = response.getBody();
+        BDDAssertions.then(returnedAutoRentals.getCount()).isEqualTo(0);
         //and descriptive attributes filed in
-        log.info("returned - {}", returnedAutos);
-        BDDAssertions.then(returnedAutos.getOffset()).isEqualTo(0);
-        BDDAssertions.then(returnedAutos.getLimit()).isEqualTo(100);
-        BDDAssertions.then(returnedAutos.getTotal()).isEqualTo(0);       
+        log.info("returned - {}", returnedAutoRentals);
+        BDDAssertions.then(returnedAutoRentals.getOffset()).isEqualTo(0);
+        BDDAssertions.then(returnedAutoRentals.getLimit()).isEqualTo(100);
+        BDDAssertions.then(returnedAutoRentals.getTotal()).isEqualTo(0);       
 
     }
 
     @Test
-    void get_many_autos() {
+    void get_many_autoRentals() {
         // given many quotes
-        given_many_autos(100);
+        given_many_autoRentals(100);
 
         //when asking for a page of quotes
-        Integer offset = 9;
+        Integer offset = 9; 
         Integer limit = 10;
-        //  UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUri(baseUrl).path(QuotesAPI.QUOTES_PATH);
+        //  UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUri(baseUrl).path(AutoRentalsAPI.AUTO_RENTALS_PATH);
         // if (offset!=null) {
         //     urlBuilder = urlBuilder.queryParam("offset", offset);
         // }
@@ -464,25 +466,25 @@ public class AutoHttpIfaceClientNTest {
         //     urlBuilder = urlBuilder.queryParam("limit", limit);
         // }
         // URI url = urlBuilder.build().toUri();
-        ResponseEntity<AutoListDTO> response = autoHttpIfaceJsonAPI.searchAutosList(null,null,
+        ResponseEntity<AutoRentalListDTO> response = autoHttpIfaceJsonAPI.searchAutoRental(null,null,
                 null,null,offset,limit);
 
          //then - page of results returned
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        AutoListDTO returnedAutos = response.getBody();
-        log.debug("{}", returnedAutos);
-        BDDAssertions.then(returnedAutos.getCount()).isEqualTo(10);
-        AutoDTO auto0 = returnedAutos.getAutos().get(0);
+        AutoRentalListDTO returnedAutoRentals = response.getBody();
+        log.debug("{}", returnedAutoRentals);
+        BDDAssertions.then(returnedAutoRentals.getCount()).isEqualTo(10);
+        AutoRentalDTO auto0 = returnedAutoRentals.getAutoRentals().get(0);
         String[] ids = auto0.getId().split("-");
         
         BDDAssertions.then(Integer.valueOf(ids[1])).isGreaterThan(1);
         
 
         //and descriptive attributes filed in
-        BDDAssertions.then(returnedAutos.getOffset()).isEqualTo(9);
-        BDDAssertions.then(returnedAutos.getLimit()).isEqualTo(10);
-        BDDAssertions.then(returnedAutos.getTotal()).isEqualTo(10);
+        BDDAssertions.then(returnedAutoRentals.getOffset()).isEqualTo(9);
+        BDDAssertions.then(returnedAutoRentals.getLimit()).isEqualTo(10);
+        BDDAssertions.then(returnedAutoRentals.getTotal()).isEqualTo(10);
     }
-
+ 
    
 }

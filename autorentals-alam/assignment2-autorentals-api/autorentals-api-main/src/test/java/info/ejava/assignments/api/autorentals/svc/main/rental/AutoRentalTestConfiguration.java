@@ -11,20 +11,22 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.MediaType;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsAPI;
-import info.ejava.assignments.api.autorenters.client.renters.RentersAPIClient;
+import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsJSONHttpIfaceMapping;
+import info.ejava.assignments.api.autorenters.client.autos.AutosJSONHttpIfaceMapping;
+import info.ejava.assignments.api.autorenters.client.autos.AutosXMLHttpIfaceMapping;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTOFactory;
-import info.ejava.assignments.api.autorenters.dto.renters.RenterDTOFactory;
 import info.ejava.examples.common.web.RestTemplateLoggingFilter;
 import info.ejava.examples.common.web.ServerConfig;
 import info.ejava.examples.common.webflux.WebClientLoggingFilter;
@@ -103,17 +105,37 @@ public class AutoRentalTestConfiguration {
     public URI autoRentalUrl(URI baseUrl){
         return UriComponentsBuilder.fromUri(baseUrl).path(AutoRentalsAPI.AUTO_RENTALS_PATH).build().toUri();
     }
-    
-
-    @Bean @Lazy @Qualifier("rentersHttpIfaceJson")
-    public RentersAPIClient rentersAPIHttpIfaceJsonClient(RestTemplate restTemplate, ServerConfig serverConfig) {
-        return new RentersAPIClient(restTemplate, serverConfig, MediaType.valueOf(MediaType.APPLICATION_JSON_VALUE));
-    }
 
 
     @Bean
     public AutoRentalDTOFactory autoRentalDTOFactory() {
         return new AutoRentalDTOFactory();
     }
+
+        @Bean @Lazy @Qualifier("autoRentalHttpIfaceJson")
+    public AutoRentalsJSONHttpIfaceMapping autoRentalsJSONHttpIfaceMapping(RestTemplate restTemplate, ServerConfig serverConfig) {
+        
+        RestClient restClient = RestClient.builder(restTemplate)
+                .baseUrl(serverConfig.getBaseUrl().toString())
+                .build();
+        RestClientAdapter adapter = RestClientAdapter.create(restClient);
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+        return factory.createClient(AutoRentalsJSONHttpIfaceMapping.class);
+        
+    }
+
+
+    @Bean @Lazy @Qualifier("autoRentalHttpIfaceXml")
+    public AutosXMLHttpIfaceMapping autosAPIHttpIfaceXmlClient(RestTemplate restTemplate, ServerConfig serverConfig) {
+        
+        RestClient restClient = RestClient.builder(restTemplate)
+                .baseUrl(serverConfig.getBaseUrl().toString())
+                .build();
+        RestClientAdapter adapter = RestClientAdapter.create(restClient);
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+        return factory.createClient(AutosXMLHttpIfaceMapping.class);
+        
+    }
+
     
 }

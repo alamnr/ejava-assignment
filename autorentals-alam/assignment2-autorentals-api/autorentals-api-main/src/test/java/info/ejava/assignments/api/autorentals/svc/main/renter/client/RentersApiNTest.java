@@ -118,7 +118,7 @@ public class RentersApiNTest {
         //given
         RenterDTO existingRenter = populate(1).get(0);
         existingRenter.getDob().plusYears(20);
-        LocalDate updatedDob = existingRenter.getDob().plus(10, ChronoUnit.YEARS);
+        LocalDate updatedDob = existingRenter.getDob().plus(20, ChronoUnit.YEARS);
         RenterDTO updatedRenter = existingRenter.withDob(updatedDob);
         //when
         ResponseEntity<RenterDTO> response = rentersAPIClient.updateRenter(existingRenter.getId(), updatedRenter);

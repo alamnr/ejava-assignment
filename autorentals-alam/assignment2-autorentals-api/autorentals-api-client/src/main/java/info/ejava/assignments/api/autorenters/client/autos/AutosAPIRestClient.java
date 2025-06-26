@@ -56,10 +56,10 @@ public class AutosAPIRestClient implements AutosAPI {
     public ResponseEntity<AutoListDTO> queryAutos(AutoDTO probe, Integer pageNumber, Integer pageSize) {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUri(baseUrl).path(AUTOS_QUERY_PATH);
         if (null!=pageNumber && null!=pageSize) {
-            // uriBuilder = uriBuilder.queryParam("pageNumber", pageNumber);
-            // uriBuilder = uriBuilder.queryParam("pageSize", pageSize);
-            uriBuilder = uriBuilder.queryParam("offset", pageNumber);
-            uriBuilder = uriBuilder.queryParam("limit", pageSize);
+             uriBuilder = uriBuilder.queryParam("pageNumber", pageNumber);
+             uriBuilder = uriBuilder.queryParam("pageSize", pageSize);
+            //uriBuilder = uriBuilder.queryParam("offset", pageNumber);
+            //uriBuilder = uriBuilder.queryParam("limit", pageSize);
         }
         URI url = uriBuilder.build().toUri();
 
@@ -85,10 +85,10 @@ public class AutosAPIRestClient implements AutosAPI {
         }
 
         if (null!=searchParams.getPageNumber() && null!=searchParams.getPageSize()) {
-            // uriBuilder = uriBuilder.queryParam("pageNumber", searchParams.getPageNumber());
-            // uriBuilder = uriBuilder.queryParam("pageSize", searchParams.getPageSize());
-             uriBuilder = uriBuilder.queryParam("offset", searchParams.getPageNumber());
-            uriBuilder = uriBuilder.queryParam("limit", searchParams.getPageSize());
+            uriBuilder = uriBuilder.queryParam("pageNumber", searchParams.getPageNumber());
+            uriBuilder = uriBuilder.queryParam("pageSize", searchParams.getPageSize());
+            //uriBuilder = uriBuilder.queryParam("offset", searchParams.getPageNumber());
+            //uriBuilder = uriBuilder.queryParam("limit", searchParams.getPageSize());
         }
         URI url = uriBuilder.build().toUri();
 

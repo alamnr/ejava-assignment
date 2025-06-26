@@ -42,7 +42,7 @@ import info.ejava.examples.common.dto.MessageDTO;
 import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes = {RenterTestConfiguration.class,AutoRentalsAppMain.class},
-                webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+                webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @Slf4j
