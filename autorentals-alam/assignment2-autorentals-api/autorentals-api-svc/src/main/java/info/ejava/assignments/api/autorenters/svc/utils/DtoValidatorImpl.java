@@ -65,18 +65,22 @@ public class DtoValidatorImpl implements DtoValidator {
         } else if( type instanceof AutoRentalDTO){
              AutoRentalDTO autoRental = (AutoRentalDTO)type;
             log.trace(" validating - {} ", autoRental);
+            
             if(autoRental.getId() == null) {
                 validate(errMsgs, ()->autoRental.getId()==null,()->"id must be null");
-               
+                
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(autoRental.getAutoId()), ()->"autoRental.autoId - can not be blank");
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(autoRental.getRenterId()), ()->"autoRental.renterId - can not be blank");
-                validate(errMsgs, ()-> autoRental.getRenterAge()!=null? autoRental.getRenterAge() > 20:false, ()->"autoRental.renterAge - must be greater than 20");
-               
+                validate(errMsgs, ()-> autoRental.getRenterAge()!=null? autoRental.getRenterAge() >= 21:false, ()->"autoRental.renterAge - must be greater than 21");
+                validate(errMsgs, ()-> autoRental.getStartDate().isEqual(LocalDate.now()) || autoRental.getStartDate().isAfter(LocalDate.now()),
+                                                        ()-> "autoRental.startDate - is not valid");
             } else {
                
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(autoRental.getAutoId()), ()->"autoRental.autoId - can not be blank");
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(autoRental.getRenterId()), ()->"autoRental.renterId - can not be blank");
-                validate(errMsgs, ()-> autoRental.getRenterAge()!=null? autoRental.getRenterAge() > 20:false, ()->"autoRental.renterAge - must be greater than 20");
+                validate(errMsgs, ()-> autoRental.getRenterAge()!=null? autoRental.getRenterAge() >= 21:false, ()->"autoRental.renterAge - must be greater than 21");
+                validate(errMsgs, ()-> autoRental.getStartDate().isEqual(LocalDate.now()) || autoRental.getStartDate().isAfter(LocalDate.now()),
+                                                        ()-> "autoRental.startDate - is not valid");
             }
     
             log.trace("auto Rental - {} , valid - {}, errors-{}", autoRental, errMsgs.isEmpty(), errMsgs);

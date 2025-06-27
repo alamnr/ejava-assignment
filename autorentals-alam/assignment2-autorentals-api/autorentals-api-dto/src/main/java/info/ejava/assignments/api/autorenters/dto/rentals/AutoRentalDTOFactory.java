@@ -36,7 +36,7 @@ public class AutoRentalDTOFactory {
         
         final AutoDTO auto = autoDTOFactory.make(AutoDTOFactory.withId);
         final RenterDTO renter = renterDTOFactory.make(RenterDTOFactory.withId);
-        final TimePeriod timePeriod = new TimePeriod(LocalDate.now(), 1);
+        final TimePeriod timePeriod = new TimePeriod(LocalDate.now(),LocalDate.now().plusDays(1));
         final AutoRentalDTO result = new AutoRentalDTO(auto, renter, timePeriod);
         result.withAmount(BigDecimal.valueOf(80));
         //result.withUserName(username());

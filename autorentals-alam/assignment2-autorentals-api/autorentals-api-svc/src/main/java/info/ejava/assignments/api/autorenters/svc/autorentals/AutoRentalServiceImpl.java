@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.RentalSearchParams;
+import info.ejava.assignments.api.autorenters.dto.rentals.TimePeriod;
 import info.ejava.assignments.api.autorenters.svc.utils.DtoValidator;
 import info.ejava.examples.common.exceptions.ClientErrorException;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class AutoRentalServiceImpl  implements AutoRentalService {
     @Override
     public AutoRentalDTO createAutoRental(AutoRentalDTO newAutoRental) {
         validateAutoRental(newAutoRental);
-        
+        isOverlapTimePeriod(newAutoRental);
         AutoRentalDTO savedAutoRental = repository.save(newAutoRental);
         log.debug("added autoRental - {}", savedAutoRental);
         return savedAutoRental;
@@ -46,6 +47,7 @@ public class AutoRentalServiceImpl  implements AutoRentalService {
     @Override
     public AutoRentalDTO updateAutoRental(String id, AutoRentalDTO autoRental) {
         validateAutoRental(autoRental);
+        isOverlapTimePeriod(autoRental);
         if(null == autoRental){
             throw new ClientErrorException.InvalidInputException("autoRental is required");
         }
@@ -118,6 +120,17 @@ public class AutoRentalServiceImpl  implements AutoRentalService {
        if(!errMsg.isEmpty()){
         throw new ClientErrorException.InvalidInputException("auto rental is not valid - %s", errMsg);
        }
+    }
+
+    private void isOverlapTimePeriod(AutoRentalDTO autoRentalDTO){
+        TimePeriod timePeriod = TimePeriod.builder().startDate(autoRentalDTO.getStartDate()).endDate(autoRentalDTO.getEndDate()).build();
+        RentalSearchParams searchParams = RentalSearchParams.builder().autoId(autoRentalDTO.getAutoId())
+                                                                        .timePeriod(timePeriod).build();
+        Page<AutoRentalDTO> rentalPage =  repository.findAllBySearchParam(searchParams, Pageable.unpaged());
+        if(rentalPage.hasContent()){
+            throw new ClientErrorException.InvalidInputException("autoRental time period overlap, use another date. Given overlap time- %s",
+                                                     timePeriod.getStartDate().toString());
+        }
     }
     
 }

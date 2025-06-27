@@ -1,6 +1,7 @@
 package info.ejava.assignments.api.autorentals.svc.main.rental.client;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -202,6 +203,7 @@ public class AutoRentalHttpIfaceClientNTest {
      void add_valid_autoRental(MediaType contentType, MediaType accept){
         // given / arrange 
         AutoRentalDTO validAutoRental = autoRentalDTOFactory.make();
+        
 
         // when / act
 
@@ -226,15 +228,18 @@ public class AutoRentalHttpIfaceClientNTest {
      }
 
     @Test
-    void update_an_existing_autoRental() {
+    void update_an_existing_autoRental_whose_timePeriod_is_not_overlapped() {
         // given - an existing auto
         AutoRentalDTO existingAutoRental = given_an_existing_autoRental();
         String requestId = existingAutoRental.getId();
+        log.info("startDate - {} , endDate - {}", existingAutoRental.getStartDate(), existingAutoRental.getEndDate());
+        AutoRentalDTO updatedAutoRental = existingAutoRental.withMakeModel(existingAutoRental.getMakeModel()+"Updated ")
+                                                .withStartDate(existingAutoRental.getStartDate().plusDays(1)).withId(null);
 
-        AutoRentalDTO updatedAuto = existingAutoRental.withMakeModel(existingAutoRental.getMakeModel()+"Updated ").withId(null);
+        log.info("startDate - {} , endDate - {}", existingAutoRental.getStartDate(), existingAutoRental.getEndDate());
 
         // when / act
-        ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.updateAutoRental(requestId, updatedAuto);
+        ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.updateAutoRental(requestId, updatedAutoRental);
 
         // then / evaluate - assert
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -242,7 +247,7 @@ public class AutoRentalHttpIfaceClientNTest {
         ResponseEntity<AutoRentalDTO> getupdatedAuto = autoHttpIfaceJsonAPI.getAutoRental(requestId);
 
         BDDAssertions.then(getupdatedAuto.getStatusCode()).isEqualTo(HttpStatus.OK);
-        BDDAssertions.then(getupdatedAuto.getBody()).isEqualTo(updatedAuto.withId(requestId));
+        BDDAssertions.then(getupdatedAuto.getBody()).isEqualTo(updatedAutoRental.withId(requestId));
         BDDAssertions.then(getupdatedAuto.getBody()).isNotEqualTo(existingAutoRental);
 
      }
@@ -376,14 +381,16 @@ public class AutoRentalHttpIfaceClientNTest {
         List<AutoRentalDTO> autos = given_many_autoRentals(3);
         
         String knownId = autos.get(0).getId();
-        AutoRentalDTO badAutoMissingText = new AutoRentalDTO();
-        badAutoMissingText.withId(knownId);
+        // AutoRentalDTO badAutoRentalMissingText = new AutoRentalDTO();
+        AutoRentalDTO badAutoAutorental = autoRentalDTOFactory.make();
+        badAutoAutorental.setStartDate(LocalDate.now().minusDays(5));
+        badAutoAutorental.withId(knownId);
         ResponseEntity<AutoRentalDTO> resp = autoHttpIfaceJsonAPI.getAutoRental(knownId);
         log.info("resp - {}", resp.getBody());
 
         // when
         RestClientResponseException ex = BDDAssertions.catchThrowableOfType(
-         () -> autoHttpIfaceJsonAPI.updateAutoRental(knownId, badAutoMissingText)
+         () -> autoHttpIfaceJsonAPI.updateAutoRental(knownId, badAutoAutorental)
                     , RestClientResponseException.class);
         // then
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
@@ -395,14 +402,16 @@ public class AutoRentalHttpIfaceClientNTest {
     void add_bad_autoRental_rejected() {
         // given
         
-        AutoRentalDTO badAutoRentalMissingText = new AutoRentalDTO();
-        
+       // AutoRentalDTO badAutoRentalMissingText = new AutoRentalDTO();
+        AutoRentalDTO badAutoRental = autoRentalDTOFactory.make();
+        badAutoRental.setStartDate(LocalDate.now().minusMonths(2));
+
         
         // when
         RestClientResponseException ex = BDDAssertions.catchThrowableOfType(
         //  () -> webClient.post().uri(UriComponentsBuilder.fromUri(baseUrl).path(QuotesAPI.QUOTES_PATH).build().toUri())
         //             .bodyValue(badQuoteMissingText).retrieve().toEntity(AutoRentalDTO.class).block()
-        () -> autoHttpIfaceJsonAPI.createAutoRental(badAutoRentalMissingText)
+        () -> autoHttpIfaceJsonAPI.createAutoRental(badAutoRental)
                     , RestClientResponseException.class);
         // then
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);

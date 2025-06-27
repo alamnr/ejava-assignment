@@ -1,6 +1,7 @@
 package info.ejava.assignments.api.autorentals.svc.main.rental.client;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -269,13 +270,18 @@ public class AutoRentalRestClientNTest {
     }
 
     @Test
-    void update_existing_autoRental( ){
+    void update_an_existing_autoRental_whose_timePeriod_is_not_overlapped( ){
         // given - an existing auto
         AutoRentalDTO existingAutoRental = given_an_existing_autoRental();
         String requestId = existingAutoRental.getId();
 
         // and an update 
-        AutoRentalDTO updatedAutoRental = existingAutoRental.withRenterName(existingAutoRental.getRenterName() + "Updated ");
+        
+        log.info("startDate - {} , endDate - {}", existingAutoRental.getStartDate(), existingAutoRental.getEndDate());
+        AutoRentalDTO updatedAutoRental  = existingAutoRental.withMakeModel(existingAutoRental.getMakeModel()+"Updated ")
+                                                .withStartDate(existingAutoRental.getStartDate().plusDays(1)).withId(null);
+
+        log.info("startDate - {} , endDate - {}", existingAutoRental.getStartDate(), existingAutoRental.getEndDate());
 
         URI updateUri = UriComponentsBuilder.fromUri(baseUrl).path(AutoRentalsAPI.AUTO_RENTAL_PATH).build(existingAutoRental.getId());
 
@@ -290,7 +296,7 @@ public class AutoRentalRestClientNTest {
         ResponseEntity<AutoRentalDTO> getUpdatedAutoRental = restClient.get().uri(getUri).retrieve().toEntity( AutoRentalDTO.class);
 
         BDDAssertions.then(getUpdatedAutoRental.getStatusCode()).isEqualTo(HttpStatus.OK);
-        BDDAssertions.then(getUpdatedAutoRental.getBody()).isEqualTo(updatedAutoRental);
+        BDDAssertions.then(getUpdatedAutoRental.getBody()).isEqualTo(updatedAutoRental.withId(existingAutoRental.getId()));
         BDDAssertions.then(getUpdatedAutoRental.getBody()).isNotEqualTo(existingAutoRental);
 
     }
@@ -447,19 +453,21 @@ public class AutoRentalRestClientNTest {
         // given
         List <AutoRentalDTO> autoRentals = given_many_autoRentals(3);
         
-        String unknownId = "auto-000";
-        AutoRentalDTO badAutoRentalMissingText = new AutoRentalDTO();
-        badAutoRentalMissingText.withId(unknownId);
-
+        String knownId = autoRentals.get(0).getId();
+        // AutoRentalDTO badAutoRentalMissingText = new AutoRentalDTO();
+        AutoRentalDTO badAutoRental = autoRentalDTOFactory.make();
+        badAutoRental.setStartDate(LocalDate.now().minusDays(5));
+        badAutoRental.withId(knownId);
+        
         
         // when
         RestClientResponseException ex = BDDAssertions.catchThrowableOfType(
-         () -> restClient.put().uri(UriComponentsBuilder.fromUri(baseUrl).path(AutoRentalsAPI.AUTO_RENTAL_PATH).build(unknownId))
-                        .body(badAutoRentalMissingText).retrieve().toEntity(Void.class),
+         () -> restClient.put().uri(UriComponentsBuilder.fromUri(baseUrl).path(AutoRentalsAPI.AUTO_RENTAL_PATH).build(knownId))
+                        .body(badAutoRental).retrieve().toEntity(Void.class),
                          RestClientResponseException.class);
         // then
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
-        BDDAssertions.then(getErrorResponse(ex).getDescription()).contains(String.format("auto rental is not valid", unknownId));
+        BDDAssertions.then(getErrorResponse(ex).getDescription()).contains(String.format("auto rental is not valid", knownId));
     }
 
     @Test
@@ -467,12 +475,14 @@ public class AutoRentalRestClientNTest {
     void add_bad_autoRental_rejected() {
         // given
         
-        AutoRentalDTO badAutoRentalMissingText = new AutoRentalDTO();
+        //AutoRentalDTO badAutoRentalMissingText = new AutoRentalDTO();
+        AutoRentalDTO badAutoRental = autoRentalDTOFactory.make();
+        badAutoRental.setStartDate(LocalDate.now().minusMonths(2));
         MediaType contentType = MediaType.valueOf( MediaType.APPLICATION_XML_VALUE);        
         // when
         RestClientResponseException ex = BDDAssertions.catchThrowableOfType(        
                                 () ->  restClient.post().uri(autoRentalUrl).contentType(contentType)
-                                .accept(MediaType.valueOf(MediaType.APPLICATION_JSON_VALUE)).body(badAutoRentalMissingText)
+                                .accept(MediaType.valueOf(MediaType.APPLICATION_JSON_VALUE)).body(badAutoRental)
                                 .retrieve().toEntity( AutoRentalDTO.class), RestClientResponseException.class);
         // then
         BDDAssertions.then(ex.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
