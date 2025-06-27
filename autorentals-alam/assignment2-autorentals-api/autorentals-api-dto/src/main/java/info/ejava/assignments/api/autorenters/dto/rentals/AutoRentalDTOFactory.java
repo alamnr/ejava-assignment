@@ -2,7 +2,6 @@ package info.ejava.assignments.api.autorenters.dto.rentals;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;

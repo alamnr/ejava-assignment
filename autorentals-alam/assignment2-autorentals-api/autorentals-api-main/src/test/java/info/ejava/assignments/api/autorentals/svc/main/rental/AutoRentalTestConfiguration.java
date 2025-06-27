@@ -23,7 +23,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsAPI;
 import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsJSONHttpIfaceMapping;
-import info.ejava.assignments.api.autorenters.client.autos.AutosJSONHttpIfaceMapping;
 import info.ejava.assignments.api.autorenters.client.autos.AutosXMLHttpIfaceMapping;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTOFactory;
@@ -112,7 +111,7 @@ public class AutoRentalTestConfiguration {
         return new AutoRentalDTOFactory();
     }
 
-        @Bean @Lazy @Qualifier("autoRentalHttpIfaceJson")
+    @Bean @Lazy @Qualifier("autoRentalHttpIfaceJson")
     public AutoRentalsJSONHttpIfaceMapping autoRentalsJSONHttpIfaceMapping(RestTemplate restTemplate, ServerConfig serverConfig) {
         
         RestClient restClient = RestClient.builder(restTemplate)

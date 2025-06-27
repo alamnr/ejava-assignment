@@ -4,8 +4,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import info.ejava.assignments.api.autorenters.dto.StreetAddressDTO;
 import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
@@ -21,6 +25,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
 @Builder
@@ -32,6 +38,7 @@ import lombok.With;
 @XmlAccessorType(XmlAccessType.FIELD) // JAXB java.util.Date and java.time adapters
 
 @JacksonXmlRootElement(localName = "autoRental" , namespace = "urn:ejava.svc-controllers.autoRental") // Jackson XML
+@Slf4j
 public class AutoRentalDTO implements RentalDTO {
 
     @XmlAttribute // JAXB
@@ -65,8 +72,23 @@ public class AutoRentalDTO implements RentalDTO {
         this.makeModel = auto.getMake()+"-"+auto.getModel();
         this.renterName = renter.getFirstName()+" "+renter.getLastName();
         this.renterAge = TimePeriod.create(renter.getDob(), LocalDate.now()).getPeriod().getYears();
-        this.streetAddress = auto.getLocation();
+        
+        this.streetAddress = deepCopyOfAutoLocation(auto.getLocation());
+        
     }
 
-    
+    private StreetAddressDTO deepCopyOfAutoLocation(StreetAddressDTO streetAddress)  {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        StreetAddressDTO deepCopy;
+        try {
+            deepCopy = mapper.readValue(mapper.writeValueAsString(streetAddress), StreetAddressDTO.class);
+            
+        } catch (JsonProcessingException e) {
+            
+            log.error("error creating AutoRental while assigning StreetAddress- {}", e.getMessage());
+            deepCopy = null;
+        }
+        return deepCopy;
+    }
 }
