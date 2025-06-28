@@ -2,6 +2,7 @@ package info.ejava.assignments.api.autorentals.svc.main.rental.service.mock;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -20,6 +21,8 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -27,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
+import info.ejava.assignments.api.autorenters.dto.rentals.RentalSearchParams;
 import info.ejava.assignments.api.autorenters.svc.autorentals.AutoRentalDTORepository;
 import info.ejava.assignments.api.autorenters.svc.autorentals.AutoRentalServiceImpl;
 import info.ejava.assignments.api.autorenters.svc.utils.DtoValidator;
@@ -69,6 +73,8 @@ public class AutoRentalServiceMockTest {
         BDDMockito.when(validatorMock.validateDto(dtoCaptor.capture() , intCaptor.capture()))
                 .thenReturn(List.<String>of());
         
+        BDDMockito.when(repo.findAllBySearchParam(any(RentalSearchParams.class), any(Pageable.class)))
+                                .thenReturn(new PageImpl<AutoRentalDTO>(List.of(), Pageable.unpaged(), 0));
         BDDMockito.when(repo.save(dtoCaptor.capture()))
                 .thenReturn(deepCopy.withId("autoRental-1"));
 
