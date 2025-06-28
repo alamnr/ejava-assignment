@@ -4,6 +4,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import info.ejava.assignments.api.autorenters.svc.autos.AutosDTORepository;
+import info.ejava.assignments.api.autorenters.svc.renters.RenterDTORepository;
 import info.ejava.assignments.api.autorenters.svc.utils.DtoValidator;
 import info.ejava.assignments.api.autorenters.svc.utils.DtoValidatorImpl;
 
@@ -24,8 +26,9 @@ public class AutoRentalsApiConfiguration {
 
     @Bean
     //@Order(Ordered.LOWEST_PRECEDENCE)
-    public AutoRentalService autoRentalService(AutoRentalDTORepository autoRentalDTORepository, DtoValidator dtoValidator){
-        return new AutoRentalServiceImpl(autoRentalDTORepository, dtoValidator);
+    public AutoRentalService autoRentalService(AutoRentalDTORepository autoRentalDTORepository, AutosDTORepository autoRepository, 
+                                                RenterDTORepository renterRepository, DtoValidator dtoValidator ){
+        return new AutoRentalServiceImpl(autoRentalDTORepository,autoRepository, renterRepository, dtoValidator);
     }
 
     @Bean

@@ -2,7 +2,6 @@ package info.ejava.assignments.api.autorentals.svc.main.rental.service.mock;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -33,6 +32,8 @@ import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.RentalSearchParams;
 import info.ejava.assignments.api.autorenters.svc.autorentals.AutoRentalDTORepository;
 import info.ejava.assignments.api.autorenters.svc.autorentals.AutoRentalServiceImpl;
+import info.ejava.assignments.api.autorenters.svc.autos.AutosDTORepository;
+import info.ejava.assignments.api.autorenters.svc.renters.RenterDTORepository;
 import info.ejava.assignments.api.autorenters.svc.utils.DtoValidator;
 import info.ejava.examples.common.exceptions.ClientErrorException;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,12 @@ public class AutoRentalServiceMockTest {
     private DtoValidator validatorMock;
     @Mock 
     private AutoRentalDTORepository repo;
+
+    @Mock 
+    private AutosDTORepository autoRepository;
+
+    @Mock 
+    private RenterDTORepository renterRepository;
     
 
     @InjectMocks // Mockito is instantiating this implementation class for us an injecting mocks

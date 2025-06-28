@@ -32,11 +32,10 @@ public class AutoRentalDTOFactory {
         return faker.name().username();
     }
 
-    public final AutoRentalDTO make(Consumer<AutoRentalDTO>... visitors){
+    public final AutoRentalDTO make(AutoDTO auto, RenterDTO renter,int i, Consumer<AutoRentalDTO>... visitors){
         
-        final AutoDTO auto = autoDTOFactory.make(AutoDTOFactory.withId);
-        final RenterDTO renter = renterDTOFactory.make(RenterDTOFactory.withId);
-        final TimePeriod timePeriod = new TimePeriod(LocalDate.now(),LocalDate.now().plusDays(1));
+        
+        final TimePeriod timePeriod = new TimePeriod(LocalDate.now().plusDays(i),LocalDate.now().plusDays(i));
         final AutoRentalDTO result = new AutoRentalDTO(auto, renter, timePeriod);
         result.withAmount(BigDecimal.valueOf(80));
         //result.withUserName(username());
@@ -49,17 +48,17 @@ public class AutoRentalDTOFactory {
     public class AutoRentalsDTOFactory {
 
         @SafeVarargs
-        public final List<AutoRentalDTO> autoRentals(int min, int max, Consumer<AutoRentalDTO>... visitors) {
+        public final List<AutoRentalDTO> autoRentals(int min, int max, AutoDTO auto, RenterDTO renter, Consumer<AutoRentalDTO>... visitors) {
             return IntStream.range(0, faker.number().numberBetween(min, max))
-                    .mapToObj(i->AutoRentalDTOFactory.this.make(visitors))
+                    .mapToObj(i->AutoRentalDTOFactory.this.make(auto,renter,i,visitors))
                     .collect(Collectors.toList());
         }
         
 
         @SafeVarargs
-        public final AutoRentalListDTO make(int min, int max, Consumer<AutoRentalDTO>... visitors) {
+        public final AutoRentalListDTO make(int min, int max, AutoDTO auto, RenterDTO renter, Consumer<AutoRentalDTO>... visitors) {
             return AutoRentalListDTO.builder()
-                    .autoRentals(autoRentals(min, max, visitors))
+                    .autoRentals(autoRentals(min, max, auto, renter, visitors))
                     .build();
         }
     }

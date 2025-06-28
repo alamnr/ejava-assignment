@@ -37,9 +37,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 import info.ejava.assignments.api.autorentals.svc.main.AutoRentalsAppMain;
 import info.ejava.assignments.api.autorentals.svc.main.rental.AutoRentalTestConfiguration;
 import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsAPI;
+import info.ejava.assignments.api.autorenters.client.autos.AutosAPI;
+import info.ejava.assignments.api.autorenters.client.renters.RentersAPI;
+import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTOFactory;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalListDTO;
+import info.ejava.assignments.api.autorenters.dto.rentals.TimePeriod;
+import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.examples.common.dto.JsonUtil;
 import info.ejava.examples.common.dto.MessageDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -71,6 +76,13 @@ public class AutoRentalRestClientNTest {
 
     @Autowired
     private URI autoRentalUrl;
+
+     @Autowired
+    private AutoDTO validAuto;
+
+    @Autowired 
+    private RenterDTO validRenter;
+
 
         
     private static final MediaType[] MEDIA_TYPES = new MediaType[] {
@@ -107,7 +119,41 @@ public class AutoRentalRestClientNTest {
     @BeforeEach  // injecting port way -2
     public void init(@LocalServerPort int port ) {
         //log.info("port way2 - {}", port);
-        restClient.delete().uri(autoRentalUrl).retrieve().toEntity(Void.class) ;         
+          
+        
+        // remove all auto, renter and autoRental
+        ResponseEntity<Void> responseAutoDelete = restClient.delete()
+                                                    .uri(UriComponentsBuilder.fromUri(baseUrl).path(AutosAPI.AUTOS_PATH).build().toUri())
+                                                    .retrieve().toEntity(Void.class);
+        ResponseEntity<Void> responseRenterDelete = restClient.delete()
+                                                    .uri(UriComponentsBuilder.fromUri(baseUrl).path(RentersAPI.RENTERS_PATH).build().toUri())
+                                                    .retrieve().toEntity(Void.class);                            
+        ResponseEntity<Void> responseAutoRentalDelete = restClient.delete().uri(autoRentalUrl).retrieve().toEntity(Void.class) ;  
+
+        BDDAssertions.then(responseAutoDelete.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        BDDAssertions.then(responseRenterDelete.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        BDDAssertions.then(responseAutoRentalDelete.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+
+
+        // insert a valid auto having id - "auto-1" and renter having id - "renter-1" 
+        URI autoUri = UriComponentsBuilder.fromUri(baseUrl).path(AutosAPI.AUTOS_PATH).build().toUri();
+        ResponseEntity<AutoDTO> responseAuto = restClient.post().uri(autoUri)
+                                                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                                                .body(validAuto).retrieve()
+                                                .toEntity(AutoDTO.class);
+        BDDAssertions.then(responseAuto.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        log.info("created Auto - {}", responseAuto.getBody());
+        validAuto = responseAuto.getBody();
+
+        URI renterUri = UriComponentsBuilder.fromUri(baseUrl).path(RentersAPI.RENTERS_PATH).build().toUri();
+        ResponseEntity<RenterDTO> responseRenter = restClient.post().uri(renterUri)
+                                                    .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                                                    .body(validRenter).retrieve()
+                                                    .toEntity(RenterDTO.class);
+        BDDAssertions.then(responseRenter.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        log.info("created Renter - {}", responseRenter.getBody());
+        validRenter = responseRenter.getBody();
     }
 
     @ParameterizedTest
@@ -117,7 +163,7 @@ public class AutoRentalRestClientNTest {
         // given - a valid auto
       
        
-        AutoRentalDTO validAutoRentalDTO = autoRentalDTOFactory.make();
+        AutoRentalDTO validAutoRentalDTO = autoRentalDTOFactory.make(validAuto,validRenter,1);
         log.info("Content-Type-{}, Accept-Type-{}, auto -{}", contentType, accept, validAutoRentalDTO);
 
         // when - making a request with different content and accept payload types
@@ -159,10 +205,11 @@ public class AutoRentalRestClientNTest {
     @Test
     void get_autoRental(){
         // given/ arrange - an existing autoRental
-        
-        
+        final TimePeriod timePeriod = new TimePeriod(validAutoRental.getStartDate(), 
+                                validAutoRental.getEndDate() != null ? validAutoRental.getEndDate() : validAutoRental.getStartDate());
+        final AutoRentalDTO existingAutoRental = new AutoRentalDTO(validAuto, validRenter, timePeriod) ;
         ResponseEntity<AutoRentalDTO> response = restClient.post()
-                                            .uri(autoRentalUrl).body(validAutoRental)
+                                            .uri(autoRentalUrl).body(existingAutoRental)
                                             .retrieve().toEntity( AutoRentalDTO.class);
         BDDAssertions.assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();        
 
@@ -177,7 +224,7 @@ public class AutoRentalRestClientNTest {
         
         // then
         BDDAssertions.then(autoRentalResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        BDDAssertions.then(autoRentalResponse.getBody()).isEqualTo(validAutoRental.withId(requestId));
+        BDDAssertions.then(autoRentalResponse.getBody()).isEqualTo(existingAutoRental.withId(requestId));
 
     }
 
@@ -188,7 +235,7 @@ public class AutoRentalRestClientNTest {
         log.info("mediaTypeString - {}", mediaTypeString);
         MediaType mediaType = MediaType.valueOf(mediaTypeString);
         Map<String, AutoRentalDTO> existingAutoRentals = new HashMap<>();
-        AutoRentalListDTO autoRentals = autoRentalDTOFactory.listBuilder().make(40, 40);
+        AutoRentalListDTO autoRentals = autoRentalDTOFactory.listBuilder().make(40, 40,validAuto,validRenter);
         for(  AutoRentalDTO autoRental : autoRentals.getAutoRentals()) {
             ResponseEntity<AutoRentalDTO> response = restClient.post().uri(autoRentalUrl).contentType(mediaType)
                                                 .body(autoRental).retrieve().toEntity( AutoRentalDTO.class);
@@ -240,7 +287,7 @@ public class AutoRentalRestClientNTest {
     @MethodSource("mediaTypes")
     void add_valid_autoRental(MediaType contentType, MediaType accept) {
         // given / arrange - a valid auto
-        AutoRentalDTO validAutoRentalDTO = autoRentalDTOFactory.make();
+        AutoRentalDTO validAutoRentalDTO = autoRentalDTOFactory.make(validAuto,validRenter,1);
         // when / act 
         ResponseEntity<AutoRentalDTO> response = restClient.post().uri(autoRentalUrl)
                                             .contentType(contentType).body(validAutoRentalDTO)
@@ -259,7 +306,7 @@ public class AutoRentalRestClientNTest {
     }
 
     private AutoRentalDTO given_an_existing_autoRental(){
-     AutoRentalDTO existingAutoRental = autoRentalDTOFactory.make();
+     AutoRentalDTO existingAutoRental = autoRentalDTOFactory.make(validAuto,validRenter,1);
         ResponseEntity<AutoRentalDTO> response =  restClient.post().uri(autoRentalUrl).accept(MediaType.APPLICATION_JSON)
                                                             .contentType(MediaType.APPLICATION_XML)
                                                             .body(existingAutoRental)
@@ -278,8 +325,10 @@ public class AutoRentalRestClientNTest {
         // and an update 
         
         log.info("startDate - {} , endDate - {}", existingAutoRental.getStartDate(), existingAutoRental.getEndDate());
-        AutoRentalDTO updatedAutoRental  = existingAutoRental.withMakeModel(existingAutoRental.getMakeModel()+"Updated ")
-                                                .withStartDate(existingAutoRental.getStartDate().plusDays(1)).withId(null);
+        AutoRentalDTO updatedAutoRental = existingAutoRental
+                                            .withStartDate(existingAutoRental.getStartDate().plusDays(1))
+                                            .withEndDate(existingAutoRental.getEndDate().plusDays(1))
+                                            .withId(null);
 
         log.info("startDate - {} , endDate - {}", existingAutoRental.getStartDate(), existingAutoRental.getEndDate());
 
@@ -304,7 +353,7 @@ public class AutoRentalRestClientNTest {
     @Test
     void get_autoRental_1() {
         // given / arrange
-        AutoRentalDTO existingAutoRental = autoRentalDTOFactory.make();
+        AutoRentalDTO existingAutoRental = autoRentalDTOFactory.make(validAuto,validRenter,1);
         ResponseEntity<AutoRentalDTO> response = restClient.post().uri(autoRentalUrl)
                                             .body(existingAutoRental).retrieve().toEntity( AutoRentalDTO.class);
         
@@ -325,7 +374,7 @@ public class AutoRentalRestClientNTest {
 
     protected List <AutoRentalDTO> given_many_autoRentals(int count) {
         List <AutoRentalDTO> autoRentals = new ArrayList<>(count);
-        for(  AutoRentalDTO auto : autoRentalDTOFactory.listBuilder().autoRentals(count,count)) {
+        for(  AutoRentalDTO auto : autoRentalDTOFactory.listBuilder().autoRentals(count,count,validAuto,validRenter)) {
                 ResponseEntity<AutoRentalDTO> response = restClient.post().uri(autoRentalUrl).body (auto).retrieve()
                                                         .toEntity( AutoRentalDTO.class);
                 BDDAssertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -435,7 +484,7 @@ public class AutoRentalRestClientNTest {
         // given
 
      String unknownId = "autoRental-13";
-     AutoRentalDTO updateauto = autoRentalDTOFactory.make();
+     AutoRentalDTO updateauto = autoRentalDTOFactory.make(validAuto,validRenter,1);
 
         // verify that updating existing quoRentalte
         RestClientResponseException ex =  BDDAssertions.catchThrowableOfType(
@@ -455,7 +504,7 @@ public class AutoRentalRestClientNTest {
         
         String knownId = autoRentals.get(0).getId();
         // AutoRentalDTO badAutoRentalMissingText = new AutoRentalDTO();
-        AutoRentalDTO badAutoRental = autoRentalDTOFactory.make();
+        AutoRentalDTO badAutoRental = autoRentalDTOFactory.make(validAuto,validRenter,1);
         badAutoRental.setStartDate(LocalDate.now().minusDays(5));
         badAutoRental.withId(knownId);
         
@@ -476,7 +525,7 @@ public class AutoRentalRestClientNTest {
         // given
         
         //AutoRentalDTO badAutoRentalMissingText = new AutoRentalDTO();
-        AutoRentalDTO badAutoRental = autoRentalDTOFactory.make();
+        AutoRentalDTO badAutoRental = autoRentalDTOFactory.make(validAuto,validRenter,1);
         badAutoRental.setStartDate(LocalDate.now().minusMonths(2));
         MediaType contentType = MediaType.valueOf( MediaType.APPLICATION_XML_VALUE);        
         // when

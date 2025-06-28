@@ -29,6 +29,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -36,9 +37,14 @@ import info.ejava.assignments.api.autorentals.svc.main.AutoRentalsAppMain;
 import info.ejava.assignments.api.autorentals.svc.main.rental.AutoRentalTestConfiguration;
 import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsAPI;
 import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsJSONHttpIfaceMapping;
+import info.ejava.assignments.api.autorenters.client.autos.AutosAPI;
+import info.ejava.assignments.api.autorenters.client.renters.RentersAPI;
+import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTOFactory;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalListDTO;
+import info.ejava.assignments.api.autorenters.dto.rentals.TimePeriod;
+import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.examples.common.dto.JsonUtil;
 import info.ejava.examples.common.dto.MessageDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +58,9 @@ public class AutoRentalHttpIfaceClientNTest {
 
     @Autowired @Qualifier("autoRentalHttpIfaceJson")
     private AutoRentalsJSONHttpIfaceMapping autoHttpIfaceJsonAPI;
+
+    @Autowired 
+    private RestClient restClient;
 
     @LocalServerPort
     private int port;  // injecting port way -1
@@ -67,6 +76,12 @@ public class AutoRentalHttpIfaceClientNTest {
 
     @Autowired @Qualifier("invalidAutoRental")
     private AutoRentalDTO invalidAutoRental;
+
+    @Autowired
+    private AutoDTO validAuto;
+
+    @Autowired 
+    private RenterDTO validRenter;
 
     
     private static final MediaType[] MEDIA_TYPES = new MediaType[] {
@@ -103,14 +118,49 @@ public class AutoRentalHttpIfaceClientNTest {
     @BeforeEach  // injecting port way -2
     public void init(@LocalServerPort int port ) {
         
-        autoHttpIfaceJsonAPI.removeAllAutoRental();
+        // remove all auto, renter and autoRental
+        ResponseEntity<Void> responseAutoDelete = restClient.delete()
+                                                    .uri(UriComponentsBuilder.fromUri(baseUrl).path(AutosAPI.AUTOS_PATH).build().toUri())
+                                                    .retrieve().toEntity(Void.class);
+        ResponseEntity<Void> responseRenterDelete = restClient.delete()
+                                                    .uri(UriComponentsBuilder.fromUri(baseUrl).path(RentersAPI.RENTERS_PATH).build().toUri())
+                                                    .retrieve().toEntity(Void.class);                            
+        ResponseEntity<Void> responseAutoRentalDelete = autoHttpIfaceJsonAPI.removeAllAutoRental();
+
+        BDDAssertions.then(responseAutoDelete.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        BDDAssertions.then(responseRenterDelete.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        BDDAssertions.then(responseAutoRentalDelete.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+
+
+        // insert a valid auto having id - "auto-1" and renter having id - "renter-1" 
+        URI autoUri = UriComponentsBuilder.fromUri(baseUrl).path(AutosAPI.AUTOS_PATH).build().toUri();
+        ResponseEntity<AutoDTO> responseAuto = restClient.post().uri(autoUri)
+                                                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                                                .body(validAuto).retrieve()
+                                                .toEntity(AutoDTO.class);
+        BDDAssertions.then(responseAuto.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        log.info("created Auto - {}", responseAuto.getBody());
+        validAuto = responseAuto.getBody();
+
+        URI renterUri = UriComponentsBuilder.fromUri(baseUrl).path(RentersAPI.RENTERS_PATH).build().toUri();
+        ResponseEntity<RenterDTO> responseRenter = restClient.post().uri(renterUri)
+                                                    .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                                                    .body(validRenter).retrieve()
+                                                    .toEntity(RenterDTO.class);
+        BDDAssertions.then(responseRenter.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        log.info("created Renter - {}", responseRenter.getBody());
+        validRenter = responseRenter.getBody();
+        
     }
 
     @ParameterizedTest
     @MethodSource("mediaTypes")
     void add_valid_autoRental_for_type(MediaType contentType, MediaType accept){
         // given / arrange
-
+        validAutoRental.setAutoId(validAuto.getId());
+        validAutoRental.setRenterId(validRenter.getId());
+        log.info("############## in client AutoRental -------------- {}", validAutoRental);
         // when  / act
         ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.createAutoRental(validAutoRental) ;
      
@@ -121,7 +171,36 @@ public class AutoRentalHttpIfaceClientNTest {
         // then / evaluate-assert
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         
+        final TimePeriod timePeriod = new TimePeriod(validAutoRental.getStartDate(), 
+                                validAutoRental.getEndDate() != null ? validAutoRental.getEndDate() : validAutoRental.getStartDate());
+        
+        validAutoRental = new AutoRentalDTO(validAuto, validRenter, timePeriod);
+        AutoRentalDTO createdAutoRental = response.getBody();
+        BDDAssertions.then(createdAutoRental).isEqualTo(validAutoRental.withId(createdAutoRental.getId()));
+        URI location = UriComponentsBuilder.fromUri(baseUrl).replacePath(AutoRentalsAPI.AUTO_RENTAL_PATH).build(createdAutoRental.getId());
+        BDDAssertions.then(response.getHeaders().getFirst(HttpHeaders.LOCATION)).isEqualTo(location.toString());
+    }
 
+    @Test
+    void add_valid_autoRental_not_parameterized(){
+        // given / arrange
+        validAutoRental.setAutoId(validAuto.getId());
+        validAutoRental.setRenterId(validRenter.getId());
+        log.info("############## in client AutoRental -------------- {}", validAutoRental);
+        // when  / act
+        ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.createAutoRental(validAutoRental) ;
+     
+        log.info("resp. status - {} - {}", response.getStatusCode(), HttpStatus.valueOf(response.getStatusCode().value()));
+        log.info("resp. body - {}", response.getBody());
+        log.info("resp. header Content Type- {}", response.getHeaders().getContentType());
+
+        // then / evaluate-assert
+        BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        
+        final TimePeriod timePeriod = new TimePeriod(validAutoRental.getStartDate(), 
+                                validAutoRental.getEndDate() != null ? validAutoRental.getEndDate() : validAutoRental.getStartDate());
+        
+        validAutoRental = new AutoRentalDTO(validAuto, validRenter, timePeriod);
         AutoRentalDTO createdAutoRental = response.getBody();
         BDDAssertions.then(createdAutoRental).isEqualTo(validAutoRental.withId(createdAutoRental.getId()));
         URI location = UriComponentsBuilder.fromUri(baseUrl).replacePath(AutoRentalsAPI.AUTO_RENTAL_PATH).build(createdAutoRental.getId());
@@ -131,8 +210,10 @@ public class AutoRentalHttpIfaceClientNTest {
     @Test
     void get_autoRental() {
         // given / arrange
-        AutoRentalDTO existingAutoRental = autoRentalDTOFactory.make();
-        
+         
+        final TimePeriod timePeriod = new TimePeriod(validAutoRental.getStartDate(), 
+                                validAutoRental.getEndDate() != null ? validAutoRental.getEndDate() : validAutoRental.getStartDate());
+        final AutoRentalDTO existingAutoRental = new AutoRentalDTO(validAuto, validRenter, timePeriod) ;
         // when / act
         ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.createAutoRental(existingAutoRental);
 
@@ -143,6 +224,7 @@ public class AutoRentalHttpIfaceClientNTest {
         URI location = UriComponentsBuilder.fromUri(baseUrl).replacePath(AutoRentalsAPI.AUTO_RENTAL_PATH).build(requestId);
         ResponseEntity<AutoRentalDTO> getAutoRental = autoHttpIfaceJsonAPI.getAutoRental(requestId);
 
+        
         BDDAssertions.then(getAutoRental.getStatusCode()).isEqualTo(HttpStatus.OK);
         BDDAssertions.then(getAutoRental.getBody()).isEqualTo(existingAutoRental.withId(requestId));
         BDDAssertions.then(response.getHeaders().getLocation()).isEqualTo(location);
@@ -154,7 +236,15 @@ public class AutoRentalHttpIfaceClientNTest {
         // given / arrange
         MediaType mediaType = MediaType.valueOf(mediaTypeString);
         Map<String,AutoRentalDTO> autoRentalsMap = new HashMap<>();
-        AutoRentalListDTO autoRentals = autoRentalDTOFactory.listBuilder().make(3,3);
+         final TimePeriod timePeriod = new TimePeriod(validAutoRental.getStartDate(), 
+                                validAutoRental.getEndDate() != null ? validAutoRental.getEndDate() : validAutoRental.getStartDate());
+                        
+        AutoRentalListDTO autoRentals = autoRentalDTOFactory.listBuilder().make(3,3,validAuto,validRenter);
+        // change over lapped start and end  date
+        autoRentals.getAutoRentals().get(1).setStartDate(LocalDate.now().plusDays(1));
+        autoRentals.getAutoRentals().get(1).setEndDate(LocalDate.now().plusDays(1));
+        autoRentals.getAutoRentals().get(2).setStartDate(LocalDate.now().plusDays(2));
+        autoRentals.getAutoRentals().get(2).setEndDate(LocalDate.now().plusDays(2));
         for (AutoRentalDTO autoRental : autoRentals.getAutoRentals()) {
             ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.createAutoRental(autoRental);
             BDDAssertions.then(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -202,8 +292,9 @@ public class AutoRentalHttpIfaceClientNTest {
      @MethodSource("mediaTypes")
      void add_valid_autoRental(MediaType contentType, MediaType accept){
         // given / arrange 
-        AutoRentalDTO validAutoRental = autoRentalDTOFactory.make();
-        
+        AutoRentalDTO validAutoRental = autoRentalDTOFactory.make(validAuto,validRenter,1);
+        validAutoRental.setAutoId(validAuto.getId());
+        validAutoRental.setRenterId(validRenter.getId());
 
         // when / act
 
@@ -212,6 +303,10 @@ public class AutoRentalHttpIfaceClientNTest {
         // then / evaluate - assert
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
+        final TimePeriod timePeriod = new TimePeriod(validAutoRental.getStartDate(), 
+                                validAutoRental.getEndDate() != null ? validAutoRental.getEndDate() : validAutoRental.getStartDate());
+        
+        validAutoRental = new AutoRentalDTO(validAuto, validRenter, timePeriod);
         AutoRentalDTO createdAuto = response.getBody();
         BDDAssertions.then(createdAuto).isEqualTo(validAutoRental.withId(createdAuto.getId()));
         URI location = UriComponentsBuilder.fromUri(baseUrl).path(AutoRentalsAPI.AUTO_RENTAL_PATH).build(createdAuto.getId());
@@ -219,7 +314,7 @@ public class AutoRentalHttpIfaceClientNTest {
      }
 
     private AutoRentalDTO given_an_existing_autoRental() {
-        AutoRentalDTO existingAutoRental = autoRentalDTOFactory.make();
+        AutoRentalDTO existingAutoRental = autoRentalDTOFactory.make(validAuto,validRenter,1);
         ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.createAutoRental(existingAutoRental);
         BDDAssertions.then(response.getStatusCode().is2xxSuccessful()).isTrue();
         BDDAssertions.then((response.getStatusCode())).isEqualTo(HttpStatus.CREATED);
@@ -233,8 +328,10 @@ public class AutoRentalHttpIfaceClientNTest {
         AutoRentalDTO existingAutoRental = given_an_existing_autoRental();
         String requestId = existingAutoRental.getId();
         log.info("startDate - {} , endDate - {}", existingAutoRental.getStartDate(), existingAutoRental.getEndDate());
-        AutoRentalDTO updatedAutoRental = existingAutoRental.withMakeModel(existingAutoRental.getMakeModel()+"Updated ")
-                                                .withStartDate(existingAutoRental.getStartDate().plusDays(1)).withId(null);
+        AutoRentalDTO updatedAutoRental = existingAutoRental
+                                            .withStartDate(existingAutoRental.getStartDate().plusDays(1))
+                                            .withEndDate(existingAutoRental.getEndDate().plusDays(1))
+                                            .withId(null);
 
         log.info("startDate - {} , endDate - {}", existingAutoRental.getStartDate(), existingAutoRental.getEndDate());
 
@@ -255,7 +352,10 @@ public class AutoRentalHttpIfaceClientNTest {
       @Test
      void get_autoRental_1(){
         // given / arrange
-        AutoRentalDTO existingAutoRental = autoRentalDTOFactory.make();
+        final TimePeriod timePeriod = new TimePeriod(validAutoRental.getStartDate(), 
+                                validAutoRental.getEndDate() != null ? validAutoRental.getEndDate() : validAutoRental.getStartDate());
+                
+        final AutoRentalDTO existingAutoRental = new AutoRentalDTO(validAuto, validRenter, timePeriod);
         ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.createAutoRental(existingAutoRental);
         BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         String requestId = response.getBody().getId();
@@ -270,7 +370,8 @@ public class AutoRentalHttpIfaceClientNTest {
 
      protected List<AutoRentalDTO> given_many_autoRentals(int count) {
         List<AutoRentalDTO> autoRentals = new ArrayList<>(count);
-        for (AutoRentalDTO autoRental : autoRentalDTOFactory.listBuilder().autoRentals(count, count)) {
+        for (AutoRentalDTO autoRental : autoRentalDTOFactory.listBuilder().autoRentals(count, count,validAuto,validRenter)) {
+            log.info("given many autoRental - {}", autoRental);
             ResponseEntity<AutoRentalDTO> response = autoHttpIfaceJsonAPI.createAutoRental(autoRental);
             BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
             autoRentals.add(response.getBody());
@@ -362,7 +463,9 @@ public class AutoRentalHttpIfaceClientNTest {
         // given
 
         String unknownId = "AutoRental-13";
-        AutoRentalDTO updateAutoRental = autoRentalDTOFactory.make().withId(unknownId);
+        AutoRentalDTO updateAutoRental = autoRentalDTOFactory.make(validAuto,validRenter,1).withId(unknownId);
+        updateAutoRental.setAutoId(validAuto.getId());
+        updateAutoRental.setRenterId(validRenter.getId());
 
         // verify that updating existing quote
         RestClientResponseException ex =  BDDAssertions.catchThrowableOfType(
@@ -382,7 +485,7 @@ public class AutoRentalHttpIfaceClientNTest {
         
         String knownId = autos.get(0).getId();
         // AutoRentalDTO badAutoRentalMissingText = new AutoRentalDTO();
-        AutoRentalDTO badAutoAutorental = autoRentalDTOFactory.make();
+        AutoRentalDTO badAutoAutorental = autoRentalDTOFactory.make(validAuto,validRenter,1);
         badAutoAutorental.setStartDate(LocalDate.now().minusDays(5));
         badAutoAutorental.withId(knownId);
         ResponseEntity<AutoRentalDTO> resp = autoHttpIfaceJsonAPI.getAutoRental(knownId);
@@ -403,7 +506,7 @@ public class AutoRentalHttpIfaceClientNTest {
         // given
         
        // AutoRentalDTO badAutoRentalMissingText = new AutoRentalDTO();
-        AutoRentalDTO badAutoRental = autoRentalDTOFactory.make();
+        AutoRentalDTO badAutoRental = autoRentalDTOFactory.make(validAuto,validRenter,1);
         badAutoRental.setStartDate(LocalDate.now().minusMonths(2));
 
         

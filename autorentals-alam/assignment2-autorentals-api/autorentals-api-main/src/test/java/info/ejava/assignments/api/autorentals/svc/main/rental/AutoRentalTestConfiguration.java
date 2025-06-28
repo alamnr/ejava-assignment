@@ -24,8 +24,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsAPI;
 import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsJSONHttpIfaceMapping;
 import info.ejava.assignments.api.autorenters.client.autos.AutosXMLHttpIfaceMapping;
+import info.ejava.assignments.api.autorenters.dto.StreetAddressDTO;
+import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTOFactory;
+import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.examples.common.web.RestTemplateLoggingFilter;
 import info.ejava.examples.common.web.ServerConfig;
 import info.ejava.examples.common.webflux.WebClientLoggingFilter;
@@ -38,17 +41,33 @@ public class AutoRentalTestConfiguration {
     @Bean
     @Qualifier("validAutoRental")
     public AutoRentalDTO validAutoRental(){
-        return AutoRentalDTO.builder().amount(BigDecimal.valueOf(100))
-                        .autoId("auto-1").renterId("renter-1")
-                        .renterAge(21).startDate(LocalDate.now()).build();
+        return AutoRentalDTO.builder().autoId("auto-1").renterId("renter-1")
+                        .startDate(LocalDate.now()).endDate(LocalDate.now()).build();
     }
     
     @Bean
     @Qualifier("invalidAutoRental")
     public AutoRentalDTO invalidAutoRental(){
-        return AutoRentalDTO.builder().amount(BigDecimal.valueOf(100))
-                    .autoId("auto-1").renterId("renter-1")
-                    .renterAge(11).startDate(LocalDate.now()).build();
+        return AutoRentalDTO.builder().autoId(" ").renterId(null)
+                    .endDate(null).startDate(null).build();
+    }
+
+    @Bean
+    @Qualifier("validAuto")
+    public AutoDTO validAuto(){
+        return  AutoDTO.builder().dailyRate(BigDecimal.valueOf(50.5))
+                .fuelType("Gasolin")
+                .location(StreetAddressDTO.builder().city("city-1")
+                .state("state-1").street("street-1").zip("zip-1").build())
+                .make("2020").model("2015").passengers(5)
+                .build();
+    }
+    
+    @Bean
+    @Qualifier("validRenter")
+    public RenterDTO validRenter(){
+        return  RenterDTO.builder().email("valid@email.com").firstName("John").lastName("Doe")
+                .dob(LocalDate.of(1930,2,26)).build();
     }
 
     @Bean

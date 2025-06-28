@@ -5,7 +5,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.math.BigDecimal;
 import java.net.URI;
+import java.time.LocalDate;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,10 +31,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsAPI;
+import info.ejava.assignments.api.autorenters.dto.StreetAddressDTO;
+import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTOFactory;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalListDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.RentalSearchParams;
+import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.svc.autorentals.AutoRentalController;
 import info.ejava.assignments.api.autorenters.svc.autorentals.AutoRentalExceptionAdvice;
 import info.ejava.assignments.api.autorenters.svc.autorentals.AutoRentalService;
@@ -53,6 +58,8 @@ public class AutoRentalControllerMockTest {
 
     static DtoUtil dtoUtil;
     static AutoRentalDTOFactory autoRentalDTOFactory;
+    static AutoDTO validAuto;
+    static RenterDTO validRenter;
 
     AutoRentalListDTO autoRentals;
 
@@ -66,6 +73,14 @@ public class AutoRentalControllerMockTest {
     static void setUp(){
         autoRentalDTOFactory = new AutoRentalDTOFactory();
         dtoUtil = new JsonUtil();
+        validAuto = AutoDTO.builder().dailyRate(BigDecimal.valueOf(50.5))
+                            .fuelType("Gasolin")
+                            .location(StreetAddressDTO.builder().city("city-1")
+                            .state("state-1").street("street-1").zip("zip-1").build())
+                            .make("2020").model("2015").passengers(5)
+                            .build();
+        validRenter = RenterDTO.builder().email("valid@email.com").firstName("John").lastName("Doe")
+                                .dob(LocalDate.of(1930,2,26)).build();
     }
 
     @BeforeEach
@@ -73,7 +88,7 @@ public class AutoRentalControllerMockTest {
          // without ID
          // autoRentals = autoRentalDTOFactory.listBuilder().make(5,5);
          // with ID
-         autoRentals = autoRentalDTOFactory.listBuilder().make(5, 5, AutoRentalDTOFactory.withId);
+         autoRentals = autoRentalDTOFactory.listBuilder().make(5, 5,validAuto,validRenter, AutoRentalDTOFactory.withId);
          autoRentals.setOffset(0);
          autoRentals.setLimit(0);
          autoRentals.setTotal(autoRentals.getAutoRentals().size());
@@ -159,7 +174,7 @@ public class AutoRentalControllerMockTest {
 
     @Test
     void should_update_autoRental_when_given_valid_autoRental() throws Exception {
-        AutoRentalDTO autoRentalWithoutId = autoRentalDTOFactory.listBuilder().make(1, 1).getAutoRentals().get(0);
+        AutoRentalDTO autoRentalWithoutId = autoRentalDTOFactory.listBuilder().make(1, 1,validAuto,validRenter).getAutoRentals().get(0);
         autoRentalWithoutId.setRenterName("updated - "+autoRentalWithoutId.getRenterName());
         String id = "auto-123";
         autoRentalWithoutId.setId(id);
