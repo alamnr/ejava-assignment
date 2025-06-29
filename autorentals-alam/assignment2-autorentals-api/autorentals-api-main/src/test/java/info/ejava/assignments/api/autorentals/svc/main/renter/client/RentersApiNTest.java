@@ -5,6 +5,7 @@ import info.ejava.assignments.api.autorentals.svc.main.AutoRentalsAppMain;
 import info.ejava.assignments.api.autorentals.svc.main.ProvidedApiAutoRenterTestConfiguration;
 import info.ejava.assignments.api.autorenters.client.renters.RentersAPI;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTOFactory;
+import info.ejava.assignments.api.autorenters.dto.rentals.TimePeriod;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterListDTO;
 import info.ejava.examples.common.dto.JsonUtil;
@@ -120,8 +121,8 @@ public class RentersApiNTest {
     void can_update_renter() {
         //given
         RenterDTO existingRenter = populate(1).get(0);
-       
-        LocalDate updatedDob =  existingRenter.getDob().plusYears(20);;
+        
+        LocalDate updatedDob =  existingRenter.getDob().minusYears(20);
         RenterDTO updatedRenter = existingRenter.withDob(updatedDob);
         log.info("updated Renter - {}, updatedDob - {}", updatedRenter, updatedDob);
         //when

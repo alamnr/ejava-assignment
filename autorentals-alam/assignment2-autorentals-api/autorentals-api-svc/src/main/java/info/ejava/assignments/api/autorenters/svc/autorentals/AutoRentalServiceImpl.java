@@ -171,7 +171,7 @@ public class AutoRentalServiceImpl  implements AutoRentalService {
                                                                         .timePeriod(timePeriod).build();
         Page<AutoRentalDTO> rentalPage =  autoRentalRepository.findAllBySearchParam(searchParams, Pageable.unpaged());
         if(rentalPage.hasContent()){
-            throw new ClientErrorException.InvalidInputException("autoRental time period overlap, use another date. Given overlap time- %s",
+            throw new ClientErrorException.InvalidInputException("autoRental time period conflict / overlapped, use another date. Given overlap time- %s",
                                                      timePeriod.getStartDate().toString());
         }
     }

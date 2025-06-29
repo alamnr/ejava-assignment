@@ -2,14 +2,17 @@ package info.ejava.assignments.api.autorentals.svc.main.rental.service.mock;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.assertj.core.api.BDDAssertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -28,8 +31,11 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import info.ejava.assignments.api.autorenters.dto.StreetAddressDTO;
+import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.RentalSearchParams;
+import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.svc.autorentals.AutoRentalDTORepository;
 import info.ejava.assignments.api.autorenters.svc.autorentals.AutoRentalServiceImpl;
 import info.ejava.assignments.api.autorenters.svc.autos.AutosDTORepository;
@@ -64,6 +70,23 @@ public class AutoRentalServiceMockTest {
     @Captor
     ArgumentCaptor<Integer> intCaptor;
 
+    private AutoDTO validAuto;
+    private RenterDTO validRenter;
+
+    @BeforeEach 
+    void init() {
+        validAuto = AutoDTO.builder().dailyRate(BigDecimal.valueOf(50.5))
+                        .fuelType("Gasolin")
+                        .location(StreetAddressDTO.builder().city("city-1")
+                        .state("state-1").street("street-1").zip("zip-1").build())
+                        .make("2020").model("2015").passengers(5)
+                        .id("auto-1")
+                        .build();
+        validRenter = RenterDTO.builder().email("valid@email.com").id("renter-1")
+                                .firstName("John").lastName("Doe")
+                                .dob(LocalDate.of(1930,2,26)).build();
+    }
+
     @Test
     void can_create_valid_autoRental() throws JsonMappingException, JsonProcessingException{
         // given / arrange 
@@ -84,6 +107,9 @@ public class AutoRentalServiceMockTest {
                                 .thenReturn(new PageImpl<AutoRentalDTO>(List.of(), Pageable.unpaged(), 0));
         BDDMockito.when(repo.save(dtoCaptor.capture()))
                 .thenReturn(deepCopy.withId("autoRental-1"));
+        BDDMockito.when(autoRepository.findById(anyString())).thenReturn(Optional.of(validAuto));
+        BDDMockito.when(renterRepository.findById(anyString())).thenReturn(Optional.of(validRenter));
+
 
         // when / act 
         AutoRentalDTO returnedAutoRental = autoRentalServiceImpl.createAutoRental(autoRentalDTO);

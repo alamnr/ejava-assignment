@@ -69,7 +69,8 @@ public class AutoRentalDTO implements RentalDTO {
         this.renterId = renter.getId();
         this.startDate = timePeriod.getStartDate();
         this.endDate = timePeriod.getEndDate();
-        this.makeModel = auto.getMake()+"-"+auto.getModel();
+        this.makeModel = auto.getMake() + "-" + auto.getModel();
+        this.amount = BigDecimal.valueOf(auto.getDailyRate().doubleValue() * timePeriod.getDays());
         this.renterName = renter.getFirstName()+" "+renter.getLastName();
         this.renterAge = TimePeriod.create(renter.getDob(), LocalDate.now()).getPeriod().getYears();
         

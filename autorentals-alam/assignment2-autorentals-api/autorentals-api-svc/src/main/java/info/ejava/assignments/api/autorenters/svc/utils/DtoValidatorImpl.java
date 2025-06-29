@@ -71,16 +71,26 @@ public class DtoValidatorImpl implements DtoValidator {
                 
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(autoRental.getAutoId()), ()->"autoRental.autoId - can not be blank");
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(autoRental.getRenterId()), ()->"autoRental.renterId - can not be blank");
-                validate(errMsgs, ()-> autoRental.getRenterAge()!=null? autoRental.getRenterAge() >= 21:false, ()->"autoRental.renterAge - must be greater than 21");
-                validate(errMsgs, ()-> autoRental.getStartDate().isEqual(LocalDate.now()) || autoRental.getStartDate().isAfter(LocalDate.now()),
-                                                        ()-> "autoRental.startDate - is not valid");
+                validate(errMsgs, ()-> autoRental.getRenterAge()!=null? autoRental.getRenterAge() >= 21:false,
+                                         ()->"autoRental.renterAge - too young, must be greater than 21");
+                validate(errMsgs, ()-> autoRental.getStartDate().isEqual(LocalDate.now()) 
+                                        || autoRental.getStartDate().isAfter(LocalDate.now()),
+                                        ()-> "autoRental.startDate - is not valid");
+                validate(errMsgs, ()-> (autoRental.getEndDate().isEqual(autoRental.getStartDate()) 
+                                        || autoRental.getEndDate().isAfter(autoRental.getStartDate())) ,
+                                        ()->" autoRental.endDate - is not valid");
             } else {
                
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(autoRental.getAutoId()), ()->"autoRental.autoId - can not be blank");
                 validate(errMsgs, ()-> !ObjectUtils.isEmpty(autoRental.getRenterId()), ()->"autoRental.renterId - can not be blank");
-                validate(errMsgs, ()-> autoRental.getRenterAge()!=null? autoRental.getRenterAge() >= 21:false, ()->"autoRental.renterAge - must be greater than 21");
-                validate(errMsgs, ()-> autoRental.getStartDate().isEqual(LocalDate.now()) || autoRental.getStartDate().isAfter(LocalDate.now()),
-                                                        ()-> "autoRental.startDate - is not valid");
+                validate(errMsgs, ()-> autoRental.getRenterAge()!=null? autoRental.getRenterAge() >= 21:false, 
+                                        ()->"autoRental.renterAge - must be greater than 21");
+                validate(errMsgs, ()-> autoRental.getStartDate().isEqual(LocalDate.now()) 
+                                        || autoRental.getStartDate().isAfter(LocalDate.now()),
+                                        ()-> "autoRental.startDate - is not valid");
+                validate(errMsgs, ()-> (autoRental.getEndDate().isEqual(autoRental.getStartDate()) 
+                                        || autoRental.getEndDate().isAfter(autoRental.getStartDate())) ,
+                                        ()->" autoRental.endDate - is not valid");
             }
     
             log.trace("auto Rental - {} , valid - {}, errors-{}", autoRental, errMsgs.isEmpty(), errMsgs);
