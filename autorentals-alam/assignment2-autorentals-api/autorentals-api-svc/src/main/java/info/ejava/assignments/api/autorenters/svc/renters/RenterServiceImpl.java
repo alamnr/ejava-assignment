@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-public class RenterServiceImpl implements RenterService {
+public class RenterServiceImpl implements RentersService {
 
     private final RenterDTORepository repo;
     private final DtoValidator dtoValidator;

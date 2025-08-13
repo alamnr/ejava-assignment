@@ -1,0 +1,15 @@
+package info.ejava.assignments.api.autorenters.dto.renters;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class RenterListDTO {
+    private List<RenterDTO> contents = new ArrayList<>();
+}

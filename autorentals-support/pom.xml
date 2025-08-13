@@ -38,6 +38,8 @@
     <modules>
         <module>autorentals-support-propertysource</module>
         <module>autorentals-support-testing</module>
+         <module>autorentals-support-api</module>
+        <module>autorentals-support-security</module>
     </modules>
     <repositories>
         <!-- <repository>

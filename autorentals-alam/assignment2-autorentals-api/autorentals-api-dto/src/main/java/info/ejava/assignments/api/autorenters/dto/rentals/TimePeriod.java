@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.With;
 import org.springframework.util.Assert;
 
@@ -23,9 +24,10 @@ import java.util.Objects;
 @Data
 @Builder
 @With
+@NoArgsConstructor
 public class TimePeriod implements Comparable<TimePeriod> {
-    private final LocalDate startDate; //inclusive
-    private final LocalDate endDate;   //inclusive
+    private  LocalDate startDate; //inclusive
+    private  LocalDate endDate;   //inclusive
 
     public TimePeriod(@NotNull LocalDate startDate, @NotNull LocalDate endDate) {
         Assert.notNull(startDate,"startDate is required");

@@ -40,6 +40,7 @@
         <module>assignment1-autorentals-logging</module>
         <module>assignment1-autorentals-testing</module>
         <module>assignment2-autorentals-api</module>
+        <module>assignment3-autorentals-security</module>
     </modules>
     <repositories>
         <!-- <repository>

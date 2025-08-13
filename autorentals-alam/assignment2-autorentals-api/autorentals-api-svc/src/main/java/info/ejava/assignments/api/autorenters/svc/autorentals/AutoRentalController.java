@@ -65,21 +65,38 @@ public class AutoRentalController {
      * @return list of contents containing autos
      */
 
-     @RequestMapping(path = AutoRentalsAPI.AUTO_RENTAL_QUERY_PATH,method = RequestMethod.POST, 
-                        produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-     public ResponseEntity<AutoRentalListDTO> queryAutoRentalList(@RequestParam(value = "pageNumber", required = false)Integer pageNumber, 
-                    @RequestParam(value = "pageSize", required = false)Integer pageSize, @RequestBody AutoRentalDTO probe) {
+    //  @RequestMapping(path = AutoRentalsAPI.AUTO_RENTAL_QUERY_PATH,method = RequestMethod.POST, 
+    //                     produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    //  public ResponseEntity<AutoRentalListDTO> queryAutoRentalList(@RequestParam(value = "pageNumber", required = false)Integer pageNumber, 
+    //                 @RequestParam(value = "pageSize", required = false)Integer pageSize, @RequestBody AutoRentalDTO probe) {
 
-        Pageable pageable = (null != pageNumber && null != pageSize && pageNumber>0 && pageSize>0) ? 
-                            PageRequest.of(pageNumber, pageSize) : Pageable.unpaged();
-        Page<AutoRentalDTO> autoRentalPage = autoRentalService.queryAutoRental(probe, pageable);
-        AutoRentalListDTO autoRentalList = new AutoRentalListDTO(pageNumber==null?0:pageNumber,
-                                                pageSize==null?0:pageSize,autoRentalPage.getContent().size(),
-                                                "",autoRentalPage.toList());
-        ResponseEntity<AutoRentalListDTO> response = ResponseEntity.ok(autoRentalList); // http status code - 200
-        return response;
+    //     Pageable pageable = (null != pageNumber && null != pageSize && pageNumber>0 && pageSize>0) ? 
+    //                         PageRequest.of(pageNumber, pageSize) : Pageable.unpaged();
+    //     Page<AutoRentalDTO> autoRentalPage = autoRentalService.queryAutoRental(probe, pageable);
+    //     AutoRentalListDTO autoRentalList = new AutoRentalListDTO(pageNumber==null?0:pageNumber,
+    //                                             pageSize==null?0:pageSize,autoRentalPage.getContent().size(),
+    //                                             "",autoRentalPage.toList());
+    //     ResponseEntity<AutoRentalListDTO> response = ResponseEntity.ok(autoRentalList); // http status code - 200
+    //     return response;
 
-     }
+    //  }
+
+
+    @RequestMapping(path=AutoRentalsAPI.AUTO_RENTAL_QUERY_PATH, method = RequestMethod.POST,
+                        produces = {MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity<AutoRentalListDTO> findRentalsBy(@RequestBody RentalSearchParams searchParams){
+
+            Integer pageNumber = searchParams.getPageNumber();
+            Integer pageSize = searchParams.getPageSize();
+            Pageable pageable = ( null != pageNumber && null != pageSize && pageNumber>=0 && pageSize>0) ? 
+                                    PageRequest.of(pageNumber, pageSize) : Pageable.unpaged();
+               
+            Page<AutoRentalDTO> autoRentalPage = autoRentalService.searchAutoRental(searchParams, pageable);
+            AutoRentalListDTO autoRentalList = new AutoRentalListDTO(pageNumber==null?0:pageNumber,pageSize==null?0:pageSize,
+                                                        autoRentalPage.getContent().size() ,"",autoRentalPage.toList());
+            ResponseEntity<AutoRentalListDTO> response = ResponseEntity.ok(autoRentalList); // http status code - 200
+            return response;
+    }
 
 
      /*

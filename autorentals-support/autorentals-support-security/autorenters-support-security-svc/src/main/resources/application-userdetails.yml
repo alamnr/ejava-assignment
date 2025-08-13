@@ -1,0 +1,12 @@
+autorenters:
+  accounts:
+    - username: mary
+      password: secret
+    - username: lou
+      password: secret
+    - username: murray
+      password: secret
+    - username: ted
+      password: secret
+    - username: sueann
+      password: betty

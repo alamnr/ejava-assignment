@@ -1,0 +1,173 @@
+package info.ejava.assignments.security.autorenters.svc;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.provider.Arguments;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.support.BasicAuthenticationInterceptor;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.RestTemplate;
+
+import info.ejava.examples.common.web.RestTemplateConfig;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+//@ExtendWith(SpringExtension.class)
+//@ContextConfiguration(classes = {Accounts.class, MyTest.MyTestConfig.class})
+@SpringBootTest(classes = MainApp.class)
+@Import({MyTest.MyTestConfig.class})
+@ActiveProfiles("authorities")
+//@ActiveProfiles("userdetails")
+public class MyTest {    
+
+    @Autowired
+    private Accounts accounts;
+
+    @Autowired
+    private Map<String,RestTemplate> authnUsers;
+    
+
+    private  RestTemplate createUser(RestTemplateBuilder builder, ClientHttpRequestFactory requestFactory, AccountProperties account) {
+
+        ClientHttpRequestInterceptor[] filters = (null == account) ? new ClientHttpRequestInterceptor[]{} : 
+                                                    new ClientHttpRequestInterceptor[]{
+                                                        new BasicAuthenticationInterceptor(account.getUsername(), account.getPassword())
+                                                    };
+        return new RestTemplateConfig().restTemplateDebug(builder,requestFactory, filters);
+
+    }
+
+     private AccountProperties getUserAccount(Accounts accounts, int index){
+            if(!accounts.getAccounts().isEmpty()){
+                List<AccountProperties> userAccounts = accounts.getAccounts().stream()
+                                                        .filter(a -> !a.getAuthorities().contains("ROLE_ADMIN"))
+                                                        .filter(a -> !a.getAuthorities().contains("ROLE_MGR"))
+                                                        .filter(a -> !a.getAuthorities().contains("PROXY"))
+                                                        .toList();
+                if(userAccounts.size() <= index ){
+                    throw new IllegalStateException("Cannot find user without elevated roles");
+                }
+                log.info("using account({}) for anAuthUser", userAccounts.get(index));
+                return userAccounts.get(index);
+            } else {
+                throw new IllegalStateException(" no user.name/password or accounts specified");
+            }
+        }
+
+        private AccountProperties findUserWithAuthority(Accounts accounts, String authority){
+            if(!accounts.getAccounts().isEmpty()) {
+                AccountProperties account = accounts.getAccounts().stream()
+                                            .filter(a -> a.getAuthorities().contains(authority))
+                                            .findFirst()
+                                            .orElseThrow(() -> new IllegalStateException("cannot find user authority " + authority));
+                log.info("using account({}) for {} authority", account,authority);
+                return account;
+            }   else {
+                throw new IllegalStateException("no user.name/password or accounts specified");
+            }
+        }      
+
+    @Test
+    void testProps(){
+        System.out.println(accounts);
+        
+        log.info("anAccount - {}", getUserAccount(accounts, 0));
+        log.info("altAccount - {}", getUserAccount(accounts, 1));
+        log.info("mgrAccount - {}",findUserWithAuthority(accounts, "ROLE_MGR"));
+        log.info("proxyAccount - {}",findUserWithAuthority(accounts, "PROXY"));
+        log.info("adminAccount - {}", findUserWithAuthority(accounts, "ROLE_ADMIN"));
+        log.info("authnUsers - {}", authnUsers);
+        log.info("anAccount from authnUsers -{}", authnUsers.get(getUserAccount(accounts, 0).getUsername()));
+        log.info("altAccount from authnUsers -{}", authnUsers.get(getUserAccount(accounts, 1).getUsername()));
+        log.info("adminAccount from authnUsers -{}", authnUsers.get(findUserWithAuthority(accounts, "ROLE_ADMIN").getUsername()));
+        log.info("mgrAccount from authnUsers -{}", authnUsers.get(findUserWithAuthority(accounts, "ROLE_MGR").getUsername()));
+        log.info("proxyAccount from authnUsers -{}", authnUsers.get(findUserWithAuthority(accounts, "PROXY").getUsername()));
+        
+        accounts.getAccounts().forEach(a->log.info("name - {} , authorities  - {}",a.getUsername(),a.getAuthorities().toArray()));
+        //log.info("authorities [0] - {}",accounts.getAccounts().get(1).getAuthorities().toArray());
+        //log.info("authorities [0] - {}",accounts.getAccounts().get(1).getAuthorities().toArray(new String[0]));
+        List<UserDetails> users = accounts.getAccounts().stream()
+                                    .map(a-> User.builder()
+                                                    .passwordEncoder(pass -> NoOpPasswordEncoder.getInstance().encode(pass))
+                                                    .username(a.getUsername())
+                                                    .password(a.getPassword())
+                                                    .authorities(a.getAuthorities().toArray(new String[0]))
+                                                    .build())
+                                                .toList();
+        
+        log.info("User Details - {} ", users);
+        log.info("-------------------------------------------------------{}--------------------", "--");
+
+        List<UserDetails> users_1 = accounts.getAccounts().stream()
+                                    .map(a-> User.builder()
+                                                    .passwordEncoder(pass -> NoOpPasswordEncoder.getInstance().encode(pass))
+                                                    .username(a.getUsername())
+                                                    .password(a.getPassword())
+                                                    .authorities(a.getAuthorities().toArray(new String[0]))
+                                                    .build())
+                                    .map(a->a)            
+                                    .toList();
+        
+        log.info("User Details - {} ", users_1);
+
+        log.info(" are they equal - {}", users.equals(users_1));
+
+        log.info("all authorities - ");
+
+        all_authorities().forEach(arg -> {
+             {
+            Object[] argsArray = arg.get(); // get() returns Object[]
+            System.out.println(java.util.Arrays.toString(argsArray));
+        }
+        });
+    }
+
+    @TestConfiguration(proxyBeanMethods = false)    
+    @Profile({"userdetails","authorities"})
+    static class MyTestConfig {
+        @Bean
+        @ConfigurationProperties("autorenters")
+        @ConditionalOnMissingBean()
+        public Accounts rentalAccounts() {
+            return new Accounts();
+        }
+
+       
+
+    }
+
+    Stream<Arguments> all_authorities() {
+        Assumptions.assumeTrue(null!=accounts,"test class should only run for derived class");
+        return accounts.getAccounts().stream()
+                    .flatMap(account -> account.getAuthorities().stream())
+                    .collect(Collectors.toSet()) // dedup
+                    .stream()
+                    .map(authority-> Arguments.of(authority));
+    }
+    
+}

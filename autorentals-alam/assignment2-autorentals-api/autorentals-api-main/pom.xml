@@ -25,12 +25,12 @@
         
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>autorenters-api-client</artifactId>
+            <artifactId>autorentals-api-client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>autorenters-api-svc</artifactId>
+            <artifactId>autorentals-api-svc</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import info.ejava.assignments.api.autorentals.svc.main.renter.RenterTestConfiguration;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
-import info.ejava.assignments.api.autorenters.svc.renters.RenterService;
+import info.ejava.assignments.api.autorenters.svc.renters.RentersService;
 import info.ejava.examples.common.exceptions.ClientErrorException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,7 +25,7 @@ public class RenterServiceBDDNTest {
     private RenterDTO invalidRenterDTO;
 
     @Autowired
-    private RenterService  renterService;
+    private RentersService  renterService;
 
     @Test
     void can_create_valid_renter(){

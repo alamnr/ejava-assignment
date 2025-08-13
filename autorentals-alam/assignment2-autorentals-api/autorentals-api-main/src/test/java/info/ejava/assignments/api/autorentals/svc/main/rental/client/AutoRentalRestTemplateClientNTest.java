@@ -43,6 +43,7 @@ import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTOFactory;
 import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalListDTO;
+import info.ejava.assignments.api.autorenters.dto.rentals.RentalSearchParams;
 import info.ejava.assignments.api.autorenters.dto.rentals.TimePeriod;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.examples.common.dto.JsonUtil;
@@ -198,6 +199,7 @@ public class AutoRentalRestTemplateClientNTest {
         
 
     }
+
 
     @Test
     void get_autoRental(){
@@ -626,5 +628,32 @@ public class AutoRentalRestTemplateClientNTest {
         BDDAssertions.then(returnedAutoRentals.getTotal()).isEqualTo(10);
     }
 
+    
+    @Test
+    void searchAutoRentals(){
 
+        
+        // given
+        // given - an existing autoRental
+        AutoRentalDTO existingAutoRental = given_an_existing_autoRental();
+        
+        final TimePeriod timePeriod = new TimePeriod(existingAutoRental.getStartDate(), 
+                                existingAutoRental.getEndDate() != null ? existingAutoRental.getEndDate() : existingAutoRental.getStartDate());
+        RentalSearchParams searchParams = RentalSearchParams.builder()
+                                                .autoId(existingAutoRental.getAutoId())
+                                                .renterId(existingAutoRental.getRenterId())
+                                                .timePeriod(timePeriod)
+                                                //.pageNumber(1)
+                                                //.pageSize(10)
+                                                .build();
+        URI url = UriComponentsBuilder.fromUri(baseUrl).path(AutoRentalsAPI.AUTO_RENTAL_QUERY_PATH).build().toUri();
+        // when 
+        ResponseEntity<AutoRentalListDTO> response = restTemplate.postForEntity(url, searchParams, AutoRentalListDTO.class);
+
+         //then - page of results returned
+        BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        AutoRentalListDTO returnedAutoRentals = response.getBody();
+        log.info("returned autorentals - {}", returnedAutoRentals);
+                                    
+    }
 }

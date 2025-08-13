@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RentersController {
 
-    private final RenterService renterService;
+    private final RentersService renterService;
 
     @PostConstruct
     public void init() {

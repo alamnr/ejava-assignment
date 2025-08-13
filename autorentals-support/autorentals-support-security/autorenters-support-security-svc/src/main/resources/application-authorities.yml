@@ -1,0 +1,24 @@
+autorenters:
+  accounts:
+    - username: mary
+      password: secret
+      authorities:
+        - ROLE_ADMIN
+        - ROLE_MEMBER
+    - username: lou
+      password: secret
+      authorities:
+        - ROLE_MGR
+    - username: murray
+      password: secret
+      authorities:
+        - ROLE_MEMBER
+        - PROXY
+    - username: ted
+      password: secret
+      authorities:
+        - ROLE_MEMBER
+    - username: sueann
+      password: betty
+      authorities:
+        - ROLE_MEMBER

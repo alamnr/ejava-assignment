@@ -1,14 +1,13 @@
 package info.ejava.assignments.api.autorenters.svc.renters;
 
-import java.util.Optional;
-
+import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
+import java.util.Optional;
 
-public interface RenterService {
-    RenterDTO createRenter(RenterDTO newrenter);
+public interface RentersService {
+    RenterDTO createRenter(RenterDTO newRenter);
     RenterDTO getRenter(String id);
     boolean hasRenter(String id);
     RenterDTO updateRenter(String id, RenterDTO renterDTO);

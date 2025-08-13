@@ -28,7 +28,7 @@ import info.ejava.assignments.api.autorenters.client.renters.RentersAPI;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTOFactory;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterListDTO;
-import info.ejava.assignments.api.autorenters.svc.renters.RenterService;
+import info.ejava.assignments.api.autorenters.svc.renters.RentersService;
 import info.ejava.assignments.api.autorenters.svc.renters.RentersController;
 import info.ejava.assignments.api.autorenters.svc.renters.RentersExceptionAdvice;
 import info.ejava.examples.common.dto.DtoUtil;
@@ -55,7 +55,7 @@ public class RenterControllerMockTest {
     RenterListDTO renters;
 
     @MockitoBean
-    RenterService renterServiceMock;
+    RentersService renterServiceMock;
 
     @Captor
     ArgumentCaptor<RenterDTO> dtoCaptor;

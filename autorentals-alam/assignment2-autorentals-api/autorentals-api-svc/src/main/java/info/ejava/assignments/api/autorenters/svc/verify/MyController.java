@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import info.ejava.assignments.api.autorenters.client.renters.RentersAPI;
-import info.ejava.assignments.api.autorenters.svc.renters.RenterService;
+import info.ejava.assignments.api.autorenters.svc.renters.RentersService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class MyController {
 
-    private final RenterService renterService;
+    private final RentersService renterService;
 
     @PostConstruct
     public void init() {

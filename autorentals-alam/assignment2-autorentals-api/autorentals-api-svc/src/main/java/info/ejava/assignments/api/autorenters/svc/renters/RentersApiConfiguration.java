@@ -32,13 +32,13 @@ public class RentersApiConfiguration {
 
     @Bean
     //@Order(Ordered.LOWEST_PRECEDENCE)
-    public RenterService renterService(RenterDTORepository renterDTORepository, DtoValidator dtoValidator, RentersProperties renterProps){
+    public RentersService renterService(RenterDTORepository renterDTORepository, DtoValidator dtoValidator, RentersProperties renterProps){
         return new RenterServiceImpl(renterDTORepository, dtoValidator, renterProps);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public RentersController rentersController(RenterService renterService){
+    public RentersController rentersController(RentersService renterService){
         return new RentersController(renterService);
     }
 

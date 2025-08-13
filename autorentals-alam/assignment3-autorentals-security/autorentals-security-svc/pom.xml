@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>info.ejava.alamnr.assignments.autorentals</groupId>
+        <artifactId>autorentals-alamnr</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>autorentals-security-svc</artifactId>
+    <name>Starter::Assignment3::Security::Autorentals Service</name>
+
+    <properties>
+        <api.groupId>info.ejava.alamnr.assignment2.autorentals</api.groupId>
+        <api.version>1.0-SNAPSHOT</api.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- bring in my service API implementations to secure -->
+        <dependency>
+            <groupId>${api.groupId}</groupId>
+            <artifactId>autorentals-api-svc</artifactId>
+            <version>${api.version}</version>
+        </dependency>
+        <!-- Bring in my service API client artifact -->
+        <dependency>
+            <groupId>${api.groupId}</groupId>
+            <artifactId>autorentals-api-client</artifactId>
+            <version>${api.version}</version>
+        </dependency>
+
+        <!-- bring in support Auto and Renter security layering -->
+        <!-- <dependency>
+            <groupId>info.ejava.assignments.security.autorentals</groupId>
+            <artifactId>autorenters-support-security-svc</artifactId>
+            <version>${ejava.version}</version>
+        </dependency> -->
+        
+        <dependency>
+            <groupId>info.ejava.examples.common</groupId>
+            <artifactId>ejava-web-util</artifactId>
+            <version>${ejava.version}</version>        
+        </dependency>
+            
+        <!-- <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>info.ejava.assignments.aop.autorentals</groupId>
+            <artifactId>autorentals-support-aop</artifactId>
+            <version>${ejava.version}</version>
+        </dependency> -->
+
+        <!-- bring in spring boot test framework -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- needed to setup TLS for RestTemplate -->
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.hakky54</groupId>
+            <artifactId>sslcontext-kickstart-for-apache5</artifactId>
+        </dependency>
+
+        <!-- bring in support test configurations from API tests -->
+        <!-- <dependency>
+            <groupId>info.ejava.assignments.api.autorentals</groupId>
+            <artifactId>autorenters-support-api-svc</artifactId>
+            <classifier>tests</classifier>
+            <version>${ejava.version}</version>
+            <scope>test</scope>
+        </dependency> -->
+        <!-- bring in test configurations from my project's API tests -->
+        <!-- <dependency>
+            <groupId>${api.groupId}</groupId>
+            <artifactId>autorentals-api-svc</artifactId>
+            <classifier>tests</classifier>
+            <version>${api.version}</version>
+            <scope>test</scope>
+        </dependency> -->
+        <!-- bring in support test configurations and base Security tests -->
+        <!-- <dependency>
+            <groupId>info.ejava.assignments.security.autorentals</groupId>
+            <artifactId>autorenters-support-security-svc</artifactId>
+            <classifier>tests</classifier>
+            <version>${ejava.version}</version>
+            <scope>test</scope>
+        </dependency> -->
+        <!-- bring in base tests for my AOP tests -->
+        <!-- <dependency>
+            <groupId>info.ejava.assignments.aop.autorentals</groupId>
+            <artifactId>autorentals-support-aop</artifactId>
+            <classifier>tests</classifier>
+            <version>${ejava.version}</version>
+            <scope>test</scope>
+        </dependency> -->
+
+
+    </dependencies>
+
+</project>
