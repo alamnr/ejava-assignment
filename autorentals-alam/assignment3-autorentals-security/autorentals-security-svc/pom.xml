@@ -50,11 +50,11 @@
         </dependency>
 
         <!-- bring in support Auto and Renter security layering -->
-        <!-- <dependency>
+        <dependency>
             <groupId>info.ejava.assignments.security.autorentals</groupId>
             <artifactId>autorenters-support-security-svc</artifactId>
             <version>${ejava.version}</version>
-        </dependency> -->
+        </dependency> 
         
         <dependency>
             <groupId>info.ejava.examples.common</groupId>
@@ -99,21 +99,21 @@
             <scope>test</scope>
         </dependency> -->
         <!-- bring in test configurations from my project's API tests -->
-        <!-- <dependency>
+        <dependency>
             <groupId>${api.groupId}</groupId>
-            <artifactId>autorentals-api-svc</artifactId>
+            <artifactId>autorentals-api-main</artifactId>
             <classifier>tests</classifier>
             <version>${api.version}</version>
             <scope>test</scope>
-        </dependency> -->
+        </dependency> 
         <!-- bring in support test configurations and base Security tests -->
-        <!-- <dependency>
+        <dependency>
             <groupId>info.ejava.assignments.security.autorentals</groupId>
             <artifactId>autorenters-support-security-svc</artifactId>
             <classifier>tests</classifier>
             <version>${ejava.version}</version>
             <scope>test</scope>
-        </dependency> -->
+        </dependency> 
         <!-- bring in base tests for my AOP tests -->
         <!-- <dependency>
             <groupId>info.ejava.assignments.aop.autorentals</groupId>
@@ -125,5 +125,14 @@
 
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

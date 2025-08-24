@@ -19,7 +19,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.support.BasicAuthenticationInterceptor;
 import org.springframework.web.client.RestTemplate;
 
-import info.ejava.assignments.api.autorenters.svc.ProvidedApiAutoRenterTestConfiguration;
+import info.ejava.assignments.api.autorentals.svc.main.ProvidedApiAutoRenterTestConfiguration;
 import info.ejava.examples.common.web.RestTemplateConfig;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,8 +43,8 @@ public class ProvidedAuthorizationTestHelperConfiguration {
     @ConditionalOnMissingBean(name = "anonymousUser")
     class AnonymousConfiguration {
         @Bean
-        public RestTemplate anonymousUser(RestTemplateBuilder builder, ClientHttpRequestFactory requestfactory){
-            return createUser(builder, requestfactory, null);
+        public RestTemplate anonymousUser(RestTemplateBuilder builder, ClientHttpRequestFactory requestFactory){
+            return createUser(builder, requestFactory, null);
         }
     }
 

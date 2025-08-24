@@ -2,7 +2,10 @@ package info.ejava.assignments.api.autorentals.svc.main;
 
 import info.ejava.assignments.api.autorenters.client.renters.RentersAPIClient;
 import info.ejava.assignments.api.autorenters.client.renters.RentersHttpIface;
+import info.ejava.assignments.api.autorentals.svc.main.rental.ApiTestHelper;
+import info.ejava.assignments.api.autorentals.svc.main.rental.impl.ApiTestHelperImpl;
 import info.ejava.assignments.api.autorenters.client.autos.AutosAPI;
+import info.ejava.assignments.api.autorenters.client.autos.AutosAPIClient;
 import info.ejava.assignments.api.autorenters.client.autos.AutosAPIRestClient;
 import info.ejava.assignments.api.autorenters.client.autos.AutosAPIRestTemplate;
 import info.ejava.assignments.api.autorenters.client.autos.AutosAPIWebClient;
@@ -10,6 +13,7 @@ import info.ejava.assignments.api.autorenters.client.autos.AutosJSONHttpIfaceMap
 import info.ejava.assignments.api.autorenters.client.autos.AutosXMLHttpIfaceMapping;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTOFactory;
 import info.ejava.assignments.api.autorenters.dto.autos.AutoDTOFactory;
+import info.ejava.assignments.api.autorenters.dto.rentals.AutoRentalDTOFactory;
 import info.ejava.examples.common.web.RestTemplateConfig;
 import info.ejava.examples.common.web.ServerConfig;
 import info.ejava.examples.common.webflux.WebClientLoggingFilter;
@@ -45,6 +49,11 @@ public class ProvidedApiAutoRenterTestConfiguration {
         return new RenterDTOFactory();
     }
 
+    @Bean
+    public  AutoRentalDTOFactory autoRentalDTOFactory() {
+        return new AutoRentalDTOFactory();
+    }
+
     /**
      * A ServerConfig bean that is solely initialized by properties and has no dependency
      * on the test port#.
@@ -78,7 +87,7 @@ public class ProvidedApiAutoRenterTestConfiguration {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnProperty(name="it.server.scheme", havingValue = "http", matchIfMissing = true)
-    ClientHttpRequestFactory requestFactory() {
+    public ClientHttpRequestFactory requestFactory() {
         return new SimpleClientHttpRequestFactory(); //no ssl concerns
     }
 
@@ -175,5 +184,28 @@ public class ProvidedApiAutoRenterTestConfiguration {
         return new RentersAPIClient(restTemplate, serverConfig, MediaType.valueOf(MediaType.APPLICATION_XML_VALUE));
     }
 
+    /**
+     * Returns a convenience bean for issuing commands to the autosService.
+     * @param restTemplate to use for communications
+     * @param serverConfig to use to establish URLs
+     * @return client to issue commands
+     */
+    @Bean @Lazy
+    public AutosAPIClient autosAPIClient(RestTemplate restTemplate, ServerConfig serverConfig) {
+        return new AutosAPIClient(restTemplate, serverConfig, MediaType.APPLICATION_JSON);
+    }
+
+    /**
+     * Returns a convenience bean for issuing commands to the rentersService.
+     * @param restTemplate to use for communications
+     * @param serverConfig to use to establish URLs
+     * @return client to issue commands
+     */
+    @Bean @Lazy 
+    public RentersAPIClient rentersAPIClient(RestTemplate restTemplate, ServerConfig serverConfig) {
+        return new RentersAPIClient(restTemplate, serverConfig, MediaType.APPLICATION_JSON);
+    }
+
+    
     
 }

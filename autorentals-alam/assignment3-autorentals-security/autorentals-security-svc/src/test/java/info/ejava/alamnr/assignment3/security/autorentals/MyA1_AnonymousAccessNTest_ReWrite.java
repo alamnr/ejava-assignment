@@ -1,4 +1,4 @@
-package info.ejava.assignments.security.autorenters.svc.rentals;
+package info.ejava.alamnr.assignment3.security.autorentals;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -6,16 +6,17 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.net.URI;
 import java.util.List;
 
-
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.BDDAssertions;
 import org.assertj.core.api.BDDAssumptions;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -24,11 +25,14 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import info.ejava.alamnr.assignment3.security.AutoRentalsSecurityApp;
+import info.ejava.alamnr.assignment3.security.autorentals.impl.SecurityTestConfiguration;
 import info.ejava.assignments.api.autorentals.svc.main.rental.ApiTestHelper;
 import info.ejava.assignments.api.autorenters.client.autos.AutosAPI;
 import info.ejava.assignments.api.autorenters.client.renters.RentersAPI;
@@ -39,18 +43,23 @@ import info.ejava.assignments.api.autorenters.dto.rentals.RentalDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.RentalSearchParams;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTOFactory;
-
+import info.ejava.assignments.security.autorenters.svc.rentals.A1_AnonymousAccessNTest;
 import info.ejava.examples.common.web.ServerConfig;
 import lombok.extern.slf4j.Slf4j;
 
-//@SpringBootTest(classes= { ...
-//    },
-//    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@ActiveProfiles({"test", "anonymous-access"})
-//@DisplayName("Part A1: Anonymous Access")
+@SpringBootTest(classes = {
+    AutoRentalsSecurityApp.class,
+    SecurityTestConfiguration.class
+    },
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
+@ActiveProfiles({"test","anonymous-access"})
 @Slf4j
-public class A1_AnonymousAccessNTest {
-    
+@DisplayName("Part A1: Anonymous Access")
+//@Disabled
+public class MyA1_AnonymousAccessNTest_ReWrite  //extends A1_AnonymousAccessNTest 
+{
+
     @Autowired
     private ApiTestHelper<RentalDTO> testHelper;
     @Autowired
@@ -87,8 +96,8 @@ public class A1_AnonymousAccessNTest {
 
     @Nested
     class granted_access_to {
-        @Test // 5.a
-        void static_content(){  
+        @Test
+        void static_content(){
             // given
             URI url = UriComponentsBuilder.fromUri(serverConfig.getBaseUrl()).path("content/past_transactions.txt").build().toUri();
             RequestEntity<Void> request = RequestEntity.get(url).accept(MediaType.TEXT_PLAIN).build();
@@ -105,11 +114,11 @@ public class A1_AnonymousAccessNTest {
                 BDDAssertions.then(body).as("did not get expected static content").contains("Past Autorentals");
 
             } catch (Exception e) {
-                org.assertj.core.api.Assertions.fail("static content was not found at %s", url);
+                Assertions.fail("static content was not found at %s", url);
             }
         }
 
-        @Test // 5.b
+        @Test
         void autos_safe_head_operation() {
             // when 
             HttpStatusCode status;
@@ -123,7 +132,7 @@ public class A1_AnonymousAccessNTest {
             BDDAssertions.then(status).as("denied anonymous access").isEqualTo(HttpStatus.NOT_FOUND);
         }
 
-        @Test // 5.b
+        @Test
         void anyUrl_safe_head_operation() {
 
             // given
@@ -141,7 +150,7 @@ public class A1_AnonymousAccessNTest {
             BDDAssertions.then(status).as("denied anonymous access").isEqualTo(HttpStatus.NOT_FOUND);
         }
 
-        @Test // 5.c
+        @Test
         void autos_safe_get_parent_operation() {
             try {
                 // given
@@ -157,14 +166,14 @@ public class A1_AnonymousAccessNTest {
             }
         }
 
-        @Test // 5.c
+        @Test
         void autos_safe_get_child_operation() {
             BDDAssertions.assertThatExceptionOfType(HttpClientErrorException.NotFound.class)
                             .as("access not granted to child resource.")
                             .isThrownBy(()->autosClient.getAuto("anId"));
         }
 
-        @Test  // 5.b
+        @Test
         void renters_safe_head_operation() {
             // when
             HttpStatusCode status;
@@ -177,7 +186,7 @@ public class A1_AnonymousAccessNTest {
             BDDAssertions.then(status).isEqualTo(HttpStatus.NOT_FOUND);
         }
 
-        @Test // 5.c
+        @Test
         void rentals_safe_get_parent_operation() {
             try {
                 // when
@@ -190,9 +199,9 @@ public class A1_AnonymousAccessNTest {
             }
         }
 
-        @Test // 5.c
+        @Test
         void rentals_safe_get_child_operation() {
-            org.assertj.core.api.Assertions.assertThatExceptionOfType(HttpClientErrorException.NotFound.class)
+            Assertions.assertThatExceptionOfType(HttpClientErrorException.NotFound.class)
                     .as("denied anonymous access to child resource")
                     .isThrownBy(()->testHelper.getRentalById("anId"));
         }
@@ -201,7 +210,7 @@ public class A1_AnonymousAccessNTest {
 
     @Nested
     class denied_for_access_to {
-        @Test // 5.e
+        @Test
         void autos_nonsafe_post_operation() {
             // when
             HttpStatusCodeException ex = org.junit.jupiter.api.Assertions.assertThrows(HttpStatusCodeException.class, 
@@ -210,7 +219,7 @@ public class A1_AnonymousAccessNTest {
             BDDAssertions.then(ex.getStatusCode()).isIn(HttpStatus.UNAUTHORIZED,HttpStatus.FORBIDDEN);
         }
 
-        @Test // 5.e
+        @Test
         void autos_nonsafe_put_operation() {
             // given
             AutoDTO auto = autoDTOFactory.make(AutoDTOFactory.withId);
@@ -222,7 +231,7 @@ public class A1_AnonymousAccessNTest {
             BDDAssertions.then(ex.getStatusCode()).isIn(HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN);
         }
 
-        @Test // 5.e
+        @Test
         void autos_nonsafe_delete_operation() {
             // when
             HttpStatusCodeException ex = assertThrows(HttpStatusCodeException.class,
@@ -232,7 +241,7 @@ public class A1_AnonymousAccessNTest {
             BDDAssertions.then(ex.getStatusCode()).isIn(HttpStatus.UNAUTHORIZED,HttpStatus.FORBIDDEN);
         }
 
-        @Test // 5.e
+        @Test
         void renters_unsafe_post_operation() {
             // when
             HttpStatusCodeException ex = assertThrows(HttpStatusCodeException.class,
@@ -242,7 +251,7 @@ public class A1_AnonymousAccessNTest {
             BDDAssertions.then(ex.getStatusCode()).isIn(HttpStatus.UNAUTHORIZED,HttpStatus.FORBIDDEN);
         }
 
-        @Test // 5.e
+        @Test
         void renters_unsafe_put_operation() {
             // given
             RenterDTO renter = renterDTOFactory.make(RenterDTOFactory.withId);
@@ -254,7 +263,7 @@ public class A1_AnonymousAccessNTest {
             BDDAssertions.then(ex.getStatusCode()).isIn(HttpStatus.UNAUTHORIZED,HttpStatus.FORBIDDEN);
         }
 
-         @Test  // 5.d
+         @Test
         void renters_safe_get_but_secured_get_operation() {
             //when
             HttpStatusCodeException ex = assertThrows(HttpStatusCodeException.class,
@@ -264,7 +273,7 @@ public class A1_AnonymousAccessNTest {
             BDDAssertions.then(ex.getStatusCode()).isIn(HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN);
         }
 
-        @Test // 5.e
+        @Test
         void renters_nonsafe_delete_operation() {
             //when
             HttpStatusCodeException ex = assertThrows(HttpStatusCodeException.class,
@@ -273,7 +282,7 @@ public class A1_AnonymousAccessNTest {
             BDDAssertions.then(ex.getStatusCode()).isIn(HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN);
         }
 
-        @Test  // 5.e
+        @Test
         void rentals_nonsafe_delete_operation() {
             //when
             try { //may get a 302 redirect to form login

@@ -23,14 +23,15 @@ import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import info.ejava.assignments.api.autorentals.svc.main.rental.ApiTestHelper;
 import info.ejava.assignments.api.autorenters.client.autos.AutosAPI;
 import info.ejava.assignments.api.autorenters.client.renters.RentersAPI;
 import info.ejava.assignments.api.autorenters.dto.autos.AutoListDTO;
 import info.ejava.assignments.api.autorenters.dto.autos.AutoSearchParams;
 import info.ejava.assignments.api.autorenters.dto.rentals.RentalDTO;
-import info.ejava.assignments.api.autorenters.dto.rentals.SearchParams;
+import info.ejava.assignments.api.autorenters.dto.rentals.RentalSearchParams;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterListDTO;
-import info.ejava.assignments.api.autorenters.svc.rentals.ApiTestHelper;
+
 import info.ejava.examples.common.web.ServerConfig;
 import lombok.extern.slf4j.Slf4j;
 
@@ -119,7 +120,7 @@ public class A2b_NoSecurityNTest {
         void rentals_safe_operation(){
             //when
             Assertions.assertDoesNotThrow(() -> {
-                testHelper.findRentalsBy(SearchParams.builder().pageSize(1).build());
+                testHelper.findRentalsBy(RentalSearchParams.builder().pageSize(1).build());
             }," unexpected exception for finder");
         }
 

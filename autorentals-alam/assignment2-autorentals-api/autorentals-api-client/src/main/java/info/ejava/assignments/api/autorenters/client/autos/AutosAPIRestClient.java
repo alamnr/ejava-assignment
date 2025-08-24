@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
@@ -140,5 +141,11 @@ public class AutosAPIRestClient implements AutosAPI {
 
         ResponseEntity<Void> response = restClient.delete().uri(url).retrieve().toEntity(Void.class);
         return response;
+    }
+
+    @Override
+    public AutosAPI withRestTemplate(RestTemplate restTemplate) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'withRestTemplate'");
     }
 }

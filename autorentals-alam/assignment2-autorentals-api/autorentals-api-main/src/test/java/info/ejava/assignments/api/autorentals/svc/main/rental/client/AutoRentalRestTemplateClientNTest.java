@@ -341,7 +341,7 @@ public class AutoRentalRestTemplateClientNTest {
 
         URI updateUri = UriComponentsBuilder.fromUri(baseUrl).path(AutoRentalsAPI.AUTO_RENTAL_PATH).build(existingAutoRental.getId());
 
-        // when - updating existing quote
+        // when - updating existing autoRental
         ResponseEntity<Void> response = restTemplate.exchange(RequestEntity.put(updateUri).contentType(MediaType.APPLICATION_JSON)
                                                         .body(updatedAutoRental), Void.class);
                                                         

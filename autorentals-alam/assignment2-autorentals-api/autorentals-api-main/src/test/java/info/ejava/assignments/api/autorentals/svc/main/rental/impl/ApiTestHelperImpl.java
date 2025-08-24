@@ -22,6 +22,8 @@ import info.ejava.assignments.api.autorenters.dto.rentals.RentalSearchParams;
 import info.ejava.assignments.api.autorenters.dto.rentals.TimePeriod;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.examples.common.web.ServerConfig;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 //TODO: implement this component for MyAutoRentalsAPINTest
@@ -34,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
  * server-side calls return ResponseEntity except the finder(s)
  * "finder(s)" simply return the List of DTOs
  */
+
 @Slf4j
 public class ApiTestHelperImpl implements ApiTestHelper<AutoRentalDTO> {
     //you will need a client instance to call your server-side implementation

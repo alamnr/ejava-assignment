@@ -16,7 +16,7 @@ public interface AutosAPI {
     String AUTO_PATH = "/api/autos/{id}";
     String AUTOS_QUERY_PATH = "/api/autos/query";
 
-    //AutosAPIRestTemplate withRestTemplate(RestTemplate restTemplate);
+    AutosAPI withRestTemplate(RestTemplate restTemplate);
 
     ResponseEntity<AutoDTO> createAuto(AutoDTO auto);
     ResponseEntity<AutoListDTO> queryAutos(AutoDTO probe, Integer pageNumber, Integer pageSize);

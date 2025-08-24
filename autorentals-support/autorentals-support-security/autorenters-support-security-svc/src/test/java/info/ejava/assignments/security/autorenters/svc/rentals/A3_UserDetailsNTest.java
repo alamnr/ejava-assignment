@@ -30,6 +30,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import info.ejava.assignments.api.autorentals.svc.main.rental.ApiTestHelper;
 import info.ejava.assignments.api.autorenters.client.autos.AutosAPI;
 import info.ejava.assignments.api.autorenters.client.autos.AutosAPIClient;
 import info.ejava.assignments.api.autorenters.client.renters.RentersAPI;
@@ -40,7 +41,7 @@ import info.ejava.assignments.api.autorenters.dto.rentals.RentalDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.TimePeriod;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTOFactory;
-import info.ejava.assignments.api.autorenters.svc.rentals.ApiTestHelper;
+
 import info.ejava.examples.common.web.ServerConfig;
 import lombok.extern.slf4j.Slf4j;
 
