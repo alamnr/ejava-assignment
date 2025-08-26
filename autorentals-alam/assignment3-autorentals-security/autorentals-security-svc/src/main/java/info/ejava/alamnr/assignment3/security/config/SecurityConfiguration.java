@@ -197,4 +197,41 @@ public class SecurityConfiguration {
             return http.build();
         }
     }
+
+    @Configuration(proxyBeanMethods = false)
+    @Profile("nosecurity")
+    public static class PartA2b_NoSecurity {
+        /**
+         * https://github.com/jzheaux/cve-2023-34035-mitigations
+         * An explicit MvcRequestMatcher.Builder is necessary when mixing SpringMvc with
+         * non-SpringMvc Servlets. Enabling the H2 console puts us in that position.
+         * Dissabling (spring.h2.console.enabled=false) or being explicit as to which URI
+         * apply to SpringMvc avoids the problem.
+         * @param introspector
+         * @return
+         */
+        @Bean
+        MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector) {
+            return new MvcRequestMatcher.Builder(introspector);
+        }
+
+        @Bean
+        public WebSecurityCustomizer authzStaticResources(MvcRequestMatcher.Builder mvc){
+            return web -> web.ignoring().requestMatchers(mvc.pattern("/content/**"));
+        }
+
+        @Bean
+        @Order(0)
+        public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+            
+            http.securityMatchers(cfg->cfg.requestMatchers("/api/**"));
+
+            http.authorizeHttpRequests(cfg->cfg.requestMatchers("/api/**").permitAll());
+
+            http.formLogin(cfg->cfg.disable());
+            http.httpBasic(cfg->cfg.disable());
+            http.csrf(cfg -> cfg.disable());
+            return http.build();
+        }
+    }
 }
