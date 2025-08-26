@@ -11,8 +11,10 @@ import org.springframework.security.access.expression.method.MethodSecurityExpre
 import org.springframework.security.access.hierarchicalroles.NullRoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
@@ -21,7 +23,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 public class SecurityConfiguration {
 
     @Configuration(proxyBeanMethods = false)
-    @Profile("anonymous-access")
+    @Profile("anonymous-access") // requirement - 6
     public static class PartA1_AnonymousAccess {
 
         /**
@@ -121,4 +123,78 @@ public class SecurityConfiguration {
 
     }
     
+
+    // page no - 749, section  - 238.2.3
+    @Configuration(proxyBeanMethods = false)
+    @Profile({"authenticated-access","userdetails"})
+    public static class PartA2_AuthenticatedAccess {
+
+        /**
+         * https://github.com/jzheaux/cve-2023-34035-mitigations
+         * An explicit MvcRequestMatcher.Builder is necessary when mixing SpringMvc with
+         * non-SpringMvc Servlets. Enabling the H2 console puts us in that position.
+         * Dissabling (spring.h2.console.enabled=false) or being explicit as to which URI
+         * apply to SpringMvc avoids the problem.
+         * @param introspector
+         * @return
+         */
+        @Bean
+        MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector) {
+            return new MvcRequestMatcher.Builder(introspector);
+        }
+
+        @Bean
+        public WebSecurityCustomizer  authzStaticResources(MvcRequestMatcher.Builder mvc){
+            return web -> web.ignoring().requestMatchers(mvc.pattern("/content/**"));
+        }
+        @Bean
+        @Order(0)
+        public SecurityFilterChain  configure(HttpSecurity http) throws Exception  {
+            // requirement -2
+            http.httpBasic(Customizer.withDefaults());
+            // form login disabled
+            http.formLogin(cfg->cfg.disable());
+            // Requirement - 3
+            http.csrf(cfg -> cfg.disable());
+            // Requirement - 4
+            http.sessionManagement(cfg -> cfg.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+
+            http.securityMatchers(cfg -> cfg.requestMatchers("api/**") );
+
+
+            /*
+             * Start of
+             * path based constraints to pass  extends A1_AnonymousAccessNTest config for anonymous-access
+             */
+            http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.HEAD).permitAll());  // Requirement: 3.b
+
+            http.authorizeHttpRequests(cfg-> 
+                    cfg.requestMatchers(HttpMethod.GET,"/api/autos","/api/autos/**","/api/autorentals","/api/autorentals/**").permitAll()
+                     
+            ); // Requirement 3.c
+
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers(HttpMethod.POST,"/api/autos/query").permitAll());  // Req- 3.d
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers(HttpMethod.POST,"/api/autorentals/query").permitAll());
+
+            /*
+             * End
+             */
+
+             /*
+             * Start of
+             * path based constraints to pass  extends A2_AuthenticatedAccessNTest config for authenticated-access
+             */
+
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("api/whoAmI").permitAll());
+
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("api/autos","api/autos/**").authenticated());
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("api/renters","api/renters/**").authenticated());
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("api/autorentals","api/autorentals/**").authenticated());
+            
+
+
+            return http.build();
+        }
+    }
 }

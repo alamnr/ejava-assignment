@@ -57,7 +57,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @DisplayName("Part A1: Anonymous Access")
 //@Disabled
-public class MyA1_AnonymousAccessNTest_ReWrite  //extends A1_AnonymousAccessNTest 
+public class MyA1_AnonymousAccessNTest_Extended  //extends A1_AnonymousAccessNTest 
 {
 
     @Autowired

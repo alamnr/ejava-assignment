@@ -2,6 +2,7 @@ package info.ejava.alamnr.assignment3.security.autorentals;
 
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ActiveProfiles;
 
 import info.ejava.alamnr.assignment3.security.AutoRentalsSecurityApp;
@@ -15,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
     },
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
-@ActiveProfiles({"test","anonymous-access"})
+@ActiveProfiles({"test","anonymous-access"})  // requirement - 6
 @Slf4j
 @DisplayName("Part A1: Anonymous Access")
 //@Disabled

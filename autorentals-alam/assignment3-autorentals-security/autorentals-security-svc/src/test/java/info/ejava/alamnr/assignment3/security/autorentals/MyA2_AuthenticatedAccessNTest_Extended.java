@@ -1,20 +1,20 @@
-package info.ejava.assignments.security.autorenters.svc.rentals;
-
-import static org.mockito.ArgumentMatchers.isNull;
+package info.ejava.alamnr.assignment3.security.autorentals;
 
 import java.net.URI;
 import java.time.LocalDate;
 
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.BDDAssertions;
 import org.assertj.core.api.BDDAssumptions;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -23,11 +23,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import info.ejava.alamnr.assignment3.security.AutoRentalsSecurityApp;
+import info.ejava.alamnr.assignment3.security.autorentals.impl.SecurityTestConfiguration;
 import info.ejava.assignments.api.autorentals.svc.main.rental.ApiTestHelper;
 import info.ejava.assignments.api.autorenters.client.autos.AutosAPI;
 import info.ejava.assignments.api.autorenters.client.autos.AutosAPIClient;
@@ -40,19 +43,21 @@ import info.ejava.assignments.api.autorenters.dto.rentals.RentalDTO;
 import info.ejava.assignments.api.autorenters.dto.rentals.TimePeriod;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTOFactory;
-
+import info.ejava.assignments.security.autorenters.svc.rentals.A2_AuthenticatedAccessNTest;
 import info.ejava.examples.common.web.ServerConfig;
 import lombok.extern.slf4j.Slf4j;
 
-//@SpringBootTest(classes= { ...
-//    },
-//    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@ActiveProfiles({"test", "authenticated-access"})
-//@DisplayName("Part A2: Authenticated Access")
+@SpringBootTest(classes= {
+        AutoRentalsSecurityApp.class,
+        SecurityTestConfiguration.class},
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles({"test", "authenticated-access"})
 @Slf4j
-public class A2_AuthenticatedAccessNTest extends A1_AnonymousAccessNTest 
+@DisplayName("Part A2: Authenticated Access")
+//@Disabled
+public class MyA2_AuthenticatedAccessNTest_Extended //extends A2_AuthenticatedAccessNTest 
 {
-   
+
     @Autowired
     private ApiTestHelper<RentalDTO> testHelper;
     @Autowired
@@ -60,26 +65,25 @@ public class A2_AuthenticatedAccessNTest extends A1_AnonymousAccessNTest
     @Autowired
     RentersAPIClient rentersAPIClient;
     @Autowired
-    AutoDTOFactory autoDTOFactory;
+    private AutoDTOFactory autoFactory;
     @Autowired
-    RenterDTOFactory renterDTOFactory;
+    private RenterDTOFactory renterFactory;
     @Autowired
-    RestTemplate authnUser;
+    private RestTemplate authnUser;
     @Autowired
-    RestTemplate badUser;
+    private RestTemplate badUser;
     @Autowired
-    String authnUsername;
+    private String authnUsername;
     @Autowired
-    RestTemplate anonymousUser;
+    private RestTemplate anonymousUser;
     @Autowired
-    String anonymousUsername;
+    private String anonymousUsername;
     @Autowired
-    ServerConfig serverConfig;
-    @Autowired Environment env;
+    private ServerConfig serverConfig;
+    private @Autowired Environment env;
     @Autowired(required = false)
-    SecurityFilterChain filterChain;
+    private SecurityFilterChain filterChain;
 
-    
     @BeforeEach
     void verify(){
         Assumptions.assumeFalse(getClass().equals(A2_AuthenticatedAccessNTest.class),"should only run for derived class");
@@ -91,7 +95,7 @@ public class A2_AuthenticatedAccessNTest extends A1_AnonymousAccessNTest
                                 .as("basic authentication not enabled in this configuration")
                                 .isNotNull();
         try {
-                rentersAPIClient.withRestTemplate(authnUser).removeAllRenters();
+                //rentersAPIClient.withRestTemplate(authnUser).removeAllRenters();
         } catch (HttpClientErrorException.Unauthorized | HttpClientErrorException.Forbidden ex) {
             // ignored
             log.info("********************************************* Exception removing renters - {}" , ex.getMessage() );
@@ -149,7 +153,7 @@ public class A2_AuthenticatedAccessNTest extends A1_AnonymousAccessNTest
         @Test
         void autos_post() {
             // given
-            AutoDTO validAuto = autoDTOFactory.make();
+            AutoDTO validAuto = autoFactory.make();
             // when
             ResponseEntity<AutoDTO> response = authnAutosClient.createAuto(validAuto);
             // then
@@ -159,7 +163,7 @@ public class A2_AuthenticatedAccessNTest extends A1_AnonymousAccessNTest
         @Test
         void renters_post() {
             // given
-            RenterDTO renterDTO = renterDTOFactory.make();
+            RenterDTO renterDTO = renterFactory.make();
             // when
             ResponseEntity<RenterDTO> response = authnRentersClient.createRenter(renterDTO);
             // then
@@ -169,8 +173,8 @@ public class A2_AuthenticatedAccessNTest extends A1_AnonymousAccessNTest
         @Test
         void rentals_post(){
             // given
-            AutoDTO auto = authnAutosClient.createAuto(autoDTOFactory.make()).getBody();
-            RenterDTO renter = authnRentersClient.createRenter(renterDTOFactory.make()).getBody();
+            AutoDTO auto = authnAutosClient.createAuto(autoFactory.make()).getBody();
+            RenterDTO renter = authnRentersClient.createRenter(renterFactory.make()).getBody();
             TimePeriod timePeriod = new TimePeriod(LocalDate.now(), 5);
             AutoRentalDTO autoRentalDTO = (AutoRentalDTO) authnHelper.makeProposal(auto, renter, timePeriod);
             // when

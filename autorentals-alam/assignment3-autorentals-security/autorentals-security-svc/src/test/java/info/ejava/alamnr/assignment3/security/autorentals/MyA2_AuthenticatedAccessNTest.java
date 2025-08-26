@@ -17,9 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @DisplayName("Part A2: Authenticated Access")
 //@Disabled
-public class MyA2_AuthenticatedAccessNTest //extends A2_AuthenticatedAccessNTest 
-{
+
+public class MyA2_AuthenticatedAccessNTest extends A2_AuthenticatedAccessNTest { 
     
 }
-
-

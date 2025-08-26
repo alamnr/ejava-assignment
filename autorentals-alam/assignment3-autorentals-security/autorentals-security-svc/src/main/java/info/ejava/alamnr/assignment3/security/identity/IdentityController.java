@@ -25,7 +25,7 @@ public class IdentityController {
 
     @RequestMapping(path = WHO_AM_I_PATH, method = RequestMethod.GET,produces = {MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity<String> whoAmIGet(@AuthenticationPrincipal UserDetails userDetails) {
-        String username = Optional.ofNullable(userDetails).map(ud->ud.getUsername()).orElse("nulll");
+        String username = Optional.ofNullable(userDetails).map(ud->ud.getUsername()).orElse("(null)");
         log.info("username={}", username);
         return ResponseEntity.ok(username);
     }
