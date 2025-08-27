@@ -1,4 +1,4 @@
-package info.ejava.assignments.security.autorenters.svc.rentals;
+package info.ejava.alamnr.assignment3.security.autorentals;
 
 import java.net.URI;
 import java.time.LocalDate;
@@ -13,23 +13,29 @@ import org.assertj.core.api.BDDAssumptions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import info.ejava.alamnr.assignment3.security.AutoRentalsSecurityApp;
+import info.ejava.alamnr.assignment3.security.autorentals.impl.SecurityTestConfiguration;
 import info.ejava.assignments.api.autorentals.svc.main.rental.ApiTestHelper;
 import info.ejava.assignments.api.autorenters.client.autos.AutosAPI;
 import info.ejava.assignments.api.autorenters.client.autos.AutosAPIClient;
@@ -43,17 +49,22 @@ import info.ejava.assignments.api.autorenters.dto.rentals.TimePeriod;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTOFactory;
 import info.ejava.assignments.security.autorenters.svc.Accounts;
+import info.ejava.assignments.security.autorenters.svc.rentals.A3_UserDetailsNTest;
 import info.ejava.examples.common.web.ServerConfig;
 import lombok.extern.slf4j.Slf4j;
 
-//@SpringBootTest(classes= { ...
-//    },
-//    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@ActiveProfiles({"test","userdetails"})
-//@DisplayName("Part A3: User Details")
+@SpringBootTest(classes= {
+        AutoRentalsSecurityApp.class,
+        SecurityTestConfiguration.class},
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles({"test","userdetails"})
 @Slf4j
-public class A3_UserDetailsNTest {
-     @Autowired
+@DisplayName("Part A3: User Details")
+//@Disabled
+
+public class MyA3_UserDetailsNTest_Extended {
+
+    @Autowired
     @Qualifier("usernameMap")
     private Map<String, RestTemplate> authnUsers;
     

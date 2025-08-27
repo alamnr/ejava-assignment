@@ -1,5 +1,9 @@
 package info.ejava.alamnr.assignment3.security.config;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,13 +15,24 @@ import org.springframework.security.access.expression.method.MethodSecurityExpre
 import org.springframework.security.access.hierarchicalroles.NullRoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
+
+import info.ejava.assignments.security.autorenters.svc.AccountProperties;
+import info.ejava.assignments.security.autorenters.svc.Accounts;
 
 @Configuration(proxyBeanMethods = false)
 public class SecurityConfiguration {
@@ -160,7 +175,7 @@ public class SecurityConfiguration {
             http.sessionManagement(cfg -> cfg.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 
-            http.securityMatchers(cfg -> cfg.requestMatchers("api/**") );
+            http.securityMatchers(cfg -> cfg.requestMatchers("/api/**") );
 
 
             /*
@@ -186,13 +201,13 @@ public class SecurityConfiguration {
              * path based constraints to pass  extends A2_AuthenticatedAccessNTest config for authenticated-access
              */
 
-            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("api/whoAmI").permitAll());
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("/api/whoAmI").permitAll());
 
-            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("api/autos","api/autos/**").authenticated());
-            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("api/renters","api/renters/**").authenticated());
-            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("api/autorentals","api/autorentals/**").authenticated());
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("/api/autos","/api/autos/**").authenticated());
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("/api/renters","/api/renters/**").authenticated());
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("/api/autorentals","/api/autorentals/**").authenticated());
             
-
+            
 
             return http.build();
         }
@@ -233,5 +248,59 @@ public class SecurityConfiguration {
             http.csrf(cfg -> cfg.disable());
             return http.build();
         }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @Profile({"nosecurity","userdetails","authorities", "authorization"})
+    public static class PartA3_UserDetailsPart {
+
+        /**
+         * https://github.com/jzheaux/cve-2023-34035-mitigations
+         * An explicit MvcRequestMatcher.Builder is necessary when mixing SpringMvc with
+         * non-SpringMvc Servlets. Enabling the H2 console puts us in that position.
+         * Dissabling (spring.h2.console.enabled=false) or being explicit as to which URI
+         * apply to SpringMvc avoids the problem.
+         * @param introspector
+         * @return
+         */
+        // @Bean
+        // MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector){
+        //     return new MvcRequestMatcher.Builder(introspector);
+        // }
+
+        // @Bean
+        // public WebSecurityCustomizer authzStaticResources(MvcRequestMatcher.Builder mvc) {
+        //     return web -> web.ignoring().requestMatchers(mvc.pattern("/content/**"));
+        // }
+
+        @Bean
+        public PasswordEncoder passwordEncoder()  {
+            return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        }
+
+        @Bean
+        public UserDetailsService userDetailsService(PasswordEncoder encoder, Accounts accounts){
+
+            List<UserDetails> users = new ArrayList<>();
+            for (AccountProperties acct : accounts.getAccounts()) {
+                users.add(User.withUsername(acct.getUsername())
+                            .passwordEncoder(encoder::encode)
+                            .password(acct.getPassword())
+                            .roles(acct.getAuthorities().toArray(new String[0]))
+                            .build());
+            }
+
+            return new InMemoryUserDetailsManager(users);
+            
+
+        }
+
+        @Bean
+        public AuthenticationManager authenticationManager(HttpSecurity http, UserDetailsService uds) throws Exception {
+            AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
+            builder.userDetailsService(uds);
+            return builder.build();
+        }
+
     }
 }
