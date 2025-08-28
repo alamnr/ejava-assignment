@@ -71,7 +71,7 @@ public class SecurityConfiguration {
 
         @Bean
         @Order(0)
-        public SecurityFilterChain authzSecurityFilters(HttpSecurity http, MvcRequestMatcher.Builder mvc, RoleHierarchy roleHierarchy) throws Exception{
+        public SecurityFilterChain configureaAnonymousProfile(HttpSecurity http, MvcRequestMatcher.Builder mvc, RoleHierarchy roleHierarchy) throws Exception{
 
             http.securityMatchers(cfg -> cfg.requestMatchers(mvc.pattern("/api/**")));
             
@@ -173,7 +173,7 @@ public class SecurityConfiguration {
         }
         @Bean
         @Order(0)
-        public SecurityFilterChain  configure(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception  {
+        public SecurityFilterChain  configureAuthenticatedAndUserDetailsProfile(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception  {
             // requirement -2
             http.httpBasic(Customizer.withDefaults());
             // form login disabled
@@ -246,7 +246,7 @@ public class SecurityConfiguration {
 
         @Bean
         @Order(0)
-        public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+        public SecurityFilterChain configureNoSecurityProfile(HttpSecurity http) throws Exception {
             
             http.securityMatchers(cfg->cfg.requestMatchers("/api/**"));
 
@@ -284,7 +284,38 @@ public class SecurityConfiguration {
         // }
 
         @Bean
+        @Order(0)
+        public SecurityFilterChain configureAnonymousHasNoAuthority(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+
+            http.securityMatchers(cfg->cfg.requestMatchers("/api/**"));
+            // http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.GET,"/api/authorities")
+            //                                     .hasAnyAuthority("ROLE_ADMIN","ROLE_MEMBER","ROLE_MGR","PROXY"));
+            
+            http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.GET,"/api/authorities").permitAll());
+            http.authenticationManager(authenticationManager);
+            http.formLogin(cfg->cfg.disable());
+            http.sessionManagement(cfg->cfg.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            http.httpBasic(Customizer.withDefaults());
+            return http.build();
+        }
+
+        @Bean
         @Order(500)
+        public SecurityFilterChain configureUserHasAuthorities(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+
+            http.securityMatchers(cfg->cfg.requestMatchers("/api/**"));
+            http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.GET,"/api/authorities")
+                                                .hasAnyAuthority("ROLE_ADMIN","ROLE_MEMBER","ROLE_MGR","PROXY"));
+            
+            
+            http.authenticationManager(authenticationManager);
+            http.formLogin(cfg->cfg.disable());
+            http.sessionManagement(cfg->cfg.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            http.httpBasic(Customizer.withDefaults());
+            return http.build();
+        }
+        @Bean
+        @Order(1000)
         public SecurityFilterChain h2SecurityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
             MediaTypeRequestMatcher htmlRequestMatcher = new MediaTypeRequestMatcher(MediaType.TEXT_HTML);
             htmlRequestMatcher.setUseEquals(true);
@@ -316,41 +347,65 @@ public class SecurityConfiguration {
             return PasswordEncoderFactories.createDelegatingPasswordEncoder();
         }
 
+        @Bean
+        public UserDetailsService userDetailsServiceInMemory(PasswordEncoder encoder, Accounts accounts){
+
+            List<UserDetails> users = new ArrayList<>();
+            for (AccountProperties acct : accounts.getAccounts()) {
+                users.add(User.withUsername(acct.getUsername())
+                            .passwordEncoder(encoder::encode)
+                            .password(acct.getPassword())
+                            .authorities(acct.getAuthorities().toArray(new String[0]))
+                            .build());
+            }
+
+             return new InMemoryUserDetailsManager(users);
+            
+
+        }
+
         // @Bean
-        // public UserDetailsService userDetailsServiceInMemory(PasswordEncoder encoder, Accounts accounts){
+        // public UserDetailsService userDetailsServiceJdbc(DataSource userDataSource){
 
-        //     List<UserDetails> users = new ArrayList<>();
-        //     for (AccountProperties acct : accounts.getAccounts()) {
-        //         users.add(User.withUsername(acct.getUsername())
-        //                     .passwordEncoder(encoder::encode)
-        //                     .password(acct.getPassword())
-        //                     .roles(acct.getAuthorities().toArray(new String[0]))
-        //                     .build());
-        //     }
+        //     JdbcDaoImpl jdbcUds = new JdbcDaoImpl();
+        //     jdbcUds.setDataSource(userDataSource);
 
-        //      return new InMemoryUserDetailsManager(users);
+        //     return jdbcUds;
             
 
         // }
 
         @Bean
-        public UserDetailsService userDetailsServiceJdbc(DataSource userDataSource){
-
-            JdbcDaoImpl jdbcUds = new JdbcDaoImpl();
-            jdbcUds.setDataSource(userDataSource);
-
-            return jdbcUds;
-            
-
-        }
-
-        @Bean
-        public AuthenticationManager authenticationManager(HttpSecurity http, UserDetailsService uds) throws Exception {
+        public AuthenticationManager authenticationManager(HttpSecurity http, List<UserDetailsService> udsList) throws Exception {
             AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
-            builder.userDetailsService(uds);
+            for (UserDetailsService userDetailsService : udsList) {
+                builder.userDetailsService(userDetailsService);    
+            }
+            
             builder.parentAuthenticationManager(null); // prevent from being recursive
             return builder.build();
         }
 
+    }
+
+    @Configuration(proxyBeanMethods =  false)
+    @Profile("authorization")
+    // enable global method securityfor prePostEnabled
+
+    public static class PartA_Authorizatonnn {
+
+            @Bean
+            public SecurityFilterChain configureAuthorizationProfile(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+
+                http.authenticationManager(authenticationManager);
+                return http.build();
+            }
+
+            @Bean
+            public RoleHierarchy roleHierarchy(){
+                return RoleHierarchyImpl.withDefaultRolePrefix()
+                        // todo
+                        .build();
+            }
     }
 }

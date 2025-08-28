@@ -16,8 +16,14 @@ insert into users(username, password, enabled) values ('ted', '{bcrypt}$2y$10$Gf
 insert into users(username, password, enabled) values ('sueann', '{bcrypt}$2y$10$NUOCifN1pxiLBJa6kTQLSOVRRIgufEkBJreOU6HE45KEv1RRrZ2Rm', true);
 
 
-insert into authorities(username,authority) values('mary','known');
-insert into authorities(username,authority) values('lou','known');
-insert into authorities(username,authority) values('murray','known');
-insert into authorities(username,authority) values('ted','known');
-insert into authorities(username,authority) values('sueann','known');
+insert into authorities(username,authority) values('mary','ROLE_MEMBER');
+insert into authorities(username,authority) values('mary','ROLE_ADMIN');
+
+insert into authorities(username,authority) values('lou','ROLE_MGR');
+
+insert into authorities(username,authority) values('murray','ROLE_MEMBER');
+insert into authorities(username,authority) values('murray','PROXY');
+
+insert into authorities(username,authority) values('ted','ROLE_MEMBER');
+
+insert into authorities(username,authority) values('sueann','ROLE_MEMBER');
