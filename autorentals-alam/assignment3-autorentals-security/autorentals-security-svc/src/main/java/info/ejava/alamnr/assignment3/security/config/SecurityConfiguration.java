@@ -145,8 +145,7 @@ public class SecurityConfiguration {
 
     // page no - 749, section  - 238.2.3
     @Configuration(proxyBeanMethods = false)
-    //@Profile({"authenticated-access","userdetails"})
-    @Profile({"authenticated-access"})
+    @Profile({"authenticated-access","userdetails"})
     public static class PartA2_AuthenticatedAccess {
 
         /**
@@ -279,55 +278,6 @@ public class SecurityConfiguration {
         //     return web -> web.ignoring().requestMatchers(mvc.pattern("/content/**"));
         // }
 
-        @Bean
-        @Order(0)
-        public SecurityFilterChain  configure(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception  {
-            // requirement -2
-            http.httpBasic(Customizer.withDefaults());
-            // form login disabled
-            http.formLogin(cfg->cfg.disable());
-            // Requirement - 3
-            http.csrf(cfg -> cfg.disable());
-            // Requirement - 4
-            http.sessionManagement(cfg -> cfg.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-
-            http.securityMatchers(cfg -> cfg.requestMatchers("/api/**") );
-
-
-            /*
-             * Start of
-             * path based constraints to pass  extends A1_AnonymousAccessNTest config for anonymous-access
-             */
-            http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.HEAD).permitAll());  // Requirement: 3.b
-
-            http.authorizeHttpRequests(cfg-> 
-                    cfg.requestMatchers(HttpMethod.GET,"/api/autos","/api/autos/**","/api/autorentals","/api/autorentals/**").permitAll()
-                     
-            ); // Requirement 3.c
-
-            http.authorizeHttpRequests(cfg -> cfg.requestMatchers(HttpMethod.POST,"/api/autos/query").permitAll());  // Req- 3.d
-            http.authorizeHttpRequests(cfg -> cfg.requestMatchers(HttpMethod.POST,"/api/autorentals/query").permitAll());
-
-            /*
-             * End
-             */
-
-             /*
-             * Start of
-             * path based constraints to pass  extends A2_AuthenticatedAccessNTest config for authenticated-access
-             */
-
-            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("/api/whoAmI").permitAll());
-
-            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("/api/autos","/api/autos/**").authenticated());
-            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("/api/renters","/api/renters/**").authenticated());
-            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("/api/autorentals","/api/autorentals/**").authenticated());
-            
-            log.info("*************************************** auth manager - {}", authenticationManager);
-            http.authenticationManager(authenticationManager);
-            return http.build();
-        }
 
         @Bean
         public PasswordEncoder passwordEncoder()  {
