@@ -27,8 +27,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.support.BasicAuthenticationInterceptor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -51,6 +53,7 @@ import info.ejava.assignments.api.autorenters.dto.renters.RenterDTOFactory;
 import info.ejava.assignments.security.autorenters.svc.Accounts;
 import info.ejava.assignments.security.autorenters.svc.rentals.A3_UserDetailsNTest;
 import info.ejava.examples.common.web.ServerConfig;
+import jakarta.servlet.FilterChain;
 import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes= {
@@ -93,6 +96,8 @@ public class MyA3_UserDetailsNTest_Extended {
     @Autowired(required = false)
     List<UserDetailsService> userdetails;
 
+    
+
     @BeforeEach
     void init(){
         Assumptions.assumeFalse(getClass().equals(A3_UserDetailsNTest.class),"should only run for derived class ");
@@ -105,11 +110,32 @@ public class MyA3_UserDetailsNTest_Extended {
         log.info("whoAmI url - {}", whoAmIUrl);
     }
 
-    //@Test
+    @Test
     void context(){
         log.info("**************************************************** account - {}", accounts);
+        log.info("**************************************************** authnUsers - {}", authnUsers);
+        log.info("************************** userdetails - {}", userdetails);
+        
     }
 
+        @Test
+        void valid_credentials_can_authenticate(){
+
+            // given
+             
+            String username = authnUsers.keySet().iterator().next(); 
+            log.info("**************************************************** user - {} ", username);
+            RestTemplate authnUser = authnUsers.get(username);
+          
+            RequestEntity<Void>  request = RequestEntity.get(whoAmIUrl).build();
+            // when
+            ResponseEntity<String> response = authnUser.exchange(request, String.class);
+            String body = response.getBody();
+            // then
+            log.info("*************** response body - {} ", body);
+            BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            BDDAssertions.then(body).isEqualTo(username);
+        }
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class with_identities {

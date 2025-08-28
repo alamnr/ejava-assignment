@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.sql.DataSource;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +26,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -33,7 +36,8 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import info.ejava.assignments.security.autorenters.svc.AccountProperties;
 import info.ejava.assignments.security.autorenters.svc.Accounts;
-
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Configuration(proxyBeanMethods = false)
 public class SecurityConfiguration {
 
@@ -141,7 +145,8 @@ public class SecurityConfiguration {
 
     // page no - 749, section  - 238.2.3
     @Configuration(proxyBeanMethods = false)
-    @Profile({"authenticated-access","userdetails"})
+    //@Profile({"authenticated-access","userdetails"})
+    @Profile({"authenticated-access"})
     public static class PartA2_AuthenticatedAccess {
 
         /**
@@ -164,7 +169,7 @@ public class SecurityConfiguration {
         }
         @Bean
         @Order(0)
-        public SecurityFilterChain  configure(HttpSecurity http) throws Exception  {
+        public SecurityFilterChain  configure(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception  {
             // requirement -2
             http.httpBasic(Customizer.withDefaults());
             // form login disabled
@@ -207,8 +212,8 @@ public class SecurityConfiguration {
             http.authorizeHttpRequests(cfg -> cfg.requestMatchers("/api/renters","/api/renters/**").authenticated());
             http.authorizeHttpRequests(cfg -> cfg.requestMatchers("/api/autorentals","/api/autorentals/**").authenticated());
             
-            
-
+            log.info("*************************************** auth manager - {}", authenticationManager);
+            http.authenticationManager(authenticationManager);
             return http.build();
         }
     }
@@ -262,6 +267,7 @@ public class SecurityConfiguration {
          * apply to SpringMvc avoids the problem.
          * @param introspector
          * @return
+         * @throws Exception 
          */
         // @Bean
         // MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector){
@@ -274,23 +280,84 @@ public class SecurityConfiguration {
         // }
 
         @Bean
+        @Order(0)
+        public SecurityFilterChain  configure(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception  {
+            // requirement -2
+            http.httpBasic(Customizer.withDefaults());
+            // form login disabled
+            http.formLogin(cfg->cfg.disable());
+            // Requirement - 3
+            http.csrf(cfg -> cfg.disable());
+            // Requirement - 4
+            http.sessionManagement(cfg -> cfg.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+
+            http.securityMatchers(cfg -> cfg.requestMatchers("/api/**") );
+
+
+            /*
+             * Start of
+             * path based constraints to pass  extends A1_AnonymousAccessNTest config for anonymous-access
+             */
+            http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.HEAD).permitAll());  // Requirement: 3.b
+
+            http.authorizeHttpRequests(cfg-> 
+                    cfg.requestMatchers(HttpMethod.GET,"/api/autos","/api/autos/**","/api/autorentals","/api/autorentals/**").permitAll()
+                     
+            ); // Requirement 3.c
+
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers(HttpMethod.POST,"/api/autos/query").permitAll());  // Req- 3.d
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers(HttpMethod.POST,"/api/autorentals/query").permitAll());
+
+            /*
+             * End
+             */
+
+             /*
+             * Start of
+             * path based constraints to pass  extends A2_AuthenticatedAccessNTest config for authenticated-access
+             */
+
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("/api/whoAmI").permitAll());
+
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("/api/autos","/api/autos/**").authenticated());
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("/api/renters","/api/renters/**").authenticated());
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers("/api/autorentals","/api/autorentals/**").authenticated());
+            
+            log.info("*************************************** auth manager - {}", authenticationManager);
+            http.authenticationManager(authenticationManager);
+            return http.build();
+        }
+
+        @Bean
         public PasswordEncoder passwordEncoder()  {
             return PasswordEncoderFactories.createDelegatingPasswordEncoder();
         }
 
+        // @Bean
+        // public UserDetailsService userDetailsServiceInMemory(PasswordEncoder encoder, Accounts accounts){
+
+        //     List<UserDetails> users = new ArrayList<>();
+        //     for (AccountProperties acct : accounts.getAccounts()) {
+        //         users.add(User.withUsername(acct.getUsername())
+        //                     .passwordEncoder(encoder::encode)
+        //                     .password(acct.getPassword())
+        //                     .roles(acct.getAuthorities().toArray(new String[0]))
+        //                     .build());
+        //     }
+
+        //      return new InMemoryUserDetailsManager(users);
+            
+
+        // }
+
         @Bean
-        public UserDetailsService userDetailsService(PasswordEncoder encoder, Accounts accounts){
+        public UserDetailsService userDetailsServiceJdbc(DataSource userDataSource){
 
-            List<UserDetails> users = new ArrayList<>();
-            for (AccountProperties acct : accounts.getAccounts()) {
-                users.add(User.withUsername(acct.getUsername())
-                            .passwordEncoder(encoder::encode)
-                            .password(acct.getPassword())
-                            .roles(acct.getAuthorities().toArray(new String[0]))
-                            .build());
-            }
+            JdbcDaoImpl jdbcUds = new JdbcDaoImpl();
+            jdbcUds.setDataSource(userDataSource);
 
-            return new InMemoryUserDetailsManager(users);
+            return jdbcUds;
             
 
         }
@@ -299,6 +366,7 @@ public class SecurityConfiguration {
         public AuthenticationManager authenticationManager(HttpSecurity http, UserDetailsService uds) throws Exception {
             AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
             builder.userDetailsService(uds);
+            builder.parentAuthenticationManager(null); // prevent from being recursive
             return builder.build();
         }
 
