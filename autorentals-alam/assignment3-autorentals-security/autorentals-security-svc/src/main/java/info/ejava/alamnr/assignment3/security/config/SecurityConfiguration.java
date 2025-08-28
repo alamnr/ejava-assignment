@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.NullRoleHierarchy;
@@ -32,6 +33,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatchers;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import info.ejava.assignments.security.autorenters.svc.AccountProperties;
@@ -278,6 +283,33 @@ public class SecurityConfiguration {
         //     return web -> web.ignoring().requestMatchers(mvc.pattern("/content/**"));
         // }
 
+        @Bean
+        @Order(500)
+        public SecurityFilterChain h2SecurityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+            MediaTypeRequestMatcher htmlRequestMatcher = new MediaTypeRequestMatcher(MediaType.TEXT_HTML);
+            htmlRequestMatcher.setUseEquals(true);
+
+            http.securityMatchers(cfg -> cfg.requestMatchers("/h2-console*","/h2-console/**")
+                                            .requestMatchers("/login","/logout")
+                                            .requestMatchers(RequestMatchers.allOf(
+                                                htmlRequestMatcher, // only want to service HTML error pages
+                                                AntPathRequestMatcher.antMatcher("/error")
+                                            ))    );
+            
+            http.authorizeHttpRequests(cfg -> cfg.requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.GET,".+(.css|.jsp|.gif)$"))
+                                        .permitAll()
+                                        .anyRequest()
+                                        .authenticated());
+            
+            http.formLogin(cfg -> cfg.permitAll()
+                                    .successForwardUrl("/h2-console"));
+            
+            http.csrf(cfg -> cfg.ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")));
+            http.headers(cfg -> cfg.frameOptions(fo -> fo.disable()));
+
+            http.authenticationManager(authenticationManager);
+            return http.build();
+        }
 
         @Bean
         public PasswordEncoder passwordEncoder()  {
