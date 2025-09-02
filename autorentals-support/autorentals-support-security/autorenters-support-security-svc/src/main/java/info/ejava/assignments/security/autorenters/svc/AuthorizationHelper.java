@@ -48,6 +48,11 @@ public class AuthorizationHelper {
         return username;
     }
 
+    public boolean isAuthenticated() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return null != auth ?  auth.isAuthenticated(): false;
+    }
+
     public boolean isUsername( String requiredUsername) {
         String username = getUsername().orElse(null);
         return StringUtils.equals(username,requiredUsername);
@@ -114,4 +119,8 @@ public class AuthorizationHelper {
         return true; 
     }
     
+    @PreAuthorize("hasAuthority('PROXY')")
+    public boolean assertProxy() { 
+        return true; 
+    }
 }

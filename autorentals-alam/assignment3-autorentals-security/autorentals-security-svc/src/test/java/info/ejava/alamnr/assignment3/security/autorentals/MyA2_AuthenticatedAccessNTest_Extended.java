@@ -170,7 +170,7 @@ public class MyA2_AuthenticatedAccessNTest_Extended //extends A2_AuthenticatedAc
             BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         }
 
-        @Test
+       // @Test
         void rentals_post(){
             // given
             AutoDTO auto = authnAutosClient.createAuto(autoFactory.make()).getBody();

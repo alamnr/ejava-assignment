@@ -57,7 +57,7 @@ public class A2b_NoSecurityNTest {
     private String anonymousUsername;
     private @Autowired Environment env;
 
-    @Autowired(required = false)
+    @Autowired(required = false) 
     private SecurityFilterChain filterChain;
 
     @BeforeEach

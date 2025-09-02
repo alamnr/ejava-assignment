@@ -3,6 +3,8 @@ package info.ejava.assignments.api.autorenters.svc.autorentals;
 import java.net.URI;
 import java.time.LocalDate;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -199,5 +201,15 @@ public class AutoRentalController {
         autoRentalService.removeAllAutoRental();
         return ResponseEntity.noContent().build();   // http status code - 204
     }
+
+    // @Autowired 
+    // ApplicationContext context;
+
+    // @PostConstruct
+    // void postConstruct() {
+    //     AutoRentalService autoRentalService = context.getBean(AutoRentalService.class);
+
+    //     log.info("*************************************** injected Auto Rental Service - {}",autoRentalService.getClass().getName());
+    // }
 
 }

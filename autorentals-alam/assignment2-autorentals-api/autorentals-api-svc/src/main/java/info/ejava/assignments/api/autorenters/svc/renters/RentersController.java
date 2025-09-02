@@ -2,6 +2,8 @@ package info.ejava.assignments.api.autorenters.svc.renters;
 
 import java.net.URI;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +25,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import info.ejava.assignments.api.autorenters.client.renters.RentersAPI;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterDTO;
 import info.ejava.assignments.api.autorenters.dto.renters.RenterListDTO;
+import info.ejava.assignments.api.autorenters.svc.autorentals.AutoRentalService;
 import info.ejava.examples.common.exceptions.ClientErrorException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -116,5 +119,15 @@ public class RentersController {
     // Idempotent http  method - GET, PUT, DELETE, HEAD etc  . For idempotent http method  browser page is automatically refresh, 
     // no warning dialogue is shown
     // For idempotent http method - POST, browser page is not automatically refres, a warning dialogue is shown each time
+
+    // @Autowired 
+    // ApplicationContext context;
+
+    // @PostConstruct
+    // void postConstruct() {
+    //     RentersService rentersService = context.getBean(RentersService.class);
+
+    //     log.info("*************************************** injected Rental Service - {}",rentersService.getClass().getName());
+    // }
 
 }

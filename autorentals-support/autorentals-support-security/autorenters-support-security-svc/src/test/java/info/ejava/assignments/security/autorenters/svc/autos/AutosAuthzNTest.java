@@ -8,6 +8,8 @@ import info.ejava.assignments.api.autorenters.dto.autos.AutoListDTO;
 import info.ejava.assignments.security.autorenters.svc.testapp.AuthoritiesTestConfiguration;
 import info.ejava.assignments.security.autorenters.svc.ProvidedAuthorizationTestHelperConfiguration;
 import lombok.extern.slf4j.Slf4j;
+
+import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -43,6 +45,11 @@ public class AutosAuthzNTest {
     @Autowired
     private AutosAPIClient autosAPIClient;
 
+    @Test
+    void context(){
+        BDDAssertions.then(autoFactory).isNotNull();
+    }
+    
     @Nested
     class anonymous_user {
         private AutosAPI anonymousClient;
@@ -73,6 +80,7 @@ public class AutosAuthzNTest {
                 then(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
             }
 
+            
             @Test
             void get_autos() {
                 //given
@@ -125,21 +133,25 @@ public class AutosAuthzNTest {
                 then(ex).as("no exception thrown").isNotNull();
                 then(ex.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
             }
+
+            @Test
+            void remove_all_autos() {
+                //when
+                HttpClientErrorException ex = catchThrowableOfType(
+                        ()->anonymousClient.removeAllAutos(),
+                        HttpClientErrorException.class
+                );
+                //then
+                then(ex).as("no exception thrown").isNotNull();
+                then(ex.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+            }
+
         }
-        @Test
-        void remove_all_autos() {
-            //when
-            HttpClientErrorException ex = catchThrowableOfType(
-                    ()->anonymousClient.removeAllAutos(),
-                    HttpClientErrorException.class
-            );
-            //then
-            then(ex).as("no exception thrown").isNotNull();
-            then(ex.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        }
+
+
     }
 
-    @Nested
+     @Nested
     class authenticated_user {
         private AutosAPI authnClient;
         private AutosAPI altClient;
@@ -152,8 +164,7 @@ public class AutosAuthzNTest {
 
         @Nested
         class can {
-
-            @Test
+                   @Test
             void get_auto() {
                 //verify
                 assertThrows(HttpClientErrorException.NotFound.class,
@@ -213,8 +224,10 @@ public class AutosAuthzNTest {
                 //then
                 then(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
             }
+     
         }
 
+        
         @Nested
         class cannot {
             @Test
@@ -257,8 +270,9 @@ public class AutosAuthzNTest {
                 then(ex.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
             }
         }
-    }
 
+
+    }
 
     @Nested
     class mgr_user {
@@ -292,9 +306,10 @@ public class AutosAuthzNTest {
                         ()->mgrClient.removeAllAutos());
             }
         }
+
     }
 
-    @Nested
+     @Nested
     class admin_user {
         private AutosAPI adminClient;
         private AutosAPI altClient;
@@ -318,6 +333,8 @@ public class AutosAuthzNTest {
         @Nested
         class cannot {
         }
+
     }
 
+    
 }

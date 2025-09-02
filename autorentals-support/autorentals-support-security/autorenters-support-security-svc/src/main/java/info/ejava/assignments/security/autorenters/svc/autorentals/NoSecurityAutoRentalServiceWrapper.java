@@ -1,4 +1,4 @@
-package info.ejava.alamnr.assignment3.security.autorentals;
+package info.ejava.assignments.security.autorenters.svc.autorentals;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,14 +11,14 @@ import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Slf4j
-public class NoSecurityAutorentalsServiceWrapper implements AutoRentalService {
-    
+public class NoSecurityAutoRentalServiceWrapper implements AutoRentalService {
+
     private final AutoRentalService impl;
 
     @Override
     public AutoRentalDTO createAutoRental(AutoRentalDTO newAutoRental) {
-        newAutoRental.setUserName("anonymous");
-        return impl.createAutoRental(newAutoRental);
+      newAutoRental.setUserName("anonymous");
+      return impl.createAutoRental(newAutoRental);
     }
 
     @Override
@@ -65,4 +65,5 @@ public class NoSecurityAutorentalsServiceWrapper implements AutoRentalService {
     public Page<AutoRentalDTO> findByRenterName(String renterName, Pageable pageable) {
         return impl.findByRenterName(renterName, pageable);
     }
+    
 }

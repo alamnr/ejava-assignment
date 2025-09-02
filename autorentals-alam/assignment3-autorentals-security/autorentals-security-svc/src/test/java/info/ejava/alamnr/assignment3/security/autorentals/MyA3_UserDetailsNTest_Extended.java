@@ -60,7 +60,9 @@ import lombok.extern.slf4j.Slf4j;
         AutoRentalsSecurityApp.class,
         SecurityTestConfiguration.class},
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"test","userdetails"})
+//@ActiveProfiles({"test","userdetails","nosecurity"})
+//@ActiveProfiles({"test","userdetails"})
+@ActiveProfiles({"test","userdetails","authorities"})
 @Slf4j
 @DisplayName("Part A3: User Details")
 //@Disabled
@@ -232,7 +234,12 @@ public class MyA3_UserDetailsNTest_Extended {
         @AfterAll
         void cleanUp(){
             // we can only have 1 renter per username -- cleanup
-            RestTemplate authnUser = authnUsers.values().iterator().next();
+            //RestTemplate authnUser = authnUsers.values().iterator().next();
+            String userNameWithAdminRole = authnUsers.keySet().stream().filter(a->a.equals("mary")).findFirst().orElse("null");
+            //authnUsers.keySet().stream().forEach(a->log.info("88888888888888888888888888888 key - {}",a));
+            log.info("8888888888888888888888888888888888888888888 userNameWithAdminRole - {}", userNameWithAdminRole);
+
+            RestTemplate authnUser = authnUsers.get(userNameWithAdminRole);
             try {
                 testHelper.withRestTemplate(authnUser).removeAllRentals();
             } catch (HttpClientErrorException.Forbidden | HttpClientErrorException.Unauthorized ex) {
@@ -258,8 +265,10 @@ public class MyA3_UserDetailsNTest_Extended {
 
             AutoDTO auto = autosClient.createAuto(autoFactory.make()).getBody();
             RenterDTO renter = rentersClient.createRenter(renterFactory.make()).getBody();
+            log.info("*********************************** renter name - {}",renter);
             TimePeriod timePeriod = new TimePeriod(LocalDate.now(), 2);
             AutoRentalDTO autoRentalDTO = (AutoRentalDTO) rentalsHelper.makeProposal(auto, renter, timePeriod);
+            log.info(" new autoRental - {}", autoRentalDTO);
             // when
             ResponseEntity<RentalDTO> response = rentalsHelper.createContract(autoRentalDTO);
             // then

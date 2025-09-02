@@ -195,7 +195,12 @@ public class A3_UserDetailsNTest {
         @AfterAll
         void cleanUp(){
             // we can only have 1 renter per username -- cleanup
-            RestTemplate authnUser = authnUsers.values().iterator().next();
+            //RestTemplate authnUser = authnUsers.values().iterator().next();
+            String userNameWithAdminRole = authnUsers.keySet().stream().filter(a->a.equals("mary")).findFirst().orElse("null");
+            //authnUsers.keySet().stream().forEach(a->log.info("88888888888888888888888888888 key - {}",a));
+            log.info("8888888888888888888888888888888888888888888 userNameWithAdminRole - {}", userNameWithAdminRole);
+
+            RestTemplate authnUser = authnUsers.get(userNameWithAdminRole);
             try {
                 testHelper.withRestTemplate(authnUser).removeAllRentals();
             } catch (HttpClientErrorException.Forbidden | HttpClientErrorException.Unauthorized ex) {

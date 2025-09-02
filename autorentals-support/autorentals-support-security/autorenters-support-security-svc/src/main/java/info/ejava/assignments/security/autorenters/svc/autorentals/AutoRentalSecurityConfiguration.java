@@ -1,4 +1,4 @@
-package info.ejava.alamnr.assignment3.security.autorentals;
+package info.ejava.assignments.security.autorenters.svc.autorentals;
 
 import java.util.List;
 
@@ -17,8 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Configuration(proxyBeanMethods = false)
 @Slf4j
-public class SecureAutoRentalsConfiguration {
-    
+public class AutoRentalSecurityConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public AuthorizationHelper authzHelper(){
@@ -32,7 +31,7 @@ public class SecureAutoRentalsConfiguration {
         Assert.notEmpty(serviceImpls,"no RenterService impls found to secure");
         log.info("nosecurity profile active, allowing all calls to renter service");
         
-        return new NoSecurityAutorentalsServiceWrapper(serviceImpls.get(0)); 
+        return new NoSecurityAutoRentalServiceWrapper(serviceImpls.get(0)); 
     }
 
     @Primary
@@ -44,7 +43,6 @@ public class SecureAutoRentalsConfiguration {
                                                    AuthorizationHelper authzHelper) {
         Assert.notEmpty(serviceImpls,"no RenterService impls found to secure");
         
-        return new SecureAutorentalsServiceWrapper(serviceImpls.get(0),autosService,rentersService,authzHelper); 
+        return new SecureAutoRentalServiceWrapper(serviceImpls.get(0),autosService,rentersService,authzHelper); 
     }
-
 }

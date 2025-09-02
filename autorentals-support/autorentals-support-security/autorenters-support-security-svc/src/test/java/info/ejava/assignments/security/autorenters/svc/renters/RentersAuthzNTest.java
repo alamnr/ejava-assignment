@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         ProvidedAuthorizationTestHelperConfiguration.class,
         AuthoritiesTestConfiguration.class,
         //AutoRenterTestConfiguration.class
-    }, properties = {"debug=true"},
+    }, //properties = {"debug=true"},
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
 @ActiveProfiles({"test","authorities"})

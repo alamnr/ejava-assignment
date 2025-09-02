@@ -22,6 +22,7 @@ public class SecureRentersServiceWrapper implements RentersService {
     private final AuthorizationHelper authzHelper;
     @Override
     public RenterDTO createRenter(RenterDTO newrenter) {
+        // 3.b.ii
         String username = authzHelper.getUsername().orElseThrow(()->
            new ServerErrorException.InternalErrorException("Security has not been enabled")
         );
@@ -31,6 +32,7 @@ public class SecureRentersServiceWrapper implements RentersService {
         }
 
         newrenter.setUsername(username);
+      
         return impl.createRenter(newrenter);
     }
 
@@ -50,7 +52,7 @@ public class SecureRentersServiceWrapper implements RentersService {
     }
     @Override
     public RenterDTO updateRenter(String id, RenterDTO renterDTO) {
-        authzHelper.assertUsername(()->impl.getRenter(id).getUsername());
+        authzHelper.assertUsername(()->impl.getRenter(id).getUsername()); // 3.b.iii
         return impl.updateRenter(id, renterDTO);
     }
     @Override
@@ -65,6 +67,7 @@ public class SecureRentersServiceWrapper implements RentersService {
     //@PreAuthorize("isAuthenticated()")
     @Override
     public void removeRenter(String id) {
+        // 3.b.iv
         try {
             String ownerName = impl.getRenter(id).getUsername();
             authzHelper.assertRules(() -> authzHelper.isUsername(ownerName) || authzHelper.assertMgr(),

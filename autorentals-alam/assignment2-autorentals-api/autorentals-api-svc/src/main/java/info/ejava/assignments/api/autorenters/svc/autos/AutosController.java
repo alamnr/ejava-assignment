@@ -2,6 +2,8 @@ package info.ejava.assignments.api.autorenters.svc.autos;
 
 import java.net.URI;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -157,5 +159,14 @@ public class AutosController {
         autosService.removeAllAutos();
         return ResponseEntity.noContent().build();   // http status code - 204
     }
+
+    // @Autowired
+    // private ApplicationContext ctx;
+
+    // @PostConstruct
+    // public void logInjectedBeans() {
+    //     AutosService autosService = ctx.getBean(AutosService.class);
+    //     log.info("88888888888888888888888888888888888888888888888888888888888 Injected renterService: {} " , autosService.getClass().getName());
+    // }
 
 }

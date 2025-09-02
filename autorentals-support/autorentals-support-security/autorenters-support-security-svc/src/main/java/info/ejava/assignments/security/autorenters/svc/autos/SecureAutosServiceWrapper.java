@@ -54,8 +54,9 @@ public class SecureAutosServiceWrapper implements AutosService {
                 String ownername = impl.getAuto(id).getUsername();
                 authzHelper.assertRules(()-> authzHelper.isUsername(ownername) || authzHelper.assertMgr(),
                                         username -> String.format("%s is not owner or have MGR role", username));
+                impl.removeAuto(id);            
         } catch (ClientErrorException.NotFoundException ex) {
-            
+            /* already does not exist -- no error */
         }
     }
     @Override
