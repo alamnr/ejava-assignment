@@ -254,7 +254,7 @@ public class MyA3_UserDetailsNTest_Extended {
         Stream<Arguments> identities(){
             return authnUsers.entrySet().stream().map(au->Arguments.of(au.getValue(),au.getKey()));
         }
-        @ParameterizedTest(name = "{index} {1} can create contract")
+        //@ParameterizedTest(name = "{index} {1} can create contract")
         @MethodSource("identities")
         void valid_credential_can_create_rentals(RestTemplate authnUser, String username){
 

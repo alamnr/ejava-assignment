@@ -361,40 +361,45 @@ public class SecurityConfiguration {
                 http.securityMatchers(cfg->cfg.requestMatchers("/api/**"));
 
                 // builder for with custom access example  // 4.a
-                UnaryOperator<AuthorityAuthorizationManager> withRoleHierarchy = autho -> {
-                    autho.setRoleHierarchy(roleHierarchy);
-                    return autho;
-                };
+                // UnaryOperator<AuthorityAuthorizationManager> withRoleHierarchy = autho -> {
+                //     autho.setRoleHierarchy(roleHierarchy);
+                //     return autho;
+                // };
                 
                 // 3.a.i
                 http.authorizeHttpRequests(cfg->
                                         cfg.requestMatchers(HttpMethod.POST,AutosAPI.AUTOS_PATH,AutosAPI.AUTOS_PATH+"/**").authenticated());
                 http.authorizeHttpRequests(cfg->
                                         cfg.requestMatchers(HttpMethod.PUT,AutosAPI.AUTOS_PATH,AutosAPI.AUTOS_PATH+"/**").authenticated());
-                http.authorizeHttpRequests(cfg->
-                                        cfg.requestMatchers(HttpMethod.DELETE,AutosAPI.AUTOS_PATH,AutosAPI.AUTOS_PATH+"/**").authenticated());
+                                           
+                // http.authorizeHttpRequests(cfg->
+                //                         cfg.requestMatchers(HttpMethod.DELETE,AutosAPI.AUTOS_PATH,AutosAPI.AUTOS_PATH+"/**").authenticated());
                 
                 // 3.b.i
                 http.authorizeHttpRequests(cfg->
-                                    cfg.requestMatchers(HttpMethod.POST,RentersAPI.RENTERS_PATH,RentersAPI.RENTERS_PATH+"/**").authenticated());
+                                    cfg.requestMatchers(HttpMethod.POST,RentersAPI.RENTERS_PATH,RentersAPI.RENTERS_PATH + "/**").authenticated());
                 http.authorizeHttpRequests(cfg->
-                                    cfg.requestMatchers(HttpMethod.PUT,RentersAPI.RENTERS_PATH,RentersAPI.RENTERS_PATH+"/**").authenticated());
-                http.authorizeHttpRequests(cfg->
-                                    cfg.requestMatchers(HttpMethod.DELETE,RentersAPI.RENTERS_PATH,RentersAPI.RENTERS_PATH+"/**").authenticated());
+                                    cfg.requestMatchers(HttpMethod.PUT,RentersAPI.RENTERS_PATH,RentersAPI.RENTERS_PATH + "/**").authenticated());
+                // http.authorizeHttpRequests(cfg->
+                //                     cfg.requestMatchers(HttpMethod.DELETE,RentersAPI.RENTERS_PATH,RentersAPI.RENTERS_PATH + "/**").authenticated());
             
                 
                 // http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.HEAD).permitAll());
-                http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.GET,AutosAPI.AUTO_PATH).permitAll());
+                http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.GET,"/api/autos","/api/autos/**").permitAll());
+                http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.GET,"/api/renters","/api/renters/**").permitAll());
                 // http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.POST,"/api/autos/query").permitAll());
         
+                //http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.DELETE,AutosAPI.AUTOS_PATH + "/**").permitAll());
                 http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.DELETE,AutosAPI.AUTOS_PATH).hasRole("ADMIN")); // 3.a.iv
+                
                 //http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.GET,"/api/renters").hasRole("MGR"));
                 //http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.GET,"/api/renters/*").authenticated());
                 http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.DELETE,RentersAPI.RENTERS_PATH).hasRole("ADMIN")); // 3.b.v
 
                 //http.authorizeHttpRequests(cfg->cfg.anyRequest().authenticated());
                 // These are requests handled by class / method annotations
-                http.authorizeHttpRequests(cfg-> cfg.requestMatchers(AutoRentalsAPI.AUTO_RENTALS_PATH).permitAll());
+                http.authorizeHttpRequests(cfg-> cfg.requestMatchers(AutoRentalsAPI.AUTO_RENTALS_PATH, AutoRentalsAPI.AUTO_RENTALS_PATH + "/**")
+                                                    .permitAll());
 
                 
 
@@ -440,11 +445,20 @@ public class SecurityConfiguration {
          * is resolved.
          */
         @Bean
-        static MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy, ApplicationContext context) {
+        public MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy, ApplicationContext context) {
             DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
             expressionHandler.setRoleHierarchy(roleHierarchy);
             expressionHandler.setApplicationContext(context);
             return expressionHandler;
         }
+
+       
+        // For HttpSecurity (URL authorization)
+        // @Bean
+        // public DefaultWebSecurityExpressionHandler webSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
+        //     DefaultWebSecurityExpressionHandler handler = new DefaultWebSecurityExpressionHandler();
+        //     handler.setRoleHierarchy(roleHierarchy);
+        //     return handler;
+        // }
     }
 }
