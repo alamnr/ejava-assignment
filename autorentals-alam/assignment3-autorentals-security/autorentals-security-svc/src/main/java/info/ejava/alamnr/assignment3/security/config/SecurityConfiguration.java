@@ -372,16 +372,14 @@ public class SecurityConfiguration {
                 http.authorizeHttpRequests(cfg->
                                         cfg.requestMatchers(HttpMethod.PUT,AutosAPI.AUTOS_PATH,AutosAPI.AUTOS_PATH+"/**").authenticated());
                                            
-                // http.authorizeHttpRequests(cfg->
-                //                         cfg.requestMatchers(HttpMethod.DELETE,AutosAPI.AUTOS_PATH,AutosAPI.AUTOS_PATH+"/**").authenticated());
+                
                 
                 // 3.b.i
                 http.authorizeHttpRequests(cfg->
                                     cfg.requestMatchers(HttpMethod.POST,RentersAPI.RENTERS_PATH,RentersAPI.RENTERS_PATH + "/**").authenticated());
                 http.authorizeHttpRequests(cfg->
                                     cfg.requestMatchers(HttpMethod.PUT,RentersAPI.RENTERS_PATH,RentersAPI.RENTERS_PATH + "/**").authenticated());
-                // http.authorizeHttpRequests(cfg->
-                //                     cfg.requestMatchers(HttpMethod.DELETE,RentersAPI.RENTERS_PATH,RentersAPI.RENTERS_PATH + "/**").authenticated());
+                
             
                 
                 // http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.HEAD).permitAll());
@@ -391,10 +389,14 @@ public class SecurityConfiguration {
         
                 //http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.DELETE,AutosAPI.AUTOS_PATH + "/**").permitAll());
                 http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.DELETE,AutosAPI.AUTOS_PATH).hasRole("ADMIN")); // 3.a.iv
+                http.authorizeHttpRequests(cfg->
+                                        cfg.requestMatchers(HttpMethod.DELETE,AutosAPI.AUTOS_PATH+"/**").authenticated());
                 
                 //http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.GET,"/api/renters").hasRole("MGR"));
                 //http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.GET,"/api/renters/*").authenticated());
                 http.authorizeHttpRequests(cfg->cfg.requestMatchers(HttpMethod.DELETE,RentersAPI.RENTERS_PATH).hasRole("ADMIN")); // 3.b.v
+                http.authorizeHttpRequests(cfg->
+                                    cfg.requestMatchers(HttpMethod.DELETE,RentersAPI.RENTERS_PATH + "/**").authenticated());
 
                 //http.authorizeHttpRequests(cfg->cfg.anyRequest().authenticated());
                 // These are requests handled by class / method annotations

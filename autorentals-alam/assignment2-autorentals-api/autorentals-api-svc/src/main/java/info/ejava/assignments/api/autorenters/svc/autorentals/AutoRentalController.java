@@ -192,6 +192,7 @@ public class AutoRentalController {
     @RequestMapping(path = AutoRentalsAPI.AUTO_RENTAL_PATH, method = RequestMethod.DELETE)
     public ResponseEntity<Void> removeAutoRental(@PathVariable("id") String id) {
         autoRentalService.removeAutoRental(id);
+        log.info("****************************************************** INSIDE CoNTROLLE");
         return ResponseEntity.noContent().build();  // http status code  - 204
     }
 

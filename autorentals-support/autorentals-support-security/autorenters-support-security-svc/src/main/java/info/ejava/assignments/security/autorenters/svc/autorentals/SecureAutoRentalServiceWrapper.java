@@ -26,11 +26,15 @@ public class SecureAutoRentalServiceWrapper implements AutoRentalService {
     private final AuthorizationHelper authzHelper;
 
 
+    @PreAuthorize("isAuthenticated()")
     @Override
     public AutoRentalDTO createAutoRental(AutoRentalDTO newAutoRental) {
         // 3.c.i &&  3.c.iii
-        String ownername = newAutoRental.getRenterName()==null ?  rentersServiceImpl.getRenter(newAutoRental.getRenterId()).getUsername()
-                                                                : newAutoRental.getRenterName();
+        boolean userNameisBlankOrEmptyOrNull = newAutoRental.getUserName() == null || newAutoRental.getUserName().isBlank() 
+                                                        || newAutoRental.getUserName().isEmpty() ;
+        String ownername = userNameisBlankOrEmptyOrNull ? rentersServiceImpl.getRenter(newAutoRental.getRenterId()).getUsername() 
+                                                        : newAutoRental.getUserName() ;
+                           
         
         // boolean isOwner = authzHelper.isUsername(ownername);
         authzHelper.assertRules( () -> authzHelper.isUsername(ownername) || authzHelper.hasAuthority("PROXY"), 
@@ -38,11 +42,23 @@ public class SecureAutoRentalServiceWrapper implements AutoRentalService {
         return impl.createAutoRental(newAutoRental);
     }
 
+    
     @Override
     public AutoRentalDTO getAutoRental(String id) {
         AutoRentalDTO autoRentalDTO = impl.getAutoRental(id);
-        String ownername = autoRentalDTO.getUserName();
-        authzHelper.assertRules(()-> authzHelper.isUsername(ownername) || authzHelper.assertMgr(),
+        boolean userNameisBlankOrEmptyOrNull = autoRentalDTO.getUserName() == null || autoRentalDTO.getUserName().isBlank() 
+                                                        || autoRentalDTO.getUserName().isEmpty() ;
+        String ownername = userNameisBlankOrEmptyOrNull ? rentersServiceImpl.getRenter(autoRentalDTO.getRenterId()).getUsername() 
+                                                        : autoRentalDTO.getUserName() ;
+        log.info("************************************* ownername in getAutoRental - {}", ownername);
+        // log.info("****************************** isUsername - {}", authzHelper.isUsername(ownername));
+        // log.info("****************************** assertMgr - {}", authzHelper.assertMgr());
+        // log.info("****************************** assertProxy - {}, hasAuthority - {}", authzHelper.assertProxy(), authzHelper.hasAuthority("PROXY"));
+        log.info("****************************** hasAuthority - {}", authzHelper.hasAuthority("PROXY"));
+        log.info("****************************** hasAuthority - {}", authzHelper.hasAuthority("ROLE_MGR"));
+        // programmatic authorization constraint, in this case role inheritance do not work
+        authzHelper.assertRules(()-> authzHelper.isUsername(ownername) || authzHelper.hasAuthority("ROLE_MGR") 
+                                        || authzHelper.hasAuthority("PROXY") || authzHelper.hasAuthority("ROLE_ADMIN"),
                                username -> String.format("%s is not this autorental and or authorized to get this autoRental[%s]",username,id));
         return autoRentalDTO;
     }
@@ -52,23 +68,38 @@ public class SecureAutoRentalServiceWrapper implements AutoRentalService {
         return impl.hasAutoRental(id);
     }
 
+
+    @PreAuthorize("isAuthenticated()")
     @Override
     public AutoRentalDTO updateAutoRental(String id, AutoRentalDTO autoRental) {
         // 3.c.ii  &&  3.c.iii
-        String ownername = autoRental.getUserName();
+        boolean userNameisBlankOrEmptyOrNull = autoRental.getUserName() == null || autoRental.getUserName().isBlank() 
+                                                        || autoRental.getUserName().isEmpty() ;
+        String ownername = userNameisBlankOrEmptyOrNull ? rentersServiceImpl.getRenter(autoRental.getRenterId()).getUsername() 
+                                                                : autoRental.getUserName() ;
         authzHelper.assertRules(()-> authzHelper.isUsername(ownername) || authzHelper.hasAuthority("PROXY"),  
                                 username -> String.format("%s is not this auto renter owner and or authorize to update this autorental[%s]", username,autoRental.getId()));
         return impl.updateAutoRental(id, autoRental);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated()")    // declacrative  authorization  constraint
     @Override
     public void removeAutoRental(String id) {
         // 3.c.iv and 3.c.v
         try {
             AutoRentalDTO autoRentalDTO = impl.getAutoRental(id);
-            String ownername = autoRentalDTO.getUserName();
-            authzHelper.assertRules(() -> authzHelper.isUsername(ownername) || authzHelper.assertMgr(),
+            boolean userNameisBlankOrEmptyOrNull = autoRentalDTO.getUserName() == null || autoRentalDTO.getUserName().isBlank() 
+                                                        || autoRentalDTO.getUserName().isEmpty() ;
+                                                        
+            String ownername =  userNameisBlankOrEmptyOrNull ? rentersServiceImpl.getRenter(autoRentalDTO.getRenterId()).getUsername() 
+                                                                : autoRentalDTO.getUserName() ;
+            log.info("********************************* ownername - {}", ownername);
+            // authzHelper.assertRules(() -> authzHelper.isUsername(ownername) || authzHelper.assertMgr(),
+            //                     username -> String.format("%s is not this autorenter owner ",   username));
+
+            // programmatic authorization constraint
+            authzHelper.assertRules(() -> authzHelper.isUsername(ownername) || authzHelper.hasAuthority("ROLE_MGR") 
+                                            || authzHelper.hasAuthority("ROLE_ADMIN"),
                                 username -> String.format("%s is not this autorenter owner ",   username));
             impl.removeAutoRental(id);    
         } catch (ClientErrorException.NotFoundException ex) {
@@ -77,12 +108,21 @@ public class SecureAutoRentalServiceWrapper implements AutoRentalService {
         
     }
 
-    @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")  // 3.c.vi
+    //  annotation based declarative authorization constraint  
+    @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")  // 3.c.vi  
     @Override
     public void removeAllAutoRental() {
         // 3.c.vi
         // authzHelper.assertRules(() -> authzHelper.isAuthenticated() && authzHelper.assertAdmin(),
         //                         username -> String.format("%s is not authorize to delete all autorentals", username));
+
+        // or , cause authzHelper.assertAdmin() / authzHelper.assertMgr() / authzHelper.assertProxy() always return true, 
+        // i think it does not work properly
+
+        // programmatic authorization constraint
+        // authzHelper.assertRules(() -> authzHelper.isAuthenticated() && authzHelper.hasAuthority("ROLE_ADMIN"),
+        //                          username -> String.format("%s is not authorize to delete all autorentals", username));
+
         impl.removeAllAutoRental();;
     }
 

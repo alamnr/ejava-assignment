@@ -212,8 +212,7 @@ public class ApiTestHelperImpl implements ApiTestHelper<AutoRentalDTO> {
 
     @Override
     public ResponseEntity<Void> removeRental(String rentalId) {
-        URI url = UriComponentsBuilder.fromUri(serverConfig.getBaseUrl()).path(AutoRentalsAPI.AUTO_RENTALS_PATH).build(rentalId);
-       
+        URI url = UriComponentsBuilder.fromUri(serverConfig.getBaseUrl()).path(AutoRentalsAPI.AUTO_RENTAL_PATH).build(rentalId);
         return  restTemplate.exchange(RequestEntity.delete(url).build(), Void.class);
     }
 

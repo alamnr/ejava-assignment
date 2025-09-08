@@ -50,6 +50,9 @@ public class MyTest {
 
     @Autowired
     private Map<String,RestTemplate> authnUsers;
+
+    @Autowired
+    private AuthorizationHelper authzHelper;
     
 
     private  RestTemplate createUser(RestTemplateBuilder builder, ClientHttpRequestFactory requestFactory, AccountProperties account) {
@@ -94,6 +97,10 @@ public class MyTest {
 
     @Test
     void testProps(){
+
+        log.info("********************************* assertMgr - {}, proxy - {}, member - {}, admin -{}, username- {}",authzHelper.assertMgr(), 
+                                                        authzHelper.assertProxy(),authzHelper.assertMember(), authzHelper.assertAdmin(), 
+                                                        authzHelper.hasAuthority("PROXY"));
         System.out.println(accounts);
         
         log.info("anAccount - {}", getUserAccount(accounts, 0));

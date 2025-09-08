@@ -52,6 +52,7 @@ public class SecureAutosServiceWrapper implements AutosService {
     public void removeAuto(String id) {
         try {
                 String ownername = impl.getAuto(id).getUsername();
+                log.info("**************************** owner auto - {}", ownername);
                 authzHelper.assertRules(()-> authzHelper.isUsername(ownername) || authzHelper.assertMgr(),
                                         username -> String.format("%s is not owner or have MGR role", username));
                 impl.removeAuto(id);            

@@ -30,7 +30,7 @@ public class SecureRentersServiceWrapper implements RentersService {
         if(existingRenter.isPresent()){
             throw new ClientErrorException.InvalidInputException("renter already exists for %s", username);
         }
-
+        
         newrenter.setUsername(username);
       
         return impl.createRenter(newrenter);

@@ -40,6 +40,6 @@ public class RenterDTO {
     private LocalDate dob;
     private String email;
 
-    //@JsonIgnore
+    @JsonIgnore
     private String username;
 }

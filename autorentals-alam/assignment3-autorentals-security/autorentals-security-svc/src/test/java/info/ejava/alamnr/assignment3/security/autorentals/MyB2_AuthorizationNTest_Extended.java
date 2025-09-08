@@ -505,6 +505,7 @@ public class MyB2_AuthorizationNTest_Extended {
         RentalDTO given_a_proposal(RestTemplate user) {
             AutoDTO auto = given_an_auto();
             RenterDTO renter = given_a_renter(user);
+            log.info("***************************************** renter - {}", renter);
             TimePeriod timePeriod = given_a_time_period();
             return testHelper.makeProposal(auto, renter, timePeriod);
         }

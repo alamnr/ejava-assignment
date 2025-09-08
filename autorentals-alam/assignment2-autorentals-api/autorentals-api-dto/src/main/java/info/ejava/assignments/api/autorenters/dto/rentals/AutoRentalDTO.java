@@ -71,7 +71,7 @@ public class AutoRentalDTO implements RentalDTO {
         this.endDate = timePeriod.getEndDate();
         this.makeModel = auto.getMake() + "-" + auto.getModel();
         this.amount = BigDecimal.valueOf(auto.getDailyRate().doubleValue() * timePeriod.getDays());
-        this.renterName = renter.getUsername();
+        this.renterName = renter.getUsername()!=null ? renter.getUsername():"";
         this.renterAge = TimePeriod.create(renter.getDob(), LocalDate.now()).getPeriod().getYears();
         
         this.streetAddress = deepCopyOfAutoLocation(auto.getLocation());

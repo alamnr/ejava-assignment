@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -51,7 +52,7 @@ public class B2_AuthorizationNTest {
     @Autowired RenterDTOFactory renterDTOFactory;
 
     @Autowired AutosAPIClient autosClient;
-    @Autowired RentersAPIClient rentersClient;
+    @Autowired @Qualifier("rentersAPIClient") RentersAPIClient rentersClient;
 
     @Autowired ApiTestHelper<RentalDTO> testHelper;
 

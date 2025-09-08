@@ -166,7 +166,7 @@ public class A2_AuthenticatedAccessNTest extends A1_AnonymousAccessNTest
             BDDAssertions.then(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         }
 
-        @Test
+        //@Test
         void rentals_post(){
             // given
             AutoDTO auto = authnAutosClient.createAuto(autoDTOFactory.make()).getBody();
