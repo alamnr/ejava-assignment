@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import info.ejava.assignments.api.autorenters.client.autos.AutosAPI;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -23,6 +25,11 @@ public class IdentityController {
     public static final String WHO_AM_I_PATH = "/api/whoAmI";
     public static final String AUTHORITIES_PATH = "/api/authorities";
 
+     @PostConstruct
+    public void init(){
+        log.info("Identity initialized , whoAmI URI - {}, authorities URI - {}", WHO_AM_I_PATH,AUTHORITIES_PATH);
+    }
+    
     @RequestMapping(path = WHO_AM_I_PATH, method = RequestMethod.GET,produces = {MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity<String> whoAmIGet(@AuthenticationPrincipal UserDetails userDetails) {
         String username = Optional.ofNullable(userDetails).map(ud->ud.getUsername()).orElse("(null)");

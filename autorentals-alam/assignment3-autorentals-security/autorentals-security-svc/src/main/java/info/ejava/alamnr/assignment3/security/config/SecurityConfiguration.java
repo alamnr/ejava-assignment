@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
+import org.apache.catalina.connector.Connector;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,6 +46,7 @@ import org.springframework.security.web.util.matcher.RequestMatchers;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
+import info.ejava.alamnr.assignment3.security.identity.IdentityController;
 import info.ejava.assignments.api.autorenters.client.autorentals.AutoRentalsAPI;
 import info.ejava.assignments.api.autorenters.client.autos.AutosAPI;
 import info.ejava.assignments.api.autorenters.client.renters.RentersAPI;
@@ -404,6 +408,8 @@ public class SecurityConfiguration {
                                                     .permitAll());
 
                 
+                // for https unit test config
+                http.authorizeHttpRequests(cfg->cfg.requestMatchers(IdentityController.WHO_AM_I_PATH).authenticated());                                                            
 
                 http.authenticationManager(authenticationManager);
 
@@ -462,5 +468,23 @@ public class SecurityConfiguration {
         //     handler.setRoleHierarchy(roleHierarchy);
         //     return handler;
         // }
+    }
+
+    @Configuration(proxyBeanMethods =  false)
+    @Profile("https")   
+    public static class PartB_Https {
+
+        @Bean
+	    @Profile("redirect") //only enable on demand
+        public WebServerFactoryCustomizer<TomcatServletWebServerFactory> redirectConnector() {
+            return factory -> {
+                Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
+                connector.setScheme("http");
+                connector.setPort(8080);
+                connector.setSecure(false);
+                connector.setRedirectPort(8443); // redirect to HTTPS
+                factory.addAdditionalTomcatConnectors(connector);
+            };
+        }
     }
 }
