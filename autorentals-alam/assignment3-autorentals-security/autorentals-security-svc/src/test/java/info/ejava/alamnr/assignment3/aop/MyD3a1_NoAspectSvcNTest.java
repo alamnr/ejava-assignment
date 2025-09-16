@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 @Slf4j
 @ActiveProfiles({"test", "nosecurity"})//no aop profile!
 @DisplayName("Part D3a1: No Aspect (Service)")
-public class MyD3a1_NoAspectSvcNTest extends D3a_AspectSvcNTest
+public class MyD3a1_NoAspectSvcNTest //extends D3a_AspectSvcNTest
 {
 
 }

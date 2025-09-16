@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
         ProvidedApiAutoRenterTestConfiguration.class})
 @DisplayName("Part D2: Dynamic Proxies")
 @Disabled
-public class MyD2_DynamnicProxyNTest extends D2_DynamnicProxyNTest
+public class MyD2_DynamnicProxyNTest //extends D2_DynamnicProxyNTest
 {
 
 }
