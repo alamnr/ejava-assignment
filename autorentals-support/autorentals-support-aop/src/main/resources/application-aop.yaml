@@ -1,0 +1,15 @@
+aop:
+  validation:
+    - methodName: createAuto
+      isNull: [id, username]
+      notNull: [make, model, passengers, dailyRate, fuelType ]
+    - methodName: updateAuto
+      isNull: [username]
+
+    - methodName: createRenter
+      isNull: [id, username]
+      notNull: [make, firstName, lastName, dob, email]
+    - methodName: updateRenter
+      isNull: [username]
+
+

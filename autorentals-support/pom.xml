@@ -40,6 +40,7 @@
         <module>autorentals-support-testing</module>
          <module>autorentals-support-api</module>
         <module>autorentals-support-security</module>
+        <module>autorentals-support-aop</module>
     </modules>
     <repositories>
         <!-- <repository>
