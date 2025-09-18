@@ -14,7 +14,15 @@ public class NullPropertyAssertionImpl extends NullPropertyAssertion {
      */
     @Override
     protected Optional<Method> getGetterMethod(Object object, String getterName) {
-        return null; //TODO
+        if (object == null || getterName == null || getterName.isBlank()) {
+            return Optional.empty();
+        }
+        try {
+            Method method = object.getClass().getMethod(getterName);
+            return Optional.of(method);
+        } catch (NoSuchMethodException | SecurityException e) {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -23,6 +31,16 @@ public class NullPropertyAssertionImpl extends NullPropertyAssertion {
      */
     @Override
     protected Object getValue(Object object, Method getterMethod) {
-        return null; //TODO
+        
+        if (object == null || getterMethod == null) {
+            return null;
+        }
+        try {
+            return getterMethod.invoke(object);
+        } catch (Exception e) {
+            throw new RuntimeException(
+                "Unable to invoke method " + getterMethod.getName() +
+                " on class " + object.getClass().getName(), e);
+        }
     }
 }

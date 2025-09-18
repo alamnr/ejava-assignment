@@ -72,6 +72,8 @@
             <version>${ejava.version}</version>
         </dependency> 
 
+        
+
         <!-- bring in spring boot test framework -->
 
         <dependency>
@@ -115,13 +117,13 @@
             <scope>test</scope>
         </dependency> 
         <!-- bring in base tests for my AOP tests -->
-        <!-- <dependency>
+        <dependency>
             <groupId>info.ejava.assignments.aop.autorentals</groupId>
             <artifactId>autorentals-support-aop</artifactId>
             <classifier>tests</classifier>
             <version>${ejava.version}</version>
             <scope>test</scope>
-        </dependency> -->
+        </dependency>
 
         <!-- username and password taken from relational db -->
         <dependency>
