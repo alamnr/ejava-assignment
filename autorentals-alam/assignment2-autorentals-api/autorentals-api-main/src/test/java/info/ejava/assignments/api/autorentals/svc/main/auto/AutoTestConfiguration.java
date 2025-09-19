@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,7 @@ import info.ejava.assignments.api.autorenters.client.renters.RentersJSONHttpIfac
 import info.ejava.assignments.api.autorenters.dto.StreetAddressDTO;
 import info.ejava.assignments.api.autorenters.dto.autos.AutoDTO;
 import info.ejava.assignments.api.autorenters.dto.autos.AutoDTOFactory;
+import info.ejava.assignments.api.autorenters.dto.renters.RenterDTOFactory;
 import info.ejava.examples.common.web.ServerConfig;
 import info.ejava.examples.common.webflux.WebClientLoggingFilter;
 
@@ -68,6 +70,12 @@ public class AutoTestConfiguration {
     public AutoDTOFactory autoDTOFactory() {
         return new AutoDTOFactory();
     }   
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RenterDTOFactory renterDTOFactory() {
+        return new RenterDTOFactory();
+    }
 
     @Bean 
     public RestTemplate restTemplate(RestTemplateBuilder builder) {

@@ -38,7 +38,7 @@ public class D1_ReflectionMethodTest {
                 .isNotNull();
         nullPropertyAssertion = (NullPropertyAssertion) implClass.getConstructor().newInstance();
     }
-
+    
     static Stream<Arguments> isNull() {
         return Stream.of(
                 Arguments.of(new Object(), "id"),

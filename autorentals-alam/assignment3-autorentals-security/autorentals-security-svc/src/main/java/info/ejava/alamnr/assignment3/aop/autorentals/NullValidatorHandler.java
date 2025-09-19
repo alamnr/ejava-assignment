@@ -4,11 +4,13 @@ import info.ejava.assignments.aop.autorenters.util.NullPropertyAssertion;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ClassUtils;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class NullValidatorHandler /*implements ...*/ {
+public class NullValidatorHandler implements InvocationHandler {
     private final NullPropertyAssertion nullPropertyAssertion;
     private final Object target;
     private final String methodName;
@@ -24,9 +26,31 @@ public class NullValidatorHandler /*implements ...*/ {
      * @throws info.ejava.examples.common.exceptions.ClientErrorException.InvalidInputException
      * if args not valid
      */
-    //@Override
+
+     /**
+     * Intercepts proxy calls and validates before invoking target method.
+     */
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        return null; //TODO
+        // Only intercept the configured method
+        if (method.getName().equals(methodName)) {
+            if (args != null && args.length > 0) {
+                Object arg = args[0]; // assume first argument is DTO to validate
+
+                // Validate required null properties
+                for (String prop : isNullProperties) {
+                    nullPropertyAssertion.assertNull(arg, prop);
+                }
+
+                // Validate required non-null properties
+                for (String prop : nonNullProperties) {
+                    nullPropertyAssertion.assertNotNull(arg, prop);
+                }
+            }
+        }
+
+        // Delegate to actual target method
+        return method.invoke(target, args);
     }
 
     /**
@@ -41,14 +65,31 @@ public class NullValidatorHandler /*implements ...*/ {
      * @param <T> target object type
      * @return dynamic proxy implementing same interfaces as target
      */
+    // public static <T> T newInstance(
+    //         NullPropertyAssertion nullPropertyAssertion,
+    //         T target,
+    //         String methodName,
+    //         List<String> nullProperties,
+    //         List<String> nonNullProperties) { //TODO
+    //     ClassUtils.getAllInterfaces(target.getClass());
+    //     new NullValidatorHandler(nullPropertyAssertion, target, methodName, nullProperties, nonNullProperties);
+    //     return (T) null;
+    // }
+    /**
+     * Factory method to create a new dynamic proxy instance.
+     */
+    @SuppressWarnings("unchecked")
     public static <T> T newInstance(
             NullPropertyAssertion nullPropertyAssertion,
             T target,
             String methodName,
             List<String> nullProperties,
-            List<String> nonNullProperties) { //TODO
-        ClassUtils.getAllInterfaces(target.getClass());
-        new NullValidatorHandler(nullPropertyAssertion, target, methodName, nullProperties, nonNullProperties);
-        return (T) null;
+            List<String> nonNullProperties) {
+
+        return (T) Proxy.newProxyInstance(
+                target.getClass().getClassLoader(),
+                ClassUtils.getAllInterfaces(target.getClass()).toArray(new Class[0]),
+                new NullValidatorHandler(nullPropertyAssertion, target, methodName, nullProperties, nonNullProperties)
+        );
     }
 }

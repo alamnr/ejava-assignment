@@ -16,7 +16,7 @@ import java.util.List;
 
 @Configuration(proxyBeanMethods = false)
 //TODO - Enable ...
-//@EnableAspectJAutoProxy
+@EnableAspectJAutoProxy
 public class AOPConfiguration {
     @Bean
     public NullPropertyAssertion nullPropertyAssertion() {
