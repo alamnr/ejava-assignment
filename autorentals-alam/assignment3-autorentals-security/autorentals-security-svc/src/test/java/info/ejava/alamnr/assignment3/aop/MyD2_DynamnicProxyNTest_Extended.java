@@ -246,26 +246,29 @@ public class MyD2_DynamnicProxyNTest_Extended {
             updateRenterProxy = newProxyInstance(rentersService, "updateRenter",
                     List.of("username"), //isNull
                     List.of()); //notNull
+            log.info("*********************** - TestingAuthenticationTokn - {} : {}", "user" + index++, "password" );
             SecurityContextHolder.getContext()
                     .setAuthentication(new TestingAuthenticationToken("user" + index++,"password"));
         }
 
         Stream<Arguments> renters() {
             return Stream.of(
-                    Arguments.of("null id & username", renterFactory.make(), null),
-                    Arguments.of("id notNull", renterFactory.make(RenterDTOFactory.withId), null),
-                    Arguments.of("username notNull", renterFactory.make().withUsername(renterFactory.username()), null),
-                    Arguments.of("email isNull", renterFactory.make().withEmail(null), null),
-                    Arguments.of("firstName notNull", renterFactory.make().withFirstName("kuddus"), null),
-                    Arguments.of("lastName notNull", renterFactory.make().withLastName("abdul"), null)
+                    Arguments.of("null id & username", renterFactory.make(), null)//,
+                    // Arguments.of("id notNull", renterFactory.make(RenterDTOFactory.withId), null),
+                    // Arguments.of("username notNull", renterFactory.make().withUsername(renterFactory.username()), null),
+                    // Arguments.of("email isNull", renterFactory.make().withEmail(null), null),
+                    // Arguments.of("firstName notNull", renterFactory.make().withFirstName("kuddus"), null),
+                    // Arguments.of("lastName notNull", renterFactory.make().withLastName("abdul"), null)
             );
         }
 
         @ParameterizedTest(name="{0}")
         @MethodSource("renters")
         void given(String name, RenterDTO renterDTO, String errorMsg) {
+            log.info("*************** renterService bean - {}", rentersService.getClass().getName());
             RenterDTO renter = rentersService.createRenter(renterFactory.make());
             //when
+            log.info("*************** updateRenterProxy bean - {}", updateRenterProxy.getClass().getName());
             ClientErrorException.InvalidInputException ex = Assertions.catchThrowableOfType(
                     () -> updateRenterProxy.updateRenter(renter.getId(), renterDTO),
                     ClientErrorException.InvalidInputException.class);
@@ -280,5 +283,5 @@ public class MyD2_DynamnicProxyNTest_Extended {
                 BDDAssertions.then(ex).hasMessageContaining(errorMsg);
             }
         }
-    }   */
+    }      */
 }

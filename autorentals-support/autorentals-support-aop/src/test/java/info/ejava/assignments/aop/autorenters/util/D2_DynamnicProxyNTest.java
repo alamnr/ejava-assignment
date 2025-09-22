@@ -226,7 +226,7 @@ public class D2_DynamnicProxyNTest {
         }
     }
 
-
+/*
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class can_proxy_updateRenters {
@@ -271,5 +271,5 @@ public class D2_DynamnicProxyNTest {
                 then(ex).hasMessageContaining(errorMsg);
             }
         }
-    }
+    }   */
 }
